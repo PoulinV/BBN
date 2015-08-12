@@ -1,0 +1,16 @@
+ z initial = 2.7812e+07z final = 1.3906e+07
+I could recognize nuclei, it's 4He.
+ z initial = 2.7812e+07z final = 1.3906e+07
+log10dz=0.030103
+2.7812e+07  3.23119e+10
+I start generating cascade spectrum and convolute them with cross sections.
+2.59495e+07  4.89752e+10
+2.42118e+07  7.42314e+10
+2.25904e+07  1.12512e+11
+2.10776e+07  1.70533e+11
+1.96661e+07  2.58472e+11
+1.83491e+07  3.91759e+11
+1.71203e+07  5.93772e+11
+1.59738e+07  8.99947e+11
+1.49041e+07  1.36398e+12
+1.3906e+07  2.06726e+12

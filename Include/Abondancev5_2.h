@@ -965,7 +965,7 @@ double  Spectre_electron_compton(double  x, double  z, int i, double  g, double 
 		return f;
 }
 double Spectre_Gamma_compton(double  x, double  z, int k, double  g, double  E_0, double  Z_x, double z_0){
-	
+
 	double pi = 3.14159;
 	double T_0 = 2.7255*0.862*pow(10.,-10);
 	double m_e=0.511;
@@ -1692,7 +1692,7 @@ double  func_z_v2_sans_reinj(double z, double x,int i, double  g, double  E_0, d
 	s=qsimp_E(func_z_v2_sans_reinj,z,z_0,z_0,14,E_0,Z_x, z_0);
 	//~ cout << "z_0 " << z_0 << " z = " << z << endl;
 	Y_He = exp(-B*s);
-	// cout << " Y = " << Y_He << " B = " << B << " s = " << s << endl;
+	cout << " Y = " << Y_He << " B = " << B << " s = " << s << endl;
 	return Y_He;
 }
 double  S_Gain_sans_reinj(double z, double x,int i, double  g, double  E_0, double  Z_x, double z_0)
@@ -2418,10 +2418,12 @@ double K_perte_non_standard_4He(double z, double x,int i, double g, double E_0,d
 	double H_r = 2.187*pow(10,-18)*pow((1+7/8*pow(4/11,4/3)*3.046)*5.46*pow(10,-5),0.5);
 	double t_inj =  pow((1+z_0),-2)/(2*H_r);
 	double tau = 5*t_inj;
+	// cout << " tau = " << tau << endl;
 	double y,dy;
 	double f=0, s_4He =0, s_4He_diffuse =0, s_4He_compton=0;
 	// cout << "E_0 " << E_0 << endl;
 		if(E_c<=E_0){
+
 			// if(E_c>Emin[15]){
 			// 				if(z<=pow(10,5.26))s_4He=pow(z,-2.5297)*pow(10,36.9046);
 			// 				else if(z>pow(10,5.26) && z<=pow(10,5.62))s_4He=pow(z,-2.84119)*pow(10,38.5537);
@@ -2453,6 +2455,8 @@ double K_perte_non_standard_4He(double z, double x,int i, double g, double E_0,d
 			// cout <<"spectre standard E_c = " << E_c << " z = " << z << endl;
 		}
 		else{
+			// cout << "E_c " <<E_c<<" E_0 " << E_0 << "z " << z << " non universal " << endl;
+
 					for(int k=15;k<19;k++){
 						if(E_0>Emin[k]){
 							s_4He+=func_sigma(E_0,z,k,g,E_0,Z_x,z_0)/(gamma_NPC(E_0,z,k,g,E_0,Z_x,z_0)+gamma_compton(E_0,z,k,g,E_0,Z_x,z_0)+gamma_phph(E_0,z,k,g,E_0,Z_x,z_0));
@@ -2505,7 +2509,7 @@ double K_perte_non_standard_4He(double z, double x,int i, double g, double E_0,d
 							// 	else if(z>pow(10,6.22) && z<pow(10,6.35)) s_4He_diffuse += pow(z,-13.0298)*pow(10,98.687);
 							// 	else s_4He_diffuse+=0;
 							// }
-							cout << "s_4He  = " <<s_4He << "s_4He_diffuse = "<<s_4He_diffuse<<" deux iterations"<<endl;
+							// cout << "s_4He  = " <<s_4He << "s_4He_diffuse = "<<s_4He_diffuse<<" deux iterations"<<endl;
 						}
 						if(avec_correction>=3){
 							// for(int k=15;k<19;k++)s_4He_diffuse+=qsimp(func_trois_interactions,Emin[k],E_0,z,k,E_0,Z_x, z_0);
@@ -2537,9 +2541,10 @@ double K_perte_non_standard_4He(double z, double x,int i, double g, double E_0,d
 
 
 		}
+				cout << exp(-1/(2*H_r*tau*(z+1)*(z+1))) << " " << s_4He<< endl;
 
 				f = exp(-1/(2*H_r*tau*(z+1)*(z+1)))*(s_4He+s_4He_diffuse+s_4He_compton);
-
+				if(f!=0)cout << "f = " <<f << endl;
 				return f;
 }
 double  func_quatre_interactions_Destruc_Helium4(double  x, double  z, int i, double  g, double  E_0, double  Z_x, double z_0)
