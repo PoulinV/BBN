@@ -26,4 +26,4 @@
 
 
 double Universal_Spectrum(double  E, double  z, double E_0);
-void Fill_Structure_Particle_Physics_Model(double M_x, double Zeta_x, double tau_x, struct Structure_Particle_Physics_Model * pt_Particle_Model);
+double Dirac_Spectrum_After_One_Iteration(double  x, double  z, double E_0);

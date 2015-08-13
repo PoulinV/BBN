@@ -33,9 +33,9 @@ int main(void){
   /***********************************************************************************************/
 
   /******* Some string useful in the program whatever calcutation is done*******/
-  string nuclei ("4He");                //This needs to be a nuclei in the list : "2H", "4He", "3He", "7Be", "7Li" or "All".
+  string nuclei ("4He");                //This needs to be a nuclei in the list : "2H", "4He", "3He", "7Be", "7Li".
   string print_result ("yes");
-  string spectrum_choice ("Dirac"); //This can be either "Dirac", "universal" or user specified "from_file", "from_function".
+  string spectrum_choice ("Dirac");     //This can be either "Dirac", "universal" or user specified "from_file", "from_function".
   string spectrum_mode ("writing");     //This can be either "writing", "reading" or "nothing".
   string inverse_compton_scattering ("yes");
   string results_files ("automatic");
@@ -56,7 +56,15 @@ int main(void){
   double Zeta_x = pow(10,-3);
   double z = T/T_0-1;
   Fill_Structure_Particle_Physics_Model(M_x, Zeta_x, tau_x, &Particle_Physics_Model); // MANDATORY STEP
-  Fill_Structure_Spectrum_and_Precision_Parameters(iterations, z_step, n_step, spectrum_choice, spectrum_mode, inverse_compton_scattering, &Spectrum_and_Precision_Parameters);
+  Fill_Structure_Spectrum_and_Precision_Parameters(iterations,
+                                                  z_step,
+                                                  n_step,
+                                                  spectrum_choice,
+                                                  spectrum_mode,
+                                                  inverse_compton_scattering,
+                                                  Dirac_Spectrum_After_One_Iteration,
+                                                  No_Electrons_Injected,
+                                                  &Spectrum_and_Precision_Parameters);
 
   // double z = 5*Particle_Physics_Model.z_x;
   cout<< "z = "<<z <<endl;
@@ -116,7 +124,8 @@ int main(void){
   mkdir("Output",01777);
 
   Fill_Structure_Particle_Physics_Model(M_x, zeta_min, tau_min, &Particle_Physics_Model); // MANDATORY STEP
-  Fill_Structure_Spectrum_and_Precision_Parameters(iterations, z_step, n_step, spectrum_choice, spectrum_mode, inverse_compton_scattering, &Spectrum_and_Precision_Parameters);
+  Fill_Structure_Spectrum_and_Precision_Parameters(iterations, z_step, n_step, spectrum_choice, spectrum_mode, inverse_compton_scattering,Dirac_Spectrum_After_One_Iteration,
+  Dirac_Spectrum_After_One_Iteration,  &Spectrum_and_Precision_Parameters);
   Fill_Structure_Scan_Parameters(nuclei, tau_min, tau_max, tau_step, zeta_min, zeta_max, zeta_step, &Scan_Parameters);
   Fill_Output_Options(print_result, results_files, spectrum_files, &Output_Options);
   if(task==2)Compute_Constraints_from_destruction_only(&Particle_Physics_Model,

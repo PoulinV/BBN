@@ -9,6 +9,7 @@
 
 #include "common.h"
 
+typedef double (*Spectrum)(double E, double  z, double E_0);
 
 struct Structure_Gamma_Spectrum{
 
@@ -52,6 +53,8 @@ struct Structure_Spectrum_and_Precision_Parameters{
   string spectrum_choice;
   string spectrum_mode;
   string inverse_compton_scattering;
+  Spectrum Injected_Gamma_Spectrum;
+  Spectrum Injected_Electron_Spectrum;
 
 };
 

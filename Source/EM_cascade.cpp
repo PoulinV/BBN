@@ -197,7 +197,6 @@ void Spectre_gamma_compton(struct Structure_Particle_Physics_Model * pt_Particle
 			resultat += h * (f1/3. + 4.*f2/3. + f3/3.);
 
 		}
-		// resultat = 2*Function_Integrand_Spectre_Compton(E_gamma,pt_Particle_Physics_Model->E_0, E_gamma_bb)/(pt_Particle_Physics_Model->E_0*pt_Particle_Physics_Model->E_0);
 		pt_Gamma_Spectrum->Gamma_Energy[j]=E_min+j*dE;
 		pt_Gamma_Spectrum->Gamma_Spectrum[j]=resultat*2*pi*r_e*r_e*m_e*m_e*int_bb/E_gamma_bb;
 		cout << "E = "  << E_min+j*dE<< "resultat = " << 	pt_Gamma_Spectrum->Gamma_Spectrum[j] << endl;
@@ -231,21 +230,6 @@ double  gamma_phph(double  x, double  z){
 
 }
 
-double Dirac_Spectrum_After_One_Iteration(double  x, double  z, double E_0){
-
-
-	double Gamma_tot = gamma_NPC(E_0,z)+gamma_compton(E_0,z)+gamma_phph(E_0,z);
-
-	double T = T_0*(1+z);
-	double int_BB = 8./63.*pow(pi,4)*pow(T_0*(1+z),6);
-
-	double spectre_gamma_gamma = 1112./(10125*pi)*pow(a*r_e,2)*pow(m_e,-6)*pow(E_0,2)*pow(1-x/E_0+pow(x/E_0,2),2)*int_BB;
-	double spectre_compton = pi*r_e*r_e*m_e*pow(E_0,-2)*(x/E_0+E_0/x+pow(m_e/x-m_e/E_0,2)-2*m_e*(1/x-1/E_0))*n_e*pow(1+z,3);
-	double f = (spectre_gamma_gamma+spectre_compton)/(Gamma_tot);
-	if(x>E_0)f=0;
-	return f;
-
-}
 void Cascade_Spectrum_Reading_From_File(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
 																				struct Structure_Gamma_Spectrum * pt_Cascade_Spectrum,
 																				double z,
@@ -289,14 +273,12 @@ void  Cascade_Spectrum_Calculation(double z,
 	double f1, f2, f3;
 	double resultat;
 	double E_c = E_c_0/(1+z);
-	struct Structure_Gamma_Spectrum Cascade_Spectrum_Old;
 	pt_Cascade_Spectrum->redshift = z;
 	dE = (pt_Particle_Physics_Model->E_0 - E_min)/ (double) (Gamma_Table_Size-1);
 	/*****Initialization****/
 	pt_Cascade_Spectrum->Gamma_Energy.resize(Gamma_Table_Size);
 	pt_Cascade_Spectrum->Gamma_Spectrum.resize(Gamma_Table_Size);
-	Cascade_Spectrum_Old.Gamma_Energy.resize(Gamma_Table_Size);
-	Cascade_Spectrum_Old.Gamma_Spectrum.resize(Gamma_Table_Size);
+
 	if(pt_Spectrum_and_Precision_Parameters->spectrum_choice == "universal"){
 		for(int i=0;i<Gamma_Table_Size;i++){
 			E1=E_min+i*dE;
@@ -324,7 +306,8 @@ void  Cascade_Spectrum_Calculation(double z,
 			for(int i=0;i<Gamma_Table_Size;i++){
 				E1=E_min+i*dE;
 				pt_Cascade_Spectrum->Gamma_Energy[i]=E1;
-				pt_Cascade_Spectrum->Gamma_Spectrum[i]=Dirac_Spectrum_After_One_Iteration(E1,z,pt_Particle_Physics_Model->E_0);
+				// pt_Cascade_Spectrum->Gamma_Spectrum[i]=Dirac_Spectrum_After_One_Iteration(E1,z,pt_Particle_Physics_Model->E_0);
+				pt_Cascade_Spectrum->Gamma_Spectrum[i]=pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum(E1,z,pt_Particle_Physics_Model->E_0);
 
 			}
 			if(pt_Spectrum_and_Precision_Parameters->spectrum_mode == "writing"){

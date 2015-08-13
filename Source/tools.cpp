@@ -113,7 +113,15 @@ void Fill_Structure_Scan_Parameters(string nuclei, double tau_min, double tau_ma
 
 }
 
-void Fill_Structure_Spectrum_and_Precision_Parameters(int iterations, int z_step, int n_step, string spectrum_choice, string spectrum_mode, string inverse_compton_scattering, struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters){
+void Fill_Structure_Spectrum_and_Precision_Parameters(int iterations,
+                                                      int z_step,
+                                                      int n_step,
+                                                      string spectrum_choice,
+                                                      string spectrum_mode,
+                                                      string inverse_compton_scattering,
+                                                      double (*Gamma_Spectrum)(double, double, double),
+                                                      double (*Electron_Spectrum)(double, double, double),
+                                                      struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters){
 
 	pt_Spectrum_and_Precision_Parameters->iterations = iterations;
 	pt_Spectrum_and_Precision_Parameters->z_step = z_step;
@@ -121,7 +129,8 @@ void Fill_Structure_Spectrum_and_Precision_Parameters(int iterations, int z_step
   pt_Spectrum_and_Precision_Parameters->spectrum_choice = spectrum_choice;
   pt_Spectrum_and_Precision_Parameters->spectrum_mode = spectrum_mode;
   pt_Spectrum_and_Precision_Parameters->inverse_compton_scattering = inverse_compton_scattering;
-
+  pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum = (*Gamma_Spectrum);
+  pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum = (*Electron_Spectrum);
 }
 
 void Fill_Output_Options(string print_result, string results_files, string spectrum_files, struct Structure_Output_Options * pt_Structure_Output_Options){
