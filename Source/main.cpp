@@ -27,7 +27,7 @@ int main(void){
 
   /******* Precision parameters : control the number of step in integration scheme, ***************
   ********** as well as the number of iterations for computing the cascade spectrum **************/
-  int iterations = 6;      //Number of iterations for computing the cascade spectrum
+  int iterations = 7;      //Number of iterations for computing the cascade spectrum
   int z_step = 80;         //Number of redshift steps between injection time and the minimal redshift of integration
   int n_step = 200;        //Number of steps in the simpson algorithm for integrations, to be chosen small, it is adapted inside the code when needed.
   /***********************************************************************************************/
@@ -35,7 +35,8 @@ int main(void){
   /******* Some string useful in the program whatever calcutation is done*******/
   string nuclei ("4He");                //This needs to be a nuclei in the list : "2H", "4He", "3He", "7Be", "7Li".
   string print_result ("yes");
-  string spectrum_choice ("Dirac");     //This can be either "Dirac", "universal" or user specified "from_file", "from_function".
+  string photon_spectrum_choice ("Dirac");     //This can be either "Dirac", "universal" or user specified "from_file", "from_function".
+  string electron_spectrum_choice ("none");     //This can be either "Dirac", "universal" or user specified "from_file", "from_function".
   string spectrum_mode ("writing");     //This can be either "writing", "reading" or "nothing".
   string inverse_compton_scattering ("yes");
   string results_files ("automatic");
@@ -59,7 +60,8 @@ int main(void){
   Fill_Structure_Spectrum_and_Precision_Parameters(iterations,
                                                   z_step,
                                                   n_step,
-                                                  spectrum_choice,
+                                                  photon_spectrum_choice,
+                                                  electron_spectrum_choice,
                                                   spectrum_mode,
                                                   inverse_compton_scattering,
                                                   Dirac_Spectrum_After_One_Iteration,
@@ -124,7 +126,8 @@ int main(void){
   mkdir("Output",01777);
 
   Fill_Structure_Particle_Physics_Model(M_x, zeta_min, tau_min, &Particle_Physics_Model); // MANDATORY STEP
-  Fill_Structure_Spectrum_and_Precision_Parameters(iterations, z_step, n_step, spectrum_choice, spectrum_mode, inverse_compton_scattering,Dirac_Spectrum_After_One_Iteration,
+  Fill_Structure_Spectrum_and_Precision_Parameters(iterations, z_step, n_step, photon_spectrum_choice,
+  electron_spectrum_choice, spectrum_mode, inverse_compton_scattering,Dirac_Spectrum_After_One_Iteration,
   Dirac_Spectrum_After_One_Iteration,  &Spectrum_and_Precision_Parameters);
   Fill_Structure_Scan_Parameters(nuclei, tau_min, tau_max, tau_step, zeta_min, zeta_max, zeta_step, &Scan_Parameters);
   Fill_Output_Options(print_result, results_files, spectrum_files, &Output_Options);

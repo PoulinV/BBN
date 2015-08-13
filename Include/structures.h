@@ -50,7 +50,8 @@ struct Structure_Spectrum_and_Precision_Parameters{
   int iterations;
   int z_step;
   int n_step;
-  string spectrum_choice;
+  string photon_spectrum_choice;
+  string electron_spectrum_choice;
   string spectrum_mode;
   string inverse_compton_scattering;
   Spectrum Injected_Gamma_Spectrum;

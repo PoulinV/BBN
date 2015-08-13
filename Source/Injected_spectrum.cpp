@@ -43,6 +43,12 @@ double Dirac_Spectrum_After_One_Iteration(double  x, double  z, double E_0){
 	return f;
 
 }
+double No_Electrons_Injected(double x, double z, double E_0){
+	return 0;
+}
+double No_Photons_Injected(double x, double z, double E_0){
+	return 0;
+}
 // void Initialize_Spectrum(double (*func)(double,double,struct),struct Structure_Particle_Model * pt_Particle_Model,struct Structure_Gamma_Spectrum * pt_Injected_Spectrum){
 //
 // 	pt_Cascade_Spectrum->Gamma_Energy.resize(Gamma_Table_Size);

@@ -244,8 +244,8 @@ void Compute_Constraints_from_destruction_only(struct Structure_Particle_Physics
 
     ostringstream os;
     string name;
-    if(pt_Spectrum_and_Precision_Parameters->spectrum_choice=="universal")os << "Output/Results_destruc_only_"<< pt_Scan_Parameters->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV_Universal_Spectrum.dat";
-    else if(pt_Spectrum_and_Precision_Parameters->spectrum_choice=="Dirac")os << "Output/Results_destruc_only_"<< pt_Scan_Parameters->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV_Dirac_Spectrum_"<<pt_Spectrum_and_Precision_Parameters->iterations<<"iterations.dat";
+    if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice=="universal")os << "Output/Results_destruc_only_"<< pt_Scan_Parameters->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV_Universal_Spectrum.dat";
+    else if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice=="Dirac")os << "Output/Results_destruc_only_"<< pt_Scan_Parameters->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV_Dirac_Spectrum_"<<pt_Spectrum_and_Precision_Parameters->iterations<<"iterations.dat";
     name = os.str();
     ofstream file(name);
     if(file){
@@ -267,7 +267,7 @@ void Compute_Constraints_from_destruction_only(struct Structure_Particle_Physics
    E_c = E_c_0/(1+z);
    if(verbose>1)cout<<"redshift = " << z << " still " << z_step-j << " to go " << endl;
 
-   if(pt_Spectrum_and_Precision_Parameters->spectrum_choice == "Dirac"){
+   if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "Dirac"){
        if(pt_Spectrum_and_Precision_Parameters->spectrum_mode=="writing" || pt_Spectrum_and_Precision_Parameters->spectrum_mode == "nothing"){
          Cascade_Spectrum_Calculation(z,
                                     pt_Particle_Physics_Model,
@@ -306,7 +306,7 @@ void Compute_Constraints_from_destruction_only(struct Structure_Particle_Physics
                                            resultat,
                                            z,
                                            n_step,
-                                           pt_Spectrum_and_Precision_Parameters->spectrum_choice);
+                                           pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice);
 
    Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.push_back(log10(resultat));
    Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei.push_back(log10(z));
@@ -776,7 +776,7 @@ void Compute_constraints_from_destruction_and_production(struct Structure_Partic
       if(verbose>1)cout<<"redshift = " << z << " still " << z_step-j << " to go " << endl;
 
 
-      if(pt_Spectrum_and_Precision_Parameters->spectrum_choice == "Dirac"){
+      if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "Dirac"){
           if(pt_Spectrum_and_Precision_Parameters->spectrum_mode=="writing" || pt_Spectrum_and_Precision_Parameters->spectrum_mode == "nothing")
           Cascade_Spectrum_Calculation(z,
                                       pt_Particle_Physics_Model,
@@ -803,7 +803,7 @@ void Compute_constraints_from_destruction_and_production(struct Structure_Partic
         //   Cascade_Spectrum_Calculation(spectrum_choice, z, &Particle_Physics_Model, &Cascade_Spectrum, n_step, iterations, spectrum_mode);
         // }
 
-       Spectrum_and_cross_sections_convolution(&Cascade_Spectrum, pt_Particle_Physics_Model, i_min, i_max, resultat, z, n_step, pt_Spectrum_and_Precision_Parameters->spectrum_choice);
+       Spectrum_and_cross_sections_convolution(&Cascade_Spectrum, pt_Particle_Physics_Model, i_min, i_max, resultat, z, n_step, pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice);
 
 
       Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.push_back(log10(resultat));
@@ -812,14 +812,14 @@ void Compute_constraints_from_destruction_and_production(struct Structure_Partic
       // for(int l = 0;l<Gamma_Table_Size;l++)cout << Cascade_Spectrum.Gamma_Energy[l] << "   " << Cascade_Spectrum.Gamma_Spectrum[l] <<  endl;
 
 
-      Spectrum_and_cross_sections_convolution(&Cascade_Spectrum, pt_Particle_Physics_Model, j_min, j_max, resultat, z, n_step, pt_Spectrum_and_Precision_Parameters->spectrum_choice);
+      Spectrum_and_cross_sections_convolution(&Cascade_Spectrum, pt_Particle_Physics_Model, j_min, j_max, resultat, z, n_step, pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice);
 
       Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_4He.push_back(log10(resultat));
       Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_4He.push_back(log10(z));
       // cout << z << "  " << resultat  << endl;
       // for(int l = 0;l<Gamma_Table_Size;l++)cout << Cascade_Spectrum.Gamma_Energy[l] << "   " << Cascade_Spectrum.Gamma_Spectrum[l] <<  endl;
 
-      Spectrum_and_cross_sections_convolution(&Cascade_Spectrum, pt_Particle_Physics_Model, k_min, k_max, resultat, z, n_step, pt_Spectrum_and_Precision_Parameters->spectrum_choice);
+      Spectrum_and_cross_sections_convolution(&Cascade_Spectrum, pt_Particle_Physics_Model, k_min, k_max, resultat, z, n_step, pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice);
 
       Cascade_Spectrum_Integrated_Over_Cross_Section_Production_Nuclei.push_back(log10(resultat));
       Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Production_Nuclei.push_back(log10(z));
