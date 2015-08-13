@@ -14,6 +14,7 @@ plot "Cascade_Spectrum_Folder/Spectrum_m140_z425643_0iterations.dat" u 1:2 w l n
 "/Users/poulin/Documents/Doc_Labo/ProgrammeBBN/ExtraProgram/OutputExtra/SpectreTotaliterations_high_precision.dat" u 1:5 notitle, \
 "/Users/poulin/Documents/Doc_Labo/ProgrammeBBN/ExtraProgram/OutputExtra/SpectreTotaliterations_high_precision.dat" u 1:6 notitle, \
 "/Users/poulin/Documents/Doc_Labo/ProgrammeBBN/ExtraProgram/OutputExtra/SpectreTotaliterations_high_precision.dat" u 1:7 notitle, \
-"/Users/poulin/Documents/Doc_Labo/ProgrammeBBN/ExtraProgram/OutputExtra/SpectreTotaliterations_high_precision.dat" u 1:8 notitle, \
+"/Users/poulin/Documents/Doc_Labo/ProgrammeBBN/ExtraProgram/OutputExtra/SpectreTotaliterations_high_precision.dat" u 1:8 notitle,\
+"/Users/poulin/Documents/Doc_Labo/ProgrammeBBN/ExtraProgram/OutputExtra/SpectreTotaliterations_high_precision.dat" u 1:11 , \
 "Cascade_Spectrum_Folder/Spectrum_m140_z425643_100iterations.dat" u 1:2 w l , \
-"Cascade_Spectrum_Folder/Spectrum_m140_z425643_101iterations.dat" u 1:2 w l 
+"Cascade_Spectrum_Folder/Spectrum_m140_z425643_101iterations.dat" u 1:2 w l

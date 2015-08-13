@@ -31,9 +31,12 @@ double Function_Integrand_Spectre_Compton_version_q(double q, double E_e, double
 	double Gamma_e = 4*E_gamma_bar*E_e/(m_e*m_e);
 	double E_gamma=Gamma_e*E_e*q/(1+Gamma_e*q);
 
-	if(q>=0 && q<=1) {f = 2*q*log(q)+(1+2*q)*(1-q)+pow(Gamma_e*q,2)/(2*(1-Gamma_e*q))*(1-q)*pow(E_e-E_gamma,2)*Gamma_e/E_e;
+	if(q>=0 && q<=1) {f = (2*q*log(q)+(1+2*q)*(1-q)+pow(Gamma_e*q,2)/(2*(1-Gamma_e*q))*(1-q))*pow(E_e-E_gamma,2)*Gamma_e/E_e;
 }
+
 	else f=0;
+	// cout <<"q = "<< q << " Gamma_e = "<<Gamma_e<<" E_gamma = "<<E_gamma<<" E_e ="<<E_e<<" f = " << f << endl;
+
 	return f;
 }
 void  Spectre_electron_compton(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
@@ -75,8 +78,6 @@ void  Spectre_electron_compton(struct Structure_Particle_Physics_Model * pt_Part
 
 			E2=E1 + h;
 			E3=E2 + h;
-			// E_gamma_2=E_gamma_1+h;
-			// E_gamma_3=E_gamma_2+h;
 			q2=q1+dq/2.;
 			q3=q2+dq/2.;
 			F1 = Function_Integrand_Spectre_Compton_version_q(q1,E_e, E_gamma_bb);
@@ -96,24 +97,17 @@ void  Spectre_electron_compton(struct Structure_Particle_Physics_Model * pt_Part
 
 			// cout << "E = " << E_min+j*dE<<" E1 = " << E1 << endl;
 			resultat += h * (f1/3. + 4.*f2/3. + f3/3.);
-			Gamma_electron += h*(F1/3+4.*F2/3+F3/3.);
+			Gamma_electron += dq/2*(F1/3+4.*F2/3+F3/3.);
 			if(i==n_step-2 && pt_Spectrum_and_Precision_Parameters->spectrum_choice=="Dirac"){
 			}
 		}
-		cout << " resultat = " << resultat << endl;
 		E_e = (E_min+j*dE);
-		// if(pt_Spectrum_and_Precision_Parameters->spectrum_choice=="Dirac")resultat_monochromatique_1=pi*pow(r_e,2)*m_e/pow(E_0,2)*n_e*pow(1+z,3)*((E_0+m_e-E_e)/E_0+E_0/(E_0+m_e-E_e)+pow(m_e/(E_0+m_e-E_e)-m_e/E_0,2)-2*m_e*(1/(E_0+m_e-E_e)-1/E_0))/(gamma_NPC(E_0,z)+gamma_compton(E_0,z)+gamma_phph(E_0,z));
-		// if(pt_Spectrum_and_Precision_Parameters->spectrum_choice=="Dirac")resultat_monochromatique_2=(dsigma_compton(E_0,z,(E_0+m_e-E_e)))/(gamma_NPC(E_0,z)+gamma_compton(E_0,z)+gamma_phph(E_0,z));
-		// cout << " resultat_monochromatique_1 = " << resultat_monochromatique_1 << " resultat_monochromatique_2 = " << resultat_monochromatique_2 << endl;
-		// cout << " resultat après = " << resultat << endl;
-
-		pt_Electron_Spectrum->Electron_Energy[j]=E_min+j*dE;
-		if(Gamma_electron>0)Gamma_electron*=2*pi*r_e*r_e*m_e*m_e*int_bb/(E_gamma_bb*pt_Electron_Spectrum->Electron_Energy[j]*pt_Electron_Spectrum->Electron_Energy[j]);
+		resultat += (dsigma_compton(E_0,z,(E_0+m_e-E_e)))/(gamma_NPC(E_0,z)+gamma_compton(E_0,z)+gamma_phph(E_0,z)) ;
+		pt_Electron_Spectrum->Electron_Energy[j]=E_e;
+		if(Gamma_electron>0)Gamma_electron*=2*pi*r_e*r_e*m_e*m_e*int_bb/(E_gamma_bb*E_e*E_e);
 		else Gamma_electron=0;
 		pt_Electron_Spectrum->Electron_Spectrum[j]=resultat;
-		// cout << "E_c = " << E_c <<"E = "  << pt_Electron_Spectrum->Electron_Energy[j]<< "resultat = " << pt_Electron_Spectrum->Electron_Spectrum[j] << " Gamma_electron " << Gamma_electron << endl;
 		pt_Electron_Spectrum->Electron_Spectrum[j]/=(Gamma_electron);
-		// cout<< "resultat après = " << pt_Electron_Spectrum->Electron_Spectrum[j]<<endl;
 	}
 	/*for(int j =0; j<Electron_Table_Size;j++){
 		resultat=0;
@@ -174,7 +168,7 @@ void Spectre_gamma_compton(struct Structure_Particle_Physics_Model * pt_Particle
 	dE = (pt_Particle_Physics_Model->E_0 - E_min)/ (double) (Gamma_Table_Size-1);
 	for(int j =0; j<Gamma_Table_Size;j++){
 		resultat=0;
-		dE_2 = (pt_Particle_Physics_Model->E_0 - (E_min+j*dE))/ (double) (n_step-1);
+		dE_2 = (pt_Particle_Physics_Model->E_0 - (E_min+j*dE+m_e))/ (double) (n_step-1);
 		h = dE_2/2;
 		for(int i=0;i<n_step-1;i++){
 			if(i==0){
@@ -203,11 +197,11 @@ void Spectre_gamma_compton(struct Structure_Particle_Physics_Model * pt_Particle
 			resultat += h * (f1/3. + 4.*f2/3. + f3/3.);
 
 		}
-
+		// resultat = 2*Function_Integrand_Spectre_Compton(E_gamma,pt_Particle_Physics_Model->E_0, E_gamma_bb)/(pt_Particle_Physics_Model->E_0*pt_Particle_Physics_Model->E_0);
 		pt_Gamma_Spectrum->Gamma_Energy[j]=E_min+j*dE;
 		pt_Gamma_Spectrum->Gamma_Spectrum[j]=resultat*2*pi*r_e*r_e*m_e*m_e*int_bb/E_gamma_bb;
 		cout << "E = "  << E_min+j*dE<< "resultat = " << 	pt_Gamma_Spectrum->Gamma_Spectrum[j] << endl;
-
+		if(resultat ==0)break;
 	}
 }
 double  gamma_compton(double  x, double  z){
