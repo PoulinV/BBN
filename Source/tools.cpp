@@ -186,6 +186,13 @@ double z = pt_Cascade_Spectrum->redshift;
           f5*=E5*(rate_NPC(E5,z)+rate_compton(E5,z)+rate_gg_scattering(E5,z));
           f6*=E6*(rate_NPC(E6,z)+rate_compton(E6,z)+rate_gg_scattering(E6,z));
           f7*=E7*(rate_NPC(E7,z)+rate_compton(E7,z)+rate_gg_scattering(E7,z));
+          // f1*=E1;
+          // f2*=E2;
+          // f3*=E3;
+          // f4*=E4;
+          // f5*=E5;
+          // f6*=E6;
+          // f7*=E7;
 
           resultat += dE/840. * (41*f1+216*f2+27*f3+272*f4+27*f5+216*f6+41*f7);
 

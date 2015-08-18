@@ -50,7 +50,7 @@ int main(void){
   struct Structure_Particle_Physics_Model Particle_Physics_Model;
   struct Structure_Spectrum_and_Precision_Parameters Spectrum_and_Precision_Parameters;
 
-  double M_x = 140;
+  double M_x = 200;
   double T = 0.0001;
   // double tau_x = 3*pow(10,6);
   double tau_x = pow(T/T_0,-2)/(2*H_r);
