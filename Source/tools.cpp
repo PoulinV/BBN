@@ -2,7 +2,7 @@
 #include "../Include/EM_cascade.h"
 
 
-void print_spectrum(ostream &file, struct Structure_Gamma_Spectrum * pt_Cascade_Spectrum, struct Structure_Particle_Physics_Model * pt_Particle_Model){
+void print_spectrum(ostream &file, struct Structure_Spectrum * pt_Cascade_Spectrum, struct Structure_Particle_Physics_Model * pt_Particle_Model){
 
 
   double dE = (pt_Particle_Model->E_0 - E_min)/Gamma_Table_Size;
@@ -10,7 +10,7 @@ void print_spectrum(ostream &file, struct Structure_Gamma_Spectrum * pt_Cascade_
   double E = E_min;
   int i = 0;
   while(i<Gamma_Table_Size){
-    file << E << "   " << pt_Cascade_Spectrum->Gamma_Spectrum[i]/(gamma_NPC(E,z)+gamma_compton(E,z)+gamma_phph(E,z)) << endl;
+    file << E << "   " << pt_Cascade_Spectrum->Spectrum[i]/(rate_NPC(E,z)+rate_compton(E,z)+rate_gg_scattering(E,z)) << endl;
     i++;
     E+=dE;
   }
@@ -23,34 +23,42 @@ void print_spectrum_from_function(ostream &file, double (*func)(double,double,do
   double E = E_min;
   int i = 0;
   while(i<Gamma_Table_Size){
-    file << E << "   " << (*func)(E,z,pt_Particle_Model->E_0)/(gamma_NPC(E,z)+gamma_compton(E,z)+gamma_phph(E,z)) << endl;
+    file << E << "   " << (*func)(E,z,pt_Particle_Model->E_0)/(rate_NPC(E,z)+rate_compton(E,z)+rate_gg_scattering(E,z)) << endl;
     i++;
     E+=dE;
   }
 
 }
-void print_spectrum_automatic_names(int iterations, struct Structure_Gamma_Spectrum * pt_Cascade_Spectrum, struct Structure_Particle_Physics_Model * pt_Particle_Model){
+void print_spectrum_automatic_names(int iterations, struct Structure_Spectrum * pt_Cascade_Spectrum, struct Structure_Particle_Physics_Model * pt_Particle_Model){
   ostringstream os;
   string name;
 
 
-  double dE = (pt_Particle_Model->E_0 - E_min)/pt_Cascade_Spectrum->Gamma_Energy.size();
+  double dE = (pt_Particle_Model->E_0 - E_min)/pt_Cascade_Spectrum->Energy.size();
   double z = pt_Cascade_Spectrum->redshift;
   double E = E_min;
   int i = 0;
 
 	  mkdir("Cascade_Spectrum_Folder", 01777);
-    os << "Cascade_Spectrum_Folder/Spectrum_m" << pt_Particle_Model->M_x<<"_z"<< z <<"_" << iterations <<"iterations.dat";
-    cout << " T = " << T_0*(1+z) << endl;
+    os << "Cascade_Spectrum_Folder/Spectrum_"<<pt_Cascade_Spectrum->spectrum_name<<"m" << pt_Particle_Model->M_x<<"_z"<< z <<"_" << iterations <<"iterations.dat";
     name = os.str();
     ofstream file(name);
     if(verbose>1)cout << "Printing in file " << name << endl;
 
+    if(pt_Cascade_Spectrum->species=="photon"){
     while(i<Gamma_Table_Size){
-      if(i<Gamma_Table_Size-1)file << pt_Cascade_Spectrum->Gamma_Energy[i] << "   " << pt_Cascade_Spectrum->Gamma_Spectrum[i]/(gamma_NPC(pt_Cascade_Spectrum->Gamma_Energy[i],z)+gamma_compton(pt_Cascade_Spectrum->Gamma_Energy[i],z)+gamma_phph(pt_Cascade_Spectrum->Gamma_Energy[i],z)) << endl;
-      if(i==Gamma_Table_Size-1)file << pt_Cascade_Spectrum->Gamma_Energy[i] << "   " << pt_Cascade_Spectrum->Gamma_Spectrum[i]/(gamma_NPC(pt_Cascade_Spectrum->Gamma_Energy[i],z)+gamma_compton(pt_Cascade_Spectrum->Gamma_Energy[i],z)+gamma_phph(pt_Cascade_Spectrum->Gamma_Energy[i],z))+1/(gamma_NPC(pt_Particle_Model->E_0,z)+gamma_compton(pt_Particle_Model->E_0,z)+gamma_phph(pt_Particle_Model->E_0,z)) << endl;
+      file << pt_Cascade_Spectrum->Energy[i] << "   " << pt_Cascade_Spectrum->Spectrum[i] << endl;
+      // file << pt_Cascade_Spectrum->Energy[i] << "   " << pt_Cascade_Spectrum->Spectrum[i]/(rate_NPC(pt_Cascade_Spectrum->Energy[i],z)+rate_compton(pt_Cascade_Spectrum->Energy[i],z)+rate_gg_scattering(pt_Cascade_Spectrum->Energy[i],z)) << endl;
+      // if(i<Gamma_Table_Size-1)file << pt_Cascade_Spectrum->Energy[i] << "   " << pt_Cascade_Spectrum->Spectrum[i]/(rate_NPC(pt_Cascade_Spectrum->Energy[i],z)+rate_compton(pt_Cascade_Spectrum->Energy[i],z)+rate_gg_scattering(pt_Cascade_Spectrum->Energy[i],z)) << endl;
+      // if(i==Gamma_Table_Size-1)file << pt_Cascade_Spectrum->Energy[i] << "   " << pt_Cascade_Spectrum->Spectrum[i]/(rate_NPC(pt_Cascade_Spectrum->Energy[i],z)+rate_compton(pt_Cascade_Spectrum->Energy[i],z)+rate_gg_scattering(pt_Cascade_Spectrum->Energy[i],z))+1/(rate_NPC(pt_Particle_Model->E_0,z)+rate_compton(pt_Particle_Model->E_0,z)+rate_gg_scattering(pt_Particle_Model->E_0,z)) << endl;
       i++;
-
+    }
+  }
+    if(pt_Cascade_Spectrum->species=="electron"){
+      while(i<Electron_Table_Size){
+        file << pt_Cascade_Spectrum->Energy[i] << "   " << pt_Cascade_Spectrum->Spectrum[i] << endl;
+        i++;
+      }
     }
 
 }
@@ -134,7 +142,57 @@ void Fill_Structure_Spectrum_and_Precision_Parameters(int iterations,
   pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum = (*Gamma_Spectrum);
   pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum = (*Electron_Spectrum);
 }
+void check_energy_conservation(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+                               struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+                               struct Structure_Spectrum * pt_Cascade_Spectrum,
+                               double &integrale){
 
+double dE = (pt_Particle_Physics_Model->E_0 - E_min) / (double) (pt_Spectrum_and_Precision_Parameters->n_step - 1);
+double h = dE/6.;
+double E1, E2, E3, E4, E5, E6, E7, f1, f2, f3, f4, f5, f6, f7, resultat = 0;
+double z = pt_Cascade_Spectrum->redshift;
+        for(int i=0;i<pt_Spectrum_and_Precision_Parameters->n_step-1;i++){
+          if(i==0){
+            E1=E_min;
+            }
+          else{
+            E1=E7;
+          }
+
+          E2=E1 + h;
+          E3=E2 + h;
+          E4=E3 + h;
+          E5=E4 + h;
+          E6=E5 + h;
+          E7=E6 + h;
+          if(E1<pt_Particle_Physics_Model->E_0)linearint(pt_Cascade_Spectrum->Energy, pt_Cascade_Spectrum->Spectrum, pt_Cascade_Spectrum->Energy.size(), E1, f1);
+          else f1=0;
+          if(E2<pt_Particle_Physics_Model->E_0)linearint(pt_Cascade_Spectrum->Energy, pt_Cascade_Spectrum->Spectrum, pt_Cascade_Spectrum->Energy.size(), E2, f2);
+          else f2=0;
+          if(E3<pt_Particle_Physics_Model->E_0)linearint(pt_Cascade_Spectrum->Energy, pt_Cascade_Spectrum->Spectrum, pt_Cascade_Spectrum->Energy.size(), E3, f3);
+          else f3=0;
+          if(E4<pt_Particle_Physics_Model->E_0)linearint(pt_Cascade_Spectrum->Energy, pt_Cascade_Spectrum->Spectrum, pt_Cascade_Spectrum->Energy.size(), E4, f4);
+          else f4=0;
+          if(E5<pt_Particle_Physics_Model->E_0)linearint(pt_Cascade_Spectrum->Energy, pt_Cascade_Spectrum->Spectrum, pt_Cascade_Spectrum->Energy.size(), E5, f5);
+          else f5=0;
+          if(E6<pt_Particle_Physics_Model->E_0)linearint(pt_Cascade_Spectrum->Energy, pt_Cascade_Spectrum->Spectrum, pt_Cascade_Spectrum->Energy.size(), E6, f6);
+          else f6=0;
+          if(E7<pt_Particle_Physics_Model->E_0)linearint(pt_Cascade_Spectrum->Energy, pt_Cascade_Spectrum->Spectrum, pt_Cascade_Spectrum->Energy.size(), E7, f7);
+          else f7=0;
+          f1*=E1*(rate_NPC(E1,z)+rate_compton(E1,z)+rate_gg_scattering(E1,z));
+          f2*=E2*(rate_NPC(E2,z)+rate_compton(E2,z)+rate_gg_scattering(E2,z));
+          f3*=E3*(rate_NPC(E3,z)+rate_compton(E3,z)+rate_gg_scattering(E3,z));
+          f4*=E4*(rate_NPC(E4,z)+rate_compton(E4,z)+rate_gg_scattering(E4,z));
+          f5*=E5*(rate_NPC(E5,z)+rate_compton(E5,z)+rate_gg_scattering(E5,z));
+          f6*=E6*(rate_NPC(E6,z)+rate_compton(E6,z)+rate_gg_scattering(E6,z));
+          f7*=E7*(rate_NPC(E7,z)+rate_compton(E7,z)+rate_gg_scattering(E7,z));
+
+          resultat += dE/840. * (41*f1+216*f2+27*f3+272*f4+27*f5+216*f6+41*f7);
+
+        }
+        integrale = resultat;
+      if(verbose>1)cout << "The total energy contained in " <<   pt_Cascade_Spectrum->spectrum_name  << "spectrum is " << resultat << " MeV, you had injected " << pt_Particle_Physics_Model->E_0 << " MeV." << endl;
+}
 void Fill_Output_Options(string print_result, string results_files, string spectrum_files, struct Structure_Output_Options * pt_Structure_Output_Options){
 
   pt_Structure_Output_Options->print_result = print_result;

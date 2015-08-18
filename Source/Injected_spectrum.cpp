@@ -31,7 +31,7 @@ double Universal_Spectrum(double  E, double  z, double E_0){
 double Dirac_Spectrum_After_One_Iteration(double  x, double  z, double E_0){
 
 
-	double Gamma_tot = gamma_NPC(E_0,z)+gamma_compton(E_0,z)+gamma_phph(E_0,z);
+	double Gamma_tot = rate_NPC(E_0,z)+rate_compton(E_0,z)+rate_gg_scattering(E_0,z);
 
 	double T = T_0*(1+z);
 	double int_BB = 8./63.*pow(pi,4)*pow(T_0*(1+z),6);

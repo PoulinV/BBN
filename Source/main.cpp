@@ -27,7 +27,7 @@ int main(void){
 
   /******* Precision parameters : control the number of step in integration scheme, ***************
   ********** as well as the number of iterations for computing the cascade spectrum **************/
-  int iterations = 7;      //Number of iterations for computing the cascade spectrum
+  int iterations = 0;      //Number of iterations for computing the cascade spectrum
   int z_step = 80;         //Number of redshift steps between injection time and the minimal redshift of integration
   int n_step = 200;        //Number of steps in the simpson algorithm for integrations, to be chosen small, it is adapted inside the code when needed.
   /***********************************************************************************************/
@@ -46,7 +46,7 @@ int main(void){
 
   // /************To print cascade spectrum in a file*********/
   if(task==1){
-  struct Structure_Gamma_Spectrum Cascade_Spectrum;
+  struct Structure_Spectrum Cascade_Spectrum;
   struct Structure_Particle_Physics_Model Particle_Physics_Model;
   struct Structure_Spectrum_and_Precision_Parameters Spectrum_and_Precision_Parameters;
 
@@ -69,7 +69,6 @@ int main(void){
                                                   &Spectrum_and_Precision_Parameters);
 
   // double z = 5*Particle_Physics_Model.z_x;
-  cout<< "z = "<<z <<endl;
   mkdir("Output",01777);
   ofstream Spectrum("Output/Universal_spectrum.dat");
   print_spectrum_from_function(Spectrum, Universal_Spectrum, z, &Particle_Physics_Model);
@@ -116,7 +115,7 @@ int main(void){
   double zeta_min = 1e-12;
   double zeta_max = 1e-3;
   double zeta_step = 100;
-  double M_x =60;
+  double M_x =140;
   if(verbose>0){
     cout << "********** you have chosen the following range for your parameters *************" << endl;
     cout << "==> tau in ["<<tau_min<<","<<tau_max<<"]"<<" with " << tau_step << " steps.    " << endl;

@@ -11,27 +11,18 @@
 
 typedef double (*Spectrum)(double E, double  z, double E_0);
 
-struct Structure_Gamma_Spectrum{
+struct Structure_Spectrum{
 
   int iterations;
   double redshift;
-  vector<double> Gamma_Energy;
-  vector<double> Gamma_Spectrum;
-
+  vector<double> Energy;
+  vector<double> Spectrum;
+  string spectrum_name;
+  string species;
 
 
 };
 
-struct Structure_Electron_Spectrum{
-
-  int iterations;
-  double redshift;
-  vector<double> Electron_Energy;
-  vector<double> Electron_Spectrum;
-
-
-
-};
 
 
 struct Structure_Particle_Physics_Model{
