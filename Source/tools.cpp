@@ -149,8 +149,72 @@ void check_energy_conservation(struct Structure_Particle_Physics_Model * pt_Part
 
 double dE = (pt_Particle_Physics_Model->E_0 - E_min) / (double) (pt_Spectrum_and_Precision_Parameters->n_step - 1);
 double h = dE/6.;
-double E1, E2, E3, E4, E5, E6, E7, f1, f2, f3, f4, f5, f6, f7, resultat = 0;
+double dE_2, h2;
+double E1, E2, E3, E4, E5, E6, E7, f1, f2, f3, f4, f5, f6, f7, E_gamma, resultat_1 = 0, resultat_2 = 0, resultat_3 = 0;
 double z = pt_Cascade_Spectrum->redshift;
+vector<double> Cascade_Spectrum_Integrated_Over_Kernel;
+vector<double> Cascade_Spectrum_Integrated_Over_Kernel_energy;
+double dE_3 = (pt_Particle_Physics_Model->E_0 - E_min) / (double) (pt_Spectrum_and_Precision_Parameters->z_step - 1);
+for(int i=0;i<pt_Spectrum_and_Precision_Parameters->z_step;i++){
+  E_gamma = E_min+i*dE_3;
+  resultat_2 = 0;
+        for(int j=0; j<pt_Spectrum_and_Precision_Parameters->n_step-1;j++){
+          dE_2 = (pt_Particle_Physics_Model->E_0 - (E_gamma))/ (double) (pt_Spectrum_and_Precision_Parameters->n_step-1);
+          h2 = dE_2/6.;
+
+          if(j==0){
+            E1=E_gamma;
+            }
+          else{
+            E1=E7;
+          }
+
+          E2=E1 + h2;
+          E3=E1 + 2*h2;
+          E4=E1 + 3*h2;
+          E5=E1 + 4*h2;
+          E6=E1 + 5*h2;
+          E7=E1 + 6*h2;
+          if(E1<pt_Particle_Physics_Model->E_0)linearint(pt_Cascade_Spectrum->Energy, pt_Cascade_Spectrum->Spectrum, pt_Cascade_Spectrum->Energy.size(), E1, f1);
+          else f1=0;
+          if(E2<pt_Particle_Physics_Model->E_0)linearint(pt_Cascade_Spectrum->Energy, pt_Cascade_Spectrum->Spectrum, pt_Cascade_Spectrum->Energy.size(), E2, f2);
+          else f2=0;
+          if(E3<pt_Particle_Physics_Model->E_0)linearint(pt_Cascade_Spectrum->Energy, pt_Cascade_Spectrum->Spectrum, pt_Cascade_Spectrum->Energy.size(), E3, f3);
+          else f3=0;
+          if(E4<pt_Particle_Physics_Model->E_0)linearint(pt_Cascade_Spectrum->Energy, pt_Cascade_Spectrum->Spectrum, pt_Cascade_Spectrum->Energy.size(), E4, f4);
+          else f4=0;
+          if(E5<pt_Particle_Physics_Model->E_0)linearint(pt_Cascade_Spectrum->Energy, pt_Cascade_Spectrum->Spectrum, pt_Cascade_Spectrum->Energy.size(), E5, f5);
+          else f5=0;
+          if(E6<pt_Particle_Physics_Model->E_0)linearint(pt_Cascade_Spectrum->Energy, pt_Cascade_Spectrum->Spectrum, pt_Cascade_Spectrum->Energy.size(), E6, f6);
+          else f6=0;
+          if(E7<pt_Particle_Physics_Model->E_0)linearint(pt_Cascade_Spectrum->Energy, pt_Cascade_Spectrum->Spectrum, pt_Cascade_Spectrum->Energy.size(), E7, f7);
+          else f7=0;
+          // f1*=(dsigma_compton(E1,z,E_gamma));
+          // f2*=(dsigma_compton(E2,z,E_gamma));
+          // f3*=(dsigma_compton(E3,z,E_gamma));
+          // f4*=(dsigma_compton(E4,z,E_gamma));
+          // f5*=(dsigma_compton(E5,z,E_gamma));
+          // f6*=(dsigma_compton(E6,z,E_gamma));
+          // f7*=(dsigma_compton(E7,z,E_gamma));
+          f1*=(dsigma_phph(E1,z,E_gamma)+dsigma_compton(E1,z,E_gamma));
+          f2*=(dsigma_phph(E2,z,E_gamma)+dsigma_compton(E2,z,E_gamma));
+          f3*=(dsigma_phph(E3,z,E_gamma)+dsigma_compton(E3,z,E_gamma));
+          f4*=(dsigma_phph(E4,z,E_gamma)+dsigma_compton(E4,z,E_gamma));
+          f5*=(dsigma_phph(E5,z,E_gamma)+dsigma_compton(E5,z,E_gamma));
+          f6*=(dsigma_phph(E6,z,E_gamma)+dsigma_compton(E6,z,E_gamma));
+          f7*=(dsigma_phph(E7,z,E_gamma)+dsigma_compton(E7,z,E_gamma));
+
+
+          resultat_1 += dE_2/840. * (41*f1+216*f2+27*f3+272*f4+27*f5+216*f6+41*f7);
+          resultat_2 += dE_2/840. * (41*(1-pow(E1,3)+pow(E1,5/2)-pow(E1,8/3)+pow(E1,1.23))+216*(1-pow(E2,3)+pow(E2,5/2)-pow(E2,8/3)+pow(E2,1.23))+27*(1-pow(E3,3)+pow(E3,5/2)-pow(E3,8/3)+pow(E3,1.23))+272*(1-pow(E4,3)+pow(E4,5/2)-pow(E4,8/3)+pow(E4,1.23))+27*(1-pow(E5,3)+pow(E5,5/2)-pow(E5,8/3)+pow(E5,1.23))+216*(1-pow(E6,3)+pow(E6,5/2)-pow(E6,8/3)+pow(E6,1.23))+41*(1-pow(E7,3)+pow(E7,5/2)-pow(E7,8/3)+pow(E7,1.23)));
+
+
+          if(i==0)cout << "Egamma = " << E_gamma << " E7 = " << E7 << " resultat = " << resultat_1 << " j = " << j << " i = " << i << "resultat check = " << resultat_2 << endl;
+        }
+        Cascade_Spectrum_Integrated_Over_Kernel_energy.push_back(E_gamma);
+        Cascade_Spectrum_Integrated_Over_Kernel.push_back(resultat_1);
+        resultat_2= 0;
+  }
         for(int i=0;i<pt_Spectrum_and_Precision_Parameters->n_step-1;i++){
           if(i==0){
             E1=E_min;
@@ -186,19 +250,36 @@ double z = pt_Cascade_Spectrum->redshift;
           f5*=E5*(rate_NPC(E5,z)+rate_compton(E5,z)+rate_gg_scattering(E5,z));
           f6*=E6*(rate_NPC(E6,z)+rate_compton(E6,z)+rate_gg_scattering(E6,z));
           f7*=E7*(rate_NPC(E7,z)+rate_compton(E7,z)+rate_gg_scattering(E7,z));
-          // f1*=E1;
-          // f2*=E2;
-          // f3*=E3;
-          // f4*=E4;
-          // f5*=E5;
-          // f6*=E6;
-          // f7*=E7;
+          resultat_2 += dE/840. * (41*f1+216*f2+27*f3+272*f4+27*f5+216*f6+41*f7);
 
-          resultat += dE/840. * (41*f1+216*f2+27*f3+272*f4+27*f5+216*f6+41*f7);
+          if(E1<pt_Particle_Physics_Model->E_0)linearint(Cascade_Spectrum_Integrated_Over_Kernel_energy, Cascade_Spectrum_Integrated_Over_Kernel, Cascade_Spectrum_Integrated_Over_Kernel_energy.size(), E1, f1);
+          else f1=0;
+          if(E2<pt_Particle_Physics_Model->E_0)linearint(Cascade_Spectrum_Integrated_Over_Kernel_energy, Cascade_Spectrum_Integrated_Over_Kernel, Cascade_Spectrum_Integrated_Over_Kernel_energy.size(), E2, f2);
+          else f2=0;
+          if(E3<pt_Particle_Physics_Model->E_0)linearint(Cascade_Spectrum_Integrated_Over_Kernel_energy, Cascade_Spectrum_Integrated_Over_Kernel, Cascade_Spectrum_Integrated_Over_Kernel_energy.size(), E3, f3);
+          else f3=0;
+          if(E4<pt_Particle_Physics_Model->E_0)linearint(Cascade_Spectrum_Integrated_Over_Kernel_energy, Cascade_Spectrum_Integrated_Over_Kernel, Cascade_Spectrum_Integrated_Over_Kernel_energy.size(), E4, f4);
+          else f4=0;
+          if(E5<pt_Particle_Physics_Model->E_0)linearint(Cascade_Spectrum_Integrated_Over_Kernel_energy, Cascade_Spectrum_Integrated_Over_Kernel, Cascade_Spectrum_Integrated_Over_Kernel_energy.size(), E5, f5);
+          else f5=0;
+          if(E6<pt_Particle_Physics_Model->E_0)linearint(Cascade_Spectrum_Integrated_Over_Kernel_energy, Cascade_Spectrum_Integrated_Over_Kernel, Cascade_Spectrum_Integrated_Over_Kernel_energy.size(), E6, f6);
+          else f6=0;
+          if(E7<pt_Particle_Physics_Model->E_0)linearint(Cascade_Spectrum_Integrated_Over_Kernel_energy, Cascade_Spectrum_Integrated_Over_Kernel, Cascade_Spectrum_Integrated_Over_Kernel_energy.size(), E7, f7);
+          else f7=0;
+          // cout << " f7 = " << f7 << endl;
+          f1*=E1;
+          f2*=E2;
+          f3*=E3;
+          f4*=E4;
+          f5*=E5;
+          f6*=E6;
+          f7*=E7;
+          resultat_3+=dE/840. * (41*f1+216*f2+27*f3+272*f4+27*f5+216*f6+41*f7);
+          // cout << " E7 = " << E7 << " resultat_2 = " << resultat_2 << "resultat_3 = " << resultat_3 <<  " i = " << i <<  endl;
 
         }
-        integrale = resultat;
-      if(verbose>1)cout << "The total energy contained in " <<   pt_Cascade_Spectrum->spectrum_name  << "spectrum is " << resultat << " MeV, you had injected " << pt_Particle_Physics_Model->E_0 << " MeV." << endl;
+        integrale = resultat_2-resultat_3;
+      if(verbose>1)cout << "The total energy contained in " <<   pt_Cascade_Spectrum->spectrum_name  << "spectrum is " << integrale << " MeV, you had injected " << pt_Particle_Physics_Model->E_0 << " MeV." << endl;
 }
 void Fill_Output_Options(string print_result, string results_files, string spectrum_files, struct Structure_Output_Options * pt_Structure_Output_Options){
 
