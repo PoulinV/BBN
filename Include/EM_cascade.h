@@ -21,3 +21,4 @@ void  Spectre_electron_compton(struct Structure_Particle_Physics_Model * pt_Part
 															 struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
 															 struct Structure_Spectrum * pt_Electron_Spectrum,
 															 struct Structure_Spectrum * pt_Gamma_Spectrum);
+double Rate_Inverse_Compton(double E_e, double z, struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);

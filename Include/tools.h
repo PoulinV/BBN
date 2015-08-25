@@ -43,7 +43,8 @@ void Fill_Structure_Scan_Parameters(string nuclei, double tau_min, double tau_ma
 void Fill_Output_Options(string print_result, string results_files, string spectrum_files, struct Structure_Output_Options * pt_Structure_Output_Options);
 void check_energy_conservation(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
                                struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-                               struct Structure_Spectrum * pt_Cascade_Spectrum,
+                               struct Structure_Spectrum * pt_Gamma_Spectrum,
+                               struct Structure_Spectrum * pt_Electron_Spectrum,
                                double &integrale);
 
 // double  trapzdb(double  (*func)(double,double,int,double,struct), double  a, double  b, double  d, int n, int i, struct Structure_Injected_Spectrum * pt_Injected_Spectrum);

@@ -24,9 +24,9 @@
 #define  H_r     (H_0*pow((1+7/8*pow(4/11,4/3)*3.046)*5.46*pow(10,-5),0.5))  /* Effective Hubble parameter today */
 
 
-#define Gamma_Table_Size    200                    /* Number of points in the gamma spectrum table */
-#define Electron_Table_Size 200                    /* Number of points in the electron spectrum table */
-#define E_min               1                      /* Minimal energy of the table, the maximum will be set by the mass of the decaying particle */
+#define Gamma_Table_Size    200                  /* Number of points in the gamma spectrum table */
+#define Electron_Table_Size 200                  /* Number of points in the electron spectrum table */
+#define E_min               1                    /* Minimal energy of the table, the maximum will be set by the mass of the decaying particle */
 
 /*****************************************************************************************************************************************************************************************/
 /************************************* DO NOT change these constants, they define the redshift range on which the code can be trusted ****************************************************/

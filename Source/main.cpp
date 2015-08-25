@@ -27,7 +27,7 @@ int main(void){
 
   /******* Precision parameters : control the number of step in integration scheme, ***************
   ********** as well as the number of iterations for computing the cascade spectrum **************/
-  int iterations = 7;      //Number of iterations for computing the cascade spectrum
+  int iterations =7;      //Number of iterations for computing the cascade spectrum
   int z_step = 80;         //Number of redshift steps between injection time and the minimal redshift of integration
   int n_step = 200;        //Number of steps in the simpson algorithm for integrations, to be chosen small, it is adapted inside the code when needed.
   /***********************************************************************************************/
@@ -38,7 +38,7 @@ int main(void){
   string photon_spectrum_choice ("Dirac");     //This can be either "Dirac", "universal" or user specified "from_file", "from_function".
   string electron_spectrum_choice ("none");     //This can be either "Dirac", "universal" or user specified "from_file", "from_function".
   string spectrum_mode ("writing");     //This can be either "writing", "reading" or "nothing".
-  string inverse_compton_scattering ("no");
+  string inverse_compton_scattering ("yes");
   string results_files ("automatic");
   string spectrum_files ("automatic");
   /*****************************************************************************/
