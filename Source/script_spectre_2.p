@@ -132,4 +132,4 @@ plot "Cascade_Spectrum_Folder/Spectrum_total_electron_m140_z425643_0iterations.d
 "Cascade_Spectrum_Folder/Spectrum_tmp_electron_m140_z425643_29iterations.dat" u 1:2 notitle w l, \
 "Cascade_Spectrum_Folder/Spectrum_tmp_electron_m140_z425643_30iterations.dat" u 1:2 notitle w l, \
 "Cascade_Spectrum_Folder/Spectrum_tmp_electron_m140_z425643_31iterations.dat" u 1:2 notitle w l, \
-"Cascade_Spectrum_Folder/Spectrum_compton_electron_m140_z425643_0iterations.dat" u 1:2 
+"Cascade_Spectrum_Folder/Spectrum_compton_electron_m140_z425643_0iterations.dat" u 1:2 w l 

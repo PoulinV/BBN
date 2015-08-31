@@ -53,14 +53,14 @@ void Electron_dirac_spectrum_after_one_iteration(struct Structure_Particle_Physi
 				double int_bb = 2*pow(T_0*(1+z),3)*1.20205/(pi*pi);
 	 			double resultat = 0, Gamma_electron_Dirac = 0, E_e;
 				double dE = (pt_Particle_Physics_Model->E_0 - E_min)/ (double) (Electron_Table_Size-1);
-				cout << " E_gamma_bb = " << E_gamma_bb << " intbb = " << int_bb << endl;
+				// cout << " E_gamma_bb = " << E_gamma_bb << " intbb = " << int_bb << endl;
 				Gamma_electron_Dirac = Rate_Inverse_Compton(E_0,z,pt_Spectrum_and_Precision_Parameters);
 				for(int i = 0 ; i < Electron_Table_Size ; i++){
 					E_e = E_min + i*dE;
 					pt_Electron_Spectrum->Energy[i] = E_e;
 					resultat = 2*pi*r_e*r_e*m_e*m_e*int_bb/(E_gamma_bb*E_0*E_0*Gamma_electron_Dirac)*Function_Integrand_Spectre_Compton(E_0+E_gamma_bb-E_e,E_0,E_gamma_bb);
 					pt_Electron_Spectrum->Spectrum[i] = resultat/Rate_Inverse_Compton(E_e,z,pt_Spectrum_and_Precision_Parameters);
-					cout << " E = " << E_e << " resultat = " << pt_Electron_Spectrum->Spectrum[i] << endl;
+					// cout << " E = " << E_e << " resultat = " << pt_Electron_Spectrum->Spectrum[i] << endl;
 				}
 }
 

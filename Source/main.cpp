@@ -36,10 +36,10 @@ int main(void){
   /******* Some string useful in the program whatever calcutation is done*******/
   string nuclei ("4He");                //This needs to be a nuclei in the list : "2H", "4He", "3He", "7Be", "7Li".
   string print_result ("yes");
-  string photon_spectrum_choice ("none");     //This can be either "Dirac", "universal" or user specified "from_file", "from_function".
-  string electron_spectrum_choice ("Dirac");     //This can be either "Dirac", "universal" or user specified "from_file", "from_function".
+  string photon_spectrum_choice ("Dirac");     //This can be either "Dirac", "universal" or user specified "from_file", "from_function".
+  string electron_spectrum_choice ("none");     //This can be either "Dirac", "universal" or user specified "from_file", "from_function".
   string spectrum_mode ("writing");     //This can be either "writing", "reading" or "nothing".
-  string inverse_compton_scattering ("yes");
+  string inverse_compton_scattering ("no");
   string results_files ("automatic");
   string spectrum_files ("automatic");
   /*****************************************************************************/
