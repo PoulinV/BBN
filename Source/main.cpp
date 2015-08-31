@@ -27,23 +27,24 @@ int main(void){
 
   /******* Precision parameters : control the number of step in integration scheme, ***************
   ********** as well as the number of iterations for computing the cascade spectrum **************/
-  int number_iterations_photon = 10;      //Number of iterations for computing the photon spectrum
+  int number_iterations_photon = 5;      //Number of iterations for computing the photon spectrum
   int number_iterations_electron = 30;    //Number of iterations for computing the electron spectrum
   int z_step = 80;         //Number of redshift steps between injection time and the minimal redshift of integration
   int n_step = 200;        //Number of steps in the simpson algorithm for integrations, to be chosen small, it is adapted inside the code when needed.
   /***********************************************************************************************/
 
   /******* Some string useful in the program whatever calcutation is done*******/
-  string nuclei ("4He");                //This needs to be a nuclei in the list : "2H", "4He", "3He", "7Be", "7Li".
+  string nuclei ("4He");                       //This needs to be a nuclei in the list : "2H", "4He", "3He", "7Be", "7Li".
   string print_result ("yes");
+  string calculation_mode ("triangular");      //This can be either "triangular" or "iterative".
   string photon_spectrum_choice ("Dirac");     //This can be either "Dirac", "universal" or user specified "from_file", "from_function".
-  string electron_spectrum_choice ("none");     //This can be either "Dirac", "universal" or user specified "from_file", "from_function".
-  string spectrum_mode ("writing");     //This can be either "writing", "reading" or "nothing".
-  string inverse_compton_scattering ("no");
+  string electron_spectrum_choice ("none");    //This can be either "Dirac", "universal" or user specified "from_file", "from_function".
+  string spectrum_mode ("writing");            //This can be either "writing", "reading" or "nothing".
+  string inverse_compton_scattering ("no");    //In case you choose the iterative mode, it is possible to switch on and off the inverse_compton_scattering.
   string results_files ("automatic");
   string spectrum_files ("automatic");
   /*****************************************************************************/
-  int task = 1; // 1 : Print spectrum in file, 2 : Compute_Constraints_from_destruction_only, 3 : Compute_constraints_from_destruction_and_production
+  int task = 2; // 1 : Print spectrum in file, 2 : Compute_Constraints_from_destruction_only, 3 : Compute_constraints_from_destruction_and_production
 
   // /************To print cascade spectrum in a file*********/
   if(task==1){
@@ -56,18 +57,20 @@ int main(void){
   // double tau_x = 3*pow(10,6);
   double tau_x = pow(T/T_0,-2)/(2*H_r);
   double Zeta_x = pow(10,-3);
-  double z = T/T_0-1;
+  // double z = T/T_0-1;
+  double z = 648069;
   Fill_Structure_Particle_Physics_Model(M_x, Zeta_x, tau_x, &Particle_Physics_Model); // MANDATORY STEP
   Fill_Structure_Spectrum_and_Precision_Parameters(number_iterations_photon,
                                                   number_iterations_electron,
                                                   z_step,
                                                   n_step,
+                                                  calculation_mode,
                                                   photon_spectrum_choice,
                                                   electron_spectrum_choice,
                                                   spectrum_mode,
                                                   inverse_compton_scattering,
-                                                  No_Photons_Injected,
-                                                  Electron_dirac_spectrum_after_one_iteration,
+                                                  Dirac_Spectrum_After_One_Iteration,
+                                                  No_Electrons_Injected,
                                                   &Spectrum_and_Precision_Parameters);
 
   // double z = 5*Particle_Physics_Model.z_x;
@@ -127,9 +130,18 @@ int main(void){
   mkdir("Output",01777);
 
   Fill_Structure_Particle_Physics_Model(M_x, zeta_min, tau_min, &Particle_Physics_Model); // MANDATORY STEP
-  Fill_Structure_Spectrum_and_Precision_Parameters(number_iterations_photon, number_iterations_electron, z_step, n_step, photon_spectrum_choice,
-  electron_spectrum_choice, spectrum_mode, inverse_compton_scattering,Dirac_Spectrum_After_One_Iteration,
-  Electron_dirac_spectrum_after_one_iteration,  &Spectrum_and_Precision_Parameters);
+  Fill_Structure_Spectrum_and_Precision_Parameters(number_iterations_photon,
+                                                  number_iterations_electron,
+                                                  z_step,
+                                                  n_step,
+                                                  calculation_mode,
+                                                  photon_spectrum_choice,
+                                                  electron_spectrum_choice,
+                                                  spectrum_mode,
+                                                  inverse_compton_scattering,
+                                                  No_Photons_Injected,
+                                                  Electron_dirac_spectrum_after_one_iteration,
+                                                  &Spectrum_and_Precision_Parameters);
   Fill_Structure_Scan_Parameters(nuclei, tau_min, tau_max, tau_step, zeta_min, zeta_max, zeta_step, &Scan_Parameters);
   Fill_Output_Options(print_result, results_files, spectrum_files, &Output_Options);
   if(task==2)Compute_Constraints_from_destruction_only(&Particle_Physics_Model,

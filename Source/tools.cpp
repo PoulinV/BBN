@@ -10,7 +10,7 @@ void print_spectrum(ostream &file, struct Structure_Spectrum * pt_Cascade_Spectr
   double E = E_min;
   int i = 0;
   while(i<Gamma_Table_Size){
-    file << E << "   " << pt_Cascade_Spectrum->Spectrum[i]/(rate_NPC(E,z)+rate_compton(E,z)+rate_gg_scattering(E,z)) << endl;
+    file << E << "   " << pt_Cascade_Spectrum->Spectrum[i]<< endl;
     i++;
     E+=dE;
   }
@@ -23,7 +23,7 @@ void print_spectrum_from_function(ostream &file, double (*func)(double,double,do
   double E = E_min;
   int i = 0;
   while(i<Gamma_Table_Size){
-    file << E << "   " << (*func)(E,z,pt_Particle_Model->E_0)/(rate_NPC(E,z)+rate_compton(E,z)+rate_gg_scattering(E,z)) << endl;
+    file << E << "   " << (*func)(E,z,pt_Particle_Model->E_0) << endl;
     i++;
     E+=dE;
   }
@@ -125,6 +125,7 @@ void Fill_Structure_Spectrum_and_Precision_Parameters(int number_iterations_phot
                                                       int number_iterations_electron,
                                                       int z_step,
                                                       int n_step,
+                                                      string calculation_mode,
                                                       string photon_spectrum_choice,
                                                       string electron_spectrum_choice,
                                                       string spectrum_mode,
@@ -133,6 +134,7 @@ void Fill_Structure_Spectrum_and_Precision_Parameters(int number_iterations_phot
                                                       void (*Electron_Spectrum)(struct Structure_Particle_Physics_Model *, struct Structure_Spectrum_and_Precision_Parameters *, struct Structure_Spectrum *),
                                                       struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters){
 
+  pt_Spectrum_and_Precision_Parameters->calculation_mode = calculation_mode;
 	pt_Spectrum_and_Precision_Parameters->number_iterations_photon = number_iterations_photon;
   pt_Spectrum_and_Precision_Parameters->number_iterations_electron = number_iterations_electron;
 	pt_Spectrum_and_Precision_Parameters->z_step = z_step;
@@ -197,13 +199,13 @@ if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice=="universal"){
           if(E7<pt_Particle_Physics_Model->E_0)linearint(pt_Gamma_Spectrum->Energy, pt_Gamma_Spectrum->Spectrum, pt_Gamma_Spectrum->Energy.size(), E7, f7);
           else f7=0;
 
-          f1*=E1;
-          f2*=E2;
-          f3*=E3;
-          f4*=E4;
-          f5*=E5;
-          f6*=E6;
-          f7*=E7;
+          f1*=E1*(rate_NPC(E1,z)+rate_compton(E1,z)+rate_gg_scattering(E1,z));
+          f2*=E2*(rate_NPC(E2,z)+rate_compton(E2,z)+rate_gg_scattering(E2,z));
+          f3*=E3*(rate_NPC(E3,z)+rate_compton(E3,z)+rate_gg_scattering(E3,z));
+          f4*=E4*(rate_NPC(E4,z)+rate_compton(E4,z)+rate_gg_scattering(E4,z));
+          f5*=E5*(rate_NPC(E5,z)+rate_compton(E5,z)+rate_gg_scattering(E5,z));
+          f6*=E6*(rate_NPC(E6,z)+rate_compton(E6,z)+rate_gg_scattering(E6,z));
+          f7*=E7*(rate_NPC(E7,z)+rate_compton(E7,z)+rate_gg_scattering(E7,z));
           resultat_1 += dE/840. * (41*f1+216*f2+27*f3+272*f4+27*f5+216*f6+41*f7);
 
         }
@@ -263,7 +265,7 @@ for(int i=0;i<pt_Spectrum_and_Precision_Parameters->z_step;i++){
           // cout << " E1 = " << E1 << endl;
 
           resultat_1 += dE_2/840. * (41*F1+216*F2+27*F3+272*F4+27*F5+216*F6+41*F7);
-          if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "Dirac" && j==pt_Spectrum_and_Precision_Parameters->n_step-2){
+          if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "Dirac" && j==pt_Spectrum_and_Precision_Parameters->n_step-2 && pt_Spectrum_and_Precision_Parameters->calculation_mode == "iterative"){
             resultat_1+=(dsigma_phph(pt_Particle_Physics_Model->E_0,z,E_gamma)+dsigma_compton(pt_Particle_Physics_Model->E_0,z,E_gamma))/(rate_NPC(pt_Particle_Physics_Model->E_0,z)+rate_compton(pt_Particle_Physics_Model->E_0,z)+rate_gg_scattering(pt_Particle_Physics_Model->E_0,z));
           }
           /******** Second : Integrate electron spectrum over e->gamma kernel ********/
@@ -295,7 +297,7 @@ for(int i=0;i<pt_Spectrum_and_Precision_Parameters->z_step;i++){
           // cout << "E7 "<<E7<<" F7  = " << F7 << endl;
 
           resultat_2 += dE_2/840. * (41*F1+216*F2+27*F3+272*F4+27*F5+216*F6+41*F7);
-          if(pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice == "Dirac" && j==pt_Spectrum_and_Precision_Parameters->n_step-2){
+          if(pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice == "Dirac" && j==pt_Spectrum_and_Precision_Parameters->n_step-2 && pt_Spectrum_and_Precision_Parameters->calculation_mode == "iterative"){
             resultat_2+=2*Function_Integrand_Spectre_Compton(E_gamma,pt_Particle_Physics_Model->E_0, E_gamma_bb)/((pt_Particle_Physics_Model->E_0)*(pt_Particle_Physics_Model->E_0))/Rate_Inverse_Compton(pt_Particle_Physics_Model->E_0,z,pt_Spectrum_and_Precision_Parameters);
           }
           /*******Third : Integrate photon spectrum over gamma->e kernel*******/
@@ -307,7 +309,7 @@ for(int i=0;i<pt_Spectrum_and_Precision_Parameters->z_step;i++){
           F6=f6*(dsigma_compton(E6,z,(E6+m_e-E_e))+dsigma_NPC(E6+m_e,z,E_e));
           F7=f7*(dsigma_compton(E7,z,(E7+m_e-E_e))+dsigma_NPC(E7+m_e,z,E_e));
           resultat_3 += dE_2/840. * (41*F1+216*F2+27*F3+272*F4+27*F5+216*F6+41*F7);
-          if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "Dirac" && j==pt_Spectrum_and_Precision_Parameters->n_step-2){
+          if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "Dirac" && j==pt_Spectrum_and_Precision_Parameters->n_step-2 && pt_Spectrum_and_Precision_Parameters->calculation_mode == "iterative"){
             resultat_3+=(dsigma_compton(pt_Particle_Physics_Model->E_0,z,(pt_Particle_Physics_Model->E_0+m_e-E_e))+dsigma_NPC(pt_Particle_Physics_Model->E_0+m_e,z,pt_Particle_Physics_Model->E_0))/(rate_NPC(pt_Particle_Physics_Model->E_0,z)+rate_compton(pt_Particle_Physics_Model->E_0,z)+rate_gg_scattering(pt_Particle_Physics_Model->E_0,z));
           }
 
@@ -338,7 +340,7 @@ for(int i=0;i<pt_Spectrum_and_Precision_Parameters->z_step;i++){
           F7=g7*Function_Integrand_Spectre_Compton(E7+E_gamma_bb-E_e,E7, E_gamma_bb)/((E7)*(E7));
 
           resultat_4+= dE_2/840. * (41*F1+216*F2+27*F3+272*F4+27*F5+216*F6+41*F7);
-          if(pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice == "Dirac" && j==pt_Spectrum_and_Precision_Parameters->n_step-2){
+          if(pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice == "Dirac" && j==pt_Spectrum_and_Precision_Parameters->n_step-2 && pt_Spectrum_and_Precision_Parameters->calculation_mode == "iterative"){
             resultat_4+=Function_Integrand_Spectre_Compton(pt_Particle_Physics_Model->E_0+E_gamma_bb-E_e,pt_Particle_Physics_Model->E_0, E_gamma_bb)/((pt_Particle_Physics_Model->E_0)*(pt_Particle_Physics_Model->E_0))/Rate_Inverse_Compton(pt_Particle_Physics_Model->E_0,z,pt_Spectrum_and_Precision_Parameters);
           }
 
@@ -405,7 +407,7 @@ for(int i=0;i<pt_Spectrum_and_Precision_Parameters->z_step;i++){
           f6*=E6*(rate_NPC(E6,z)+rate_compton(E6,z)+rate_gg_scattering(E6,z));
           f7*=E7*(rate_NPC(E7,z)+rate_compton(E7,z)+rate_gg_scattering(E7,z));
           resultat_1 += dE/840. * (41*f1+216*f2+27*f3+272*f4+27*f5+216*f6+41*f7);
-          if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "Dirac" &&  i==pt_Spectrum_and_Precision_Parameters->n_step-2){
+          if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "Dirac" &&  i==pt_Spectrum_and_Precision_Parameters->n_step-2 && pt_Spectrum_and_Precision_Parameters->calculation_mode == "iterative"){
             resultat_1+=pt_Particle_Physics_Model->E_0;
           }
 
@@ -432,7 +434,7 @@ for(int i=0;i<pt_Spectrum_and_Precision_Parameters->z_step;i++){
           f6*=E6*(Rate_Inverse_Compton(E6,z,pt_Spectrum_and_Precision_Parameters));
           f7*=E7*(Rate_Inverse_Compton(E7,z,pt_Spectrum_and_Precision_Parameters));
           resultat_2 += dE/840. * (41*f1+216*f2+27*f3+272*f4+27*f5+216*f6+41*f7);
-          if(pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice == "Dirac" &&  i==pt_Spectrum_and_Precision_Parameters->n_step-2){
+          if(pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice == "Dirac" &&  i==pt_Spectrum_and_Precision_Parameters->n_step-2 && pt_Spectrum_and_Precision_Parameters->calculation_mode == "iterative"){
             resultat_2+=pt_Particle_Physics_Model->E_0;
           }
 
@@ -488,9 +490,17 @@ for(int i=0;i<pt_Spectrum_and_Precision_Parameters->z_step;i++){
           resultat_4+=dE/840. * (41*g1+216*g2+27*g3+272*g4+27*g5+216*g6+41*g7);
 
           // cout << " E7 = " << E7 << "resultat_1 " << resultat_1 << " resultat_2 = " << resultat_2 << "resultat_3 = " << resultat_3 <<  " i = " << i <<  endl;
-
+          f1*=(Rate_Inverse_Compton(E1,z,pt_Spectrum_and_Precision_Parameters));
+          f2*=(Rate_Inverse_Compton(E2,z,pt_Spectrum_and_Precision_Parameters));
+          f3*=(Rate_Inverse_Compton(E3,z,pt_Spectrum_and_Precision_Parameters));
+          f4*=(Rate_Inverse_Compton(E4,z,pt_Spectrum_and_Precision_Parameters));
+          f5*=(Rate_Inverse_Compton(E5,z,pt_Spectrum_and_Precision_Parameters));
+          f6*=(Rate_Inverse_Compton(E6,z,pt_Spectrum_and_Precision_Parameters));
+          f7*=(Rate_Inverse_Compton(E7,z,pt_Spectrum_and_Precision_Parameters));
+          resultat_5 += dE/840. * (41*f1+216*f2+27*f3+272*f4+27*f5+216*f6+41*f7);
         }
         integrale = (resultat_1-resultat_3)+(resultat_2-resultat_4);
+        cout << " check cross section = " << resultat_5 << " theoritical value = " << 8*pi/3*re*re*eta*n_y_0*pow(1+z,3)*()
       }
       if(verbose>1){cout << "The total energy contained in " <<   pt_Gamma_Spectrum->spectrum_name  << "spectrum is " << resultat_1 << " - " << resultat_3 << " = " << resultat_1-resultat_3 << " MeV";
         cout << " and in " << pt_Electron_Spectrum->spectrum_name << "spectrum is " << resultat_2 << " - " << resultat_4 << " = " << resultat_2-resultat_4 << " MeV ";

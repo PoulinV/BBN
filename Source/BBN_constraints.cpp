@@ -3,6 +3,7 @@
 int l=0;
 void Spectrum_and_cross_sections_convolution(struct Structure_Spectrum * pt_Cascade_Spectrum,
                                              struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+                                             struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
                                              int i_min,
                                              int i_max,
                                              double &resultat,
@@ -50,7 +51,13 @@ void Spectrum_and_cross_sections_convolution(struct Structure_Spectrum * pt_Casc
           }
         }
 
-          if(spectrum_choice == "Dirac"){
+
+          if(spectrum_choice == "universal"){
+          if(E1 <= E_c)f1 = Universal_Spectrum(E1,z,pt_Particle_Physics_Model->E_0);
+          if(E2 <= E_c)f2 = Universal_Spectrum(E2,z,pt_Particle_Physics_Model->E_0);
+          if(E3 <= E_c)f3 = Universal_Spectrum(E3,z,pt_Particle_Physics_Model->E_0);
+          }
+          else{
             if(E_0<E_c)linearint(pt_Cascade_Spectrum->Energy, pt_Cascade_Spectrum->Spectrum, pt_Cascade_Spectrum->Energy.size(), E1, f1);
             else if (E_0>E_c)f1 = Universal_Spectrum(E1,z,pt_Particle_Physics_Model->E_0);
             if(E1>E_c)f1=0;
@@ -61,23 +68,18 @@ void Spectrum_and_cross_sections_convolution(struct Structure_Spectrum * pt_Casc
             else if (E_0>E_c)f3 = Universal_Spectrum(E3,z,pt_Particle_Physics_Model->E_0);
             if(E3>E_c)f3=0;
           }
-          else if(spectrum_choice == "universal"){
-          if(E1 <= E_c)f1 = Universal_Spectrum(E1,z,pt_Particle_Physics_Model->E_0);
-          if(E2 <= E_c)f2 = Universal_Spectrum(E2,z,pt_Particle_Physics_Model->E_0);
-          if(E3 <= E_c)f3 = Universal_Spectrum(E3,z,pt_Particle_Physics_Model->E_0);
-          }
           // if(z==462770 && l==0){
           //   cout << z << " " << E1 << " " << f1/(rate_NPC(E1,z)+rate_compton(E1,z)+rate_gg_scattering(E1,z)) << " E_c = " << E_c << endl;
           //   l++;}
           f1 *=cross_sections_1;
-          f1 /=(rate_NPC(E1,z)+rate_compton(E1,z)+rate_gg_scattering(E1,z));
+          // f1 /=(rate_NPC(E1,z)+rate_compton(E1,z)+rate_gg_scattering(E1,z));
           f2 *=cross_sections_2;
-          f2 /=(rate_NPC(E2,z)+rate_compton(E2,z)+rate_gg_scattering(E2,z));
+          // f2 /=(rate_NPC(E2,z)+rate_compton(E2,z)+rate_gg_scattering(E2,z));
           f3 *=cross_sections_3;
-          f3 /=(rate_NPC(E3,z)+rate_compton(E3,z)+rate_gg_scattering(E3,z));
+          // f3 /=(rate_NPC(E3,z)+rate_compton(E3,z)+rate_gg_scattering(E3,z));
           resultat += h * (f1/3. + 4.*f2/3. + f3/3.);
 
-          if(spectrum_choice == "Dirac" && k==n_step && E_c>pt_Particle_Physics_Model->E_0){
+          if(spectrum_choice == "Dirac" && k==n_step && E_c>pt_Particle_Physics_Model->E_0 && pt_Spectrum_and_Precision_Parameters->calculation_mode == "iterative"){
             // cout << "works"<<endl;
 
             for(int i = i_min; i<=i_max;i++){
@@ -301,13 +303,14 @@ void Compute_Constraints_from_destruction_only(struct Structure_Particle_Physics
     // }
    Spectrum_and_cross_sections_convolution(&Cascade_Spectrum,
                                            pt_Particle_Physics_Model,
+                                           pt_Spectrum_and_Precision_Parameters,
                                            i_min,
                                            i_max,
                                            resultat,
                                            z,
                                            n_step,
                                            pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice);
-
+  cout << " resultat = " << resultat << " z = " << z << endl;
    Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.push_back(log10(resultat));
    Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei.push_back(log10(z));
    Cascade_Spectrum.Energy.clear();
@@ -803,7 +806,7 @@ void Compute_constraints_from_destruction_and_production(struct Structure_Partic
         //   Cascade_Spectrum_Calculation(spectrum_choice, z, &Particle_Physics_Model, &Cascade_Spectrum, n_step, iterations, spectrum_mode);
         // }
 
-       Spectrum_and_cross_sections_convolution(&Cascade_Spectrum, pt_Particle_Physics_Model, i_min, i_max, resultat, z, n_step, pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice);
+       Spectrum_and_cross_sections_convolution(&Cascade_Spectrum, pt_Particle_Physics_Model, pt_Spectrum_and_Precision_Parameters, i_min, i_max, resultat, z, n_step, pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice);
 
 
       Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.push_back(log10(resultat));
@@ -812,14 +815,14 @@ void Compute_constraints_from_destruction_and_production(struct Structure_Partic
       // for(int l = 0;l<Gamma_Table_Size;l++)cout << Cascade_Spectrum.Energy[l] << "   " << Cascade_Spectrum.Spectrum[l] <<  endl;
 
 
-      Spectrum_and_cross_sections_convolution(&Cascade_Spectrum, pt_Particle_Physics_Model, j_min, j_max, resultat, z, n_step, pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice);
+      Spectrum_and_cross_sections_convolution(&Cascade_Spectrum, pt_Particle_Physics_Model, pt_Spectrum_and_Precision_Parameters, j_min, j_max, resultat, z, n_step, pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice);
 
       Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_4He.push_back(log10(resultat));
       Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_4He.push_back(log10(z));
       // cout << z << "  " << resultat  << endl;
       // for(int l = 0;l<Gamma_Table_Size;l++)cout << Cascade_Spectrum.Energy[l] << "   " << Cascade_Spectrum.Spectrum[l] <<  endl;
 
-      Spectrum_and_cross_sections_convolution(&Cascade_Spectrum, pt_Particle_Physics_Model, k_min, k_max, resultat, z, n_step, pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice);
+      Spectrum_and_cross_sections_convolution(&Cascade_Spectrum, pt_Particle_Physics_Model, pt_Spectrum_and_Precision_Parameters, k_min, k_max, resultat, z, n_step, pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice);
 
       Cascade_Spectrum_Integrated_Over_Cross_Section_Production_Nuclei.push_back(log10(resultat));
       Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Production_Nuclei.push_back(log10(z));

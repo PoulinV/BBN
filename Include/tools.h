@@ -33,6 +33,7 @@ void Fill_Structure_Spectrum_and_Precision_Parameters(int number_iterations_phot
                                                       int number_iterations_electron,
                                                       int z_step,
                                                       int n_step,
+                                                      string calcutation_mode,
                                                       string photon_spectrum_choice,
                                                       string electron_spectrum_choice,
                                                       string spectrum_mode,
