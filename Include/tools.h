@@ -29,7 +29,8 @@ void print_spectrum(ostream &file, struct Structure_Spectrum * pt_Cascade_Spectr
 void print_spectrum_from_function(ostream &file, double (*func)(double,double,double), struct Structure_Particle_Physics_Model * pt_Particle_Model);
 void print_spectrum_automatic_names(int number_files, struct Structure_Spectrum * pt_Cascade_Spectrum, struct Structure_Particle_Physics_Model * pt_Particle_Model);
 void Fill_Structure_Particle_Physics_Model(double M_x, double Zeta_x, double tau_x, struct Structure_Particle_Physics_Model * pt_Particle_Model);
-void Fill_Structure_Spectrum_and_Precision_Parameters(int iterations,
+void Fill_Structure_Spectrum_and_Precision_Parameters(int number_iterations_photon,
+                                                      int number_iterations_electron,
                                                       int z_step,
                                                       int n_step,
                                                       string photon_spectrum_choice,
@@ -37,7 +38,7 @@ void Fill_Structure_Spectrum_and_Precision_Parameters(int iterations,
                                                       string spectrum_mode,
                                                       string inverse_compton_scattering,
                                                       double (*Gamma_Spectrum)(double, double, double),
-                                                      double (*Electron_Spectrum)(double, double, double),
+                                                      void (*Electron_Spectrum)(struct Structure_Particle_Physics_Model *, struct Structure_Spectrum_and_Precision_Parameters *, struct Structure_Spectrum *),
                                                       struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);
 void Fill_Structure_Scan_Parameters(string nuclei, double tau_min, double tau_max, double tau_step, double zeta_min, double zeta_max, double zeta_step, struct Structure_Scan_Parameters * pt_Scan_Parameters);
 void Fill_Output_Options(string print_result, string results_files, string spectrum_files, struct Structure_Output_Options * pt_Structure_Output_Options);

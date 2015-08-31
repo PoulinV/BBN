@@ -219,7 +219,7 @@ void Compute_Constraints_from_destruction_only(struct Structure_Particle_Physics
   vector<double> Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei;
 
   /******** This step attributes locally the values of precision and scan parameters ********/
-  double tau_min, tau_max, tau_step, zeta_min, zeta_max, zeta_step, z_step, n_step, iterations;
+  double tau_min, tau_max, tau_step, zeta_min, zeta_max, zeta_step, z_step, n_step, number_iterations_photon;
   tau_min = pt_Scan_Parameters->tau_min;
   tau_max = pt_Scan_Parameters->tau_max;
   tau_step = pt_Scan_Parameters->tau_step;
@@ -228,7 +228,7 @@ void Compute_Constraints_from_destruction_only(struct Structure_Particle_Physics
   zeta_step = pt_Scan_Parameters->zeta_step;
   n_step = pt_Spectrum_and_Precision_Parameters->n_step;
   z_step = pt_Spectrum_and_Precision_Parameters->z_step;
-  iterations = pt_Spectrum_and_Precision_Parameters->iterations;
+  number_iterations_photon = pt_Spectrum_and_Precision_Parameters->number_iterations_photon;
   /******************************************************************************************/
 
   double z_initial =  (5*(pow(2*H_r*tau_min,-0.5)-1)), z_final =  35000, z;
@@ -245,7 +245,7 @@ void Compute_Constraints_from_destruction_only(struct Structure_Particle_Physics
     ostringstream os;
     string name;
     if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice=="universal")os << "Output/Results_destruc_only_"<< pt_Scan_Parameters->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV_Universal_Spectrum.dat";
-    else if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice=="Dirac")os << "Output/Results_destruc_only_"<< pt_Scan_Parameters->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV_Dirac_Spectrum_"<<pt_Spectrum_and_Precision_Parameters->iterations<<"iterations.dat";
+    else if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice=="Dirac")os << "Output/Results_destruc_only_"<< pt_Scan_Parameters->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV_Dirac_Spectrum_"<<pt_Spectrum_and_Precision_Parameters->number_iterations_photon<<"iterations.dat";
     name = os.str();
     ofstream file(name);
     if(file){
@@ -289,7 +289,7 @@ void Compute_Constraints_from_destruction_only(struct Structure_Particle_Physics
       Cascade_Spectrum_Reading_From_File(pt_Particle_Physics_Model,
                                                &Cascade_Spectrum,
                                                z,
-                                               pt_Spectrum_and_Precision_Parameters->iterations);
+                                               pt_Spectrum_and_Precision_Parameters->number_iterations_photon);
      }
 
     }
@@ -708,7 +708,7 @@ void Compute_constraints_from_destruction_and_production(struct Structure_Partic
 
   struct Structure_Spectrum Cascade_Spectrum;
   /******** This step attributes locally the values of precision and scan parameters ********/
-  double tau_min, tau_max, tau_step, zeta_min, zeta_max, zeta_step, z_step, n_step, iterations;
+  double tau_min, tau_max, tau_step, zeta_min, zeta_max, zeta_step, z_step, n_step, number_iterations_photon;
   tau_min = pt_Scan_Parameters->tau_min;
   tau_max = pt_Scan_Parameters->tau_max;
   tau_step = pt_Scan_Parameters->tau_step;
@@ -717,7 +717,7 @@ void Compute_constraints_from_destruction_and_production(struct Structure_Partic
   zeta_step = pt_Scan_Parameters->zeta_step;
   n_step = pt_Spectrum_and_Precision_Parameters->n_step;
   z_step = pt_Spectrum_and_Precision_Parameters->z_step;
-  iterations = pt_Spectrum_and_Precision_Parameters->iterations;
+  number_iterations_photon = pt_Spectrum_and_Precision_Parameters->number_iterations_photon;
   /******************************************************************************************/
   int i_min, i_max;
   int j_min, j_max;
@@ -796,7 +796,7 @@ void Compute_constraints_from_destruction_and_production(struct Structure_Partic
           else Cascade_Spectrum_Reading_From_File(pt_Particle_Physics_Model,
                                                   &Cascade_Spectrum,
                                                   z,
-                                                  pt_Spectrum_and_Precision_Parameters->iterations);
+                                                  pt_Spectrum_and_Precision_Parameters->number_iterations_photon);
           }
        }
         // else if(spectrum_choice == "universal"){

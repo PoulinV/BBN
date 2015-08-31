@@ -10,7 +10,9 @@
 #include "common.h"
 
 typedef double (*Spectrum)(double E, double  z, double E_0);
-
+typedef void (*Electron_Spectrum)(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+                                  struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+                                  struct Structure_Spectrum * Tmp_Electron_Spectrum);
 struct Structure_Spectrum{
 
   int iterations;
@@ -38,7 +40,8 @@ struct Structure_Particle_Physics_Model{
 
 struct Structure_Spectrum_and_Precision_Parameters{
 
-  int iterations;
+  int number_iterations_photon;
+  int number_iterations_electron;
   int z_step;
   int n_step;
   string photon_spectrum_choice;
@@ -46,7 +49,7 @@ struct Structure_Spectrum_and_Precision_Parameters{
   string spectrum_mode;
   string inverse_compton_scattering;
   Spectrum Injected_Gamma_Spectrum;
-  Spectrum Injected_Electron_Spectrum;
+  Electron_Spectrum Injected_Electron_Spectrum;
 
 };
 

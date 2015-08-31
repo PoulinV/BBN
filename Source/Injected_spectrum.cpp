@@ -1,4 +1,4 @@
-#include "../Include/Injected_spectrum.h"
+#include "../Include/injected_spectrum.h"
 /**********************************************************************************************************************************************************************************************************/
 /**********************************************************************************************************************************************************************************************************/
 
@@ -43,15 +43,38 @@ double Dirac_Spectrum_After_One_Iteration(double  x, double  z, double E_0){
 	return f;
 
 }
-double No_Electrons_Injected(double x, double z, double E_0){
-	return 0;
+void Electron_dirac_spectrum_after_one_iteration(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+								                                   struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+								                                   struct Structure_Spectrum * pt_Electron_Spectrum){
+			  double z = pt_Electron_Spectrum->redshift;
+				double E_0 = pt_Particle_Physics_Model->E_0;
+			 	int n_step = pt_Spectrum_and_Precision_Parameters->n_step;
+			 	double E_gamma_bb = 2.701*T_0*(1+z);
+				double int_bb = 2*pow(T_0*(1+z),3)*1.20205/(pi*pi);
+	 			double resultat = 0, Gamma_electron_Dirac = 0, E_e;
+				double dE = (pt_Particle_Physics_Model->E_0 - E_min)/ (double) (Electron_Table_Size-1);
+				cout << " E_gamma_bb = " << E_gamma_bb << " intbb = " << int_bb << endl;
+				Gamma_electron_Dirac = Rate_Inverse_Compton(E_0,z,pt_Spectrum_and_Precision_Parameters);
+				for(int i = 0 ; i < Electron_Table_Size ; i++){
+					E_e = E_min + i*dE;
+					pt_Electron_Spectrum->Energy[i] = E_e;
+					resultat = 2*pi*r_e*r_e*m_e*m_e*int_bb/(E_gamma_bb*E_0*E_0*Gamma_electron_Dirac)*Function_Integrand_Spectre_Compton(E_0+E_gamma_bb-E_e,E_0,E_gamma_bb);
+					pt_Electron_Spectrum->Spectrum[i] = resultat/Rate_Inverse_Compton(E_e,z,pt_Spectrum_and_Precision_Parameters);
+					cout << " E = " << E_e << " resultat = " << pt_Electron_Spectrum->Spectrum[i] << endl;
+				}
 }
+
+void No_Electrons_Injected(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+                           struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+                           struct Structure_Spectrum * pt_Electron_Spectrum){
+
+		 double dE = (pt_Particle_Physics_Model->E_0 - E_min)/ (double) (Electron_Table_Size-1);
+		 for(int i = 0 ; i < Electron_Table_Size ; i++){
+				pt_Electron_Spectrum->Energy[i] = E_min + i*dE;
+				pt_Electron_Spectrum->Spectrum[i] = 0;
+			}
+}
+
 double No_Photons_Injected(double x, double z, double E_0){
 	return 0;
 }
-// void Initialize_Spectrum(double (*func)(double,double,struct),struct Structure_Particle_Model * pt_Particle_Model,struct Structure_Gamma_Spectrum * pt_Injected_Spectrum){
-//
-// 	pt_Cascade_Spectrum->Gamma_Energy.resize(Gamma_Table_Size);
-//
-//
-// }
