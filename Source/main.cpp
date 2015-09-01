@@ -15,13 +15,9 @@ using namespace std;
 #include "../Include/common.h"
 #include "../Include/structures.h"
 #include "../Include/EM_cascade.h"
-#include "EM_cascade.cpp"
-#include "../Include/Injected_spectrum.h"
-#include "Injected_spectrum.cpp"
+#include "../Include/injected_spectrum.h"
 #include "../Include/tools.h"
-#include "tools.cpp"
 #include "../Include/BBN_constraints.h"
-#include "BBN_constraints.cpp"
 
 int main(void){
 

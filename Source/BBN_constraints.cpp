@@ -1,5 +1,5 @@
 #include "../Include/EM_cascade.h"
-#include "../Include/Injected_spectrum.h"
+#include "../Include/injected_spectrum.h"
 int l=0;
 void Spectrum_and_cross_sections_convolution(struct Structure_Spectrum * pt_Cascade_Spectrum,
                                              struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
