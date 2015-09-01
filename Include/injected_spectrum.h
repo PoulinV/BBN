@@ -1,3 +1,6 @@
+#ifndef __injected_spectrum__
+#define __injected_spectrum__
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -25,12 +28,10 @@
 
 
 
-double Universal_Spectrum(double  E, double  z, double E_0);
-double Dirac_Spectrum_After_One_Iteration(double  x, double  z, double E_0);
-void Electron_dirac_spectrum_after_one_iteration(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-							                                   struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-							                                   struct Structure_Spectrum * pt_Electron_Spectrum);
-void No_Electrons_Injected(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-                           struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-                           struct Structure_Spectrum * pt_Electron_Spectrum);
-double No_Photons_Injected(double x, double z, double E_0);
+double universal_spectrum(double  E, double  z, double E_0);
+double photon_spectrum_after_one_iteration(double  x, double  z, double E_0);
+double electron_dirac_spectrum_after_one_iteration(double  E, double  z, double E_0);
+double no_electrons_injected(double x, double z, double E_0);
+double no_photons_injected(double x, double z, double E_0);
+
+#endif

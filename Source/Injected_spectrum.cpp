@@ -15,7 +15,7 @@
 
 
 
-double Universal_Spectrum(double  E, double  z, double E_0){
+double universal_spectrum(double  E, double  z, double E_0){
 
 	double  E_x = E_x_0/(1+z), E_c = E_c_0/(1+z);
 	double  K_0 = E_0/(pow(E_x,2)*(2+log(E_c/E_x)));
@@ -28,7 +28,7 @@ double Universal_Spectrum(double  E, double  z, double E_0){
 	return f;
 }
 
-double Dirac_Spectrum_After_One_Iteration(double  x, double  z, double E_0){
+double photon_spectrum_after_one_iteration(double  x, double  z, double E_0){
 
 
 	double Gamma_tot = rate_NPC(E_0,z)+rate_compton(E_0,z)+rate_gg_scattering(E_0,z);
@@ -43,38 +43,49 @@ double Dirac_Spectrum_After_One_Iteration(double  x, double  z, double E_0){
 	return f;
 
 }
-void Electron_dirac_spectrum_after_one_iteration(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-								                                   struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-								                                   struct Structure_Spectrum * pt_Electron_Spectrum){
-			  double z = pt_Electron_Spectrum->redshift;
-				double E_0 = pt_Particle_Physics_Model->E_0;
-			 	int n_step = pt_Spectrum_and_Precision_Parameters->n_step;
+double electron_dirac_spectrum_after_one_iteration(double  E, double  z, double E_0){
 			 	double E_gamma_bb = 2.701*T_0*(1+z);
 				double int_bb = 2*pow(T_0*(1+z),3)*1.20205/(pi*pi);
 	 			double resultat = 0, Gamma_electron_Dirac = 0, E_e;
-				double dE = (pt_Particle_Physics_Model->E_0 - E_min)/ (double) (Electron_Table_Size-1);
+				double dE = (E_0 - E_min)/ (double) (Electron_Table_Size-1);
 				// cout << " E_gamma_bb = " << E_gamma_bb << " intbb = " << int_bb << endl;
-				Gamma_electron_Dirac = Rate_Inverse_Compton(E_0,z,pt_Spectrum_and_Precision_Parameters);
-				for(int i = 0 ; i < Electron_Table_Size ; i++){
-					E_e = E_min + i*dE;
-					pt_Electron_Spectrum->Energy[i] = E_e;
-					resultat = 2*pi*r_e*r_e*m_e*m_e*int_bb/(E_gamma_bb*E_0*E_0*Gamma_electron_Dirac)*Function_Integrand_Spectre_Compton(E_0+E_gamma_bb-E_e,E_0,E_gamma_bb);
-					pt_Electron_Spectrum->Spectrum[i] = resultat/Rate_Inverse_Compton(E_e,z,pt_Spectrum_and_Precision_Parameters);
-					// cout << " E = " << E_e << " resultat = " << pt_Electron_Spectrum->Spectrum[i] << endl;
+				double F1, F2, F3, F4, F5, F6, F7;
+				double q_min=0.0001, q1, q2, q3, q4, q5, q6, q7, dq, h;
+				int n_step = 200;
+				dq = (1-q_min)/ (double) (n_step-1);
+				h = dq/6.;
+				q1=q_min;
+				for(int i=0;i<n_step-1;i++){
+					if(i!=0){
+						q1=q7;
+					}
+					q2=q1+h;
+					q3=q2+h;
+					q4=q3+h;
+					q5=q4+h;
+					q6=q5+h;
+					q7=q6+h;
+
+					F1 = Function_Integrand_Spectre_Compton_version_q(q1,E, E_gamma_bb);
+					F2 = Function_Integrand_Spectre_Compton_version_q(q2,E, E_gamma_bb);
+					F3 = Function_Integrand_Spectre_Compton_version_q(q3,E, E_gamma_bb);
+					F4 = Function_Integrand_Spectre_Compton_version_q(q4,E, E_gamma_bb);
+					F5 = Function_Integrand_Spectre_Compton_version_q(q5,E, E_gamma_bb);
+					F6 = Function_Integrand_Spectre_Compton_version_q(q6,E, E_gamma_bb);
+					F7 = Function_Integrand_Spectre_Compton_version_q(q7,E, E_gamma_bb);
+
+					Gamma_electron_Dirac+= dq/840. * (41*F1+216*F2+27*F3+272*F4+27*F5+216*F6+41*F7);
 				}
+				Gamma_electron_Dirac*=2*pi*r_e*r_e*m_e*m_e*int_bb/(E_gamma_bb*E*E);
+				resultat = 2*pi*r_e*r_e*m_e*m_e*int_bb/(E_gamma_bb*E_0*E_0*Gamma_electron_Dirac)*Function_Integrand_Spectre_Compton(E_0+E_gamma_bb-E,E_0,E_gamma_bb);
+
+				return resultat;
 }
 
-void No_Electrons_Injected(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-                           struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-                           struct Structure_Spectrum * pt_Electron_Spectrum){
-
-		 double dE = (pt_Particle_Physics_Model->E_0 - E_min)/ (double) (Electron_Table_Size-1);
-		 for(int i = 0 ; i < Electron_Table_Size ; i++){
-				pt_Electron_Spectrum->Energy[i] = E_min + i*dE;
-				pt_Electron_Spectrum->Spectrum[i] = 0;
-			}
+double no_electrons_injected(double x, double z, double E_0){
+	return 0;
 }
 
-double No_Photons_Injected(double x, double z, double E_0){
+double no_photons_injected(double x, double z, double E_0){
 	return 0;
 }

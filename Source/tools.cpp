@@ -98,7 +98,7 @@ void linearint(vector<double> &xa, vector<double> &ya, int n, double x, double &
         }
 }
 
-void Fill_Structure_Particle_Physics_Model(double M_x, double Zeta_x, double tau_x, struct Structure_Particle_Physics_Model * pt_Particle_Model){
+void fill_structure_particle_physics_model(double M_x, double Zeta_x, double tau_x, struct Structure_Particle_Physics_Model * pt_Particle_Model){
 
 	pt_Particle_Model->M_x = M_x;
 	pt_Particle_Model->E_0 = M_x/2.;
@@ -109,7 +109,7 @@ void Fill_Structure_Particle_Physics_Model(double M_x, double Zeta_x, double tau
 
 }
 
-void Fill_Structure_Scan_Parameters(string nuclei, double tau_min, double tau_max, double tau_step, double zeta_min, double zeta_max, double zeta_step, struct Structure_Scan_Parameters * pt_Scan_Parameters){
+void fill_structure_scan_parameters(string nuclei, double tau_min, double tau_max, double tau_step, double zeta_min, double zeta_max, double zeta_step, struct Structure_Scan_Parameters * pt_Scan_Parameters){
 
   pt_Scan_Parameters->nuclei = nuclei;
 	pt_Scan_Parameters->tau_min = tau_min;
@@ -121,7 +121,7 @@ void Fill_Structure_Scan_Parameters(string nuclei, double tau_min, double tau_ma
 
 }
 
-void Fill_Structure_Spectrum_and_Precision_Parameters(int number_iterations_photon,
+void fill_structure_spectrum_and_precision_parameters(int number_iterations_photon,
                                                       int number_iterations_electron,
                                                       int z_step,
                                                       int n_step,
@@ -131,7 +131,7 @@ void Fill_Structure_Spectrum_and_Precision_Parameters(int number_iterations_phot
                                                       string spectrum_mode,
                                                       string inverse_compton_scattering,
                                                       double (*Gamma_Spectrum)(double, double, double),
-                                                      void (*Electron_Spectrum)(struct Structure_Particle_Physics_Model *, struct Structure_Spectrum_and_Precision_Parameters *, struct Structure_Spectrum *),
+                                                      double (*Electron_Spectrum)(double,double,double),
                                                       struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters){
 
   pt_Spectrum_and_Precision_Parameters->calculation_mode = calculation_mode;
@@ -490,17 +490,9 @@ for(int i=0;i<pt_Spectrum_and_Precision_Parameters->z_step;i++){
           resultat_4+=dE/840. * (41*g1+216*g2+27*g3+272*g4+27*g5+216*g6+41*g7);
 
           // cout << " E7 = " << E7 << "resultat_1 " << resultat_1 << " resultat_2 = " << resultat_2 << "resultat_3 = " << resultat_3 <<  " i = " << i <<  endl;
-          f1*=(Rate_Inverse_Compton(E1,z,pt_Spectrum_and_Precision_Parameters));
-          f2*=(Rate_Inverse_Compton(E2,z,pt_Spectrum_and_Precision_Parameters));
-          f3*=(Rate_Inverse_Compton(E3,z,pt_Spectrum_and_Precision_Parameters));
-          f4*=(Rate_Inverse_Compton(E4,z,pt_Spectrum_and_Precision_Parameters));
-          f5*=(Rate_Inverse_Compton(E5,z,pt_Spectrum_and_Precision_Parameters));
-          f6*=(Rate_Inverse_Compton(E6,z,pt_Spectrum_and_Precision_Parameters));
-          f7*=(Rate_Inverse_Compton(E7,z,pt_Spectrum_and_Precision_Parameters));
-          resultat_5 += dE/840. * (41*f1+216*f2+27*f3+272*f4+27*f5+216*f6+41*f7);
+
         }
         integrale = (resultat_1-resultat_3)+(resultat_2-resultat_4);
-        cout << " check cross section = " << resultat_5 << " theoritical value = " << 8*pi/3*re*re*eta*n_y_0*pow(1+z,3)*()
       }
       if(verbose>1){cout << "The total energy contained in " <<   pt_Gamma_Spectrum->spectrum_name  << "spectrum is " << resultat_1 << " - " << resultat_3 << " = " << resultat_1-resultat_3 << " MeV";
         cout << " and in " << pt_Electron_Spectrum->spectrum_name << "spectrum is " << resultat_2 << " - " << resultat_4 << " = " << resultat_2-resultat_4 << " MeV ";
@@ -508,7 +500,7 @@ for(int i=0;i<pt_Spectrum_and_Precision_Parameters->z_step;i++){
       }
 
 }
-void Fill_Output_Options(string print_result, string results_files, string spectrum_files, struct Structure_Output_Options * pt_Structure_Output_Options){
+void fill_output_options(string print_result, string results_files, string spectrum_files, struct Structure_Output_Options * pt_Structure_Output_Options){
 
   pt_Structure_Output_Options->print_result = print_result;
   pt_Structure_Output_Options->results_files = results_files;

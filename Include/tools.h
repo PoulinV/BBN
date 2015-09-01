@@ -28,8 +28,8 @@ void polint(vector<double> &xa, vector<double> &ya, int n, double x, double &y, 
 void print_spectrum(ostream &file, struct Structure_Spectrum * pt_Cascade_Spectrum, struct Structure_Particle_Physics_Model * pt_Particle_Model);
 void print_spectrum_from_function(ostream &file, double (*func)(double,double,double), struct Structure_Particle_Physics_Model * pt_Particle_Model);
 void print_spectrum_automatic_names(int number_files, struct Structure_Spectrum * pt_Cascade_Spectrum, struct Structure_Particle_Physics_Model * pt_Particle_Model);
-void Fill_Structure_Particle_Physics_Model(double M_x, double Zeta_x, double tau_x, struct Structure_Particle_Physics_Model * pt_Particle_Model);
-void Fill_Structure_Spectrum_and_Precision_Parameters(int number_iterations_photon,
+void fill_structure_particle_physics_model(double M_x, double Zeta_x, double tau_x, struct Structure_Particle_Physics_Model * pt_Particle_Model);
+void fill_structure_spectrum_and_precision_parameters(int number_iterations_photon,
                                                       int number_iterations_electron,
                                                       int z_step,
                                                       int n_step,
@@ -39,10 +39,10 @@ void Fill_Structure_Spectrum_and_Precision_Parameters(int number_iterations_phot
                                                       string spectrum_mode,
                                                       string inverse_compton_scattering,
                                                       double (*Gamma_Spectrum)(double, double, double),
-                                                      void (*Electron_Spectrum)(struct Structure_Particle_Physics_Model *, struct Structure_Spectrum_and_Precision_Parameters *, struct Structure_Spectrum *),
+                                                      double (*Electron_Spectrum)(double,double,double),
                                                       struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);
-void Fill_Structure_Scan_Parameters(string nuclei, double tau_min, double tau_max, double tau_step, double zeta_min, double zeta_max, double zeta_step, struct Structure_Scan_Parameters * pt_Scan_Parameters);
-void Fill_Output_Options(string print_result, string results_files, string spectrum_files, struct Structure_Output_Options * pt_Structure_Output_Options);
+void fill_structure_scan_parameters(string nuclei, double tau_min, double tau_max, double tau_step, double zeta_min, double zeta_max, double zeta_step, struct Structure_Scan_Parameters * pt_Scan_Parameters);
+void fill_output_options(string print_result, string results_files, string spectrum_files, struct Structure_Output_Options * pt_Structure_Output_Options);
 void check_energy_conservation(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
                                struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
                                struct Structure_Spectrum * pt_Gamma_Spectrum,

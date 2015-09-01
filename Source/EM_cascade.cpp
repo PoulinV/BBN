@@ -505,13 +505,15 @@ void Triangular_Spectrum(struct Structure_Particle_Physics_Model * pt_Particle_P
 			pt_Electron_Spectrum->Energy[i] = E_e;
 			pt_Cascade_Spectrum->Energy[i] = E_g;
 			if(i==(Electron_Table_Size-1)){
-				// pt_Electron_Spectrum->Spectrum[i]=dE*pt_Cascade_Spectrum->Spectrum[i]/Rate_Inverse_Compton(E_e,z,pt_Spectrum_and_Precision_Parameters);
-				// pt_Gamma_Spectrum->Spectrum[i]=dE*pt_Cascade_Spectrum->Spectrum[i]/Rate_Inverse_Compton(E_e,z,pt_Spectrum_and_Precision_Parameters);
 				if(pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice == "Dirac"){
 					pt_Electron_Spectrum->Spectrum[i]=1/(dE*Rate_Inverse_Compton(E_e,z,pt_Spectrum_and_Precision_Parameters));
 				}
 				if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "Dirac"){
 					pt_Cascade_Spectrum->Spectrum[i]=1/(dE*(rate_NPC(E_g,z)+rate_compton(E_g,z)+rate_gg_scattering(E_g,z)));
+				}
+				else{
+					pt_Electron_Spectrum->Spectrum[i]=pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum(E_e,z,pt_Particle_Physics_Model->E_0)/Rate_Inverse_Compton(E_e,z,pt_Spectrum_and_Precision_Parameters);
+					pt_Cascade_Spectrum->Spectrum[i]=pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum(E_g,z,pt_Particle_Physics_Model->E_0)/(rate_NPC(E_g,z)+rate_compton(E_g,z)+rate_gg_scattering(E_g,z));
 				}
 			}
 			else{
@@ -520,6 +522,9 @@ void Triangular_Spectrum(struct Structure_Particle_Physics_Model * pt_Particle_P
 					E_j_plus_1 = E_min*pow(E_0/E_min,((double) j+1)/(Electron_Table_Size-1));
 					E_j_minus_1 = E_min*pow(E_0/E_min,((double) j-1)/(Electron_Table_Size-1));
 					dE_j = (E_j_plus_1 - E_j_minus_1)/2.;
+					pt_Electron_Spectrum->Spectrum[i]+=pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum(E_j,z,pt_Particle_Physics_Model->E_0)/Rate_Inverse_Compton(E_j,z,pt_Spectrum_and_Precision_Parameters);
+					pt_Cascade_Spectrum->Spectrum[i]+=pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum(E_j,z,pt_Particle_Physics_Model->E_0)/(rate_NPC(E_j,z)+rate_compton(E_j,z)+rate_gg_scattering(E_j,z));
+
 					pt_Electron_Spectrum->Spectrum[i] += dE_j * pt_Cascade_Spectrum->Spectrum[j] * (dsigma_compton(E_j,z,(E_j+m_e-E_e))+dsigma_NPC(E_j+m_e,z,E_e))/Rate_Inverse_Compton(E_e,z,pt_Spectrum_and_Precision_Parameters);
 					pt_Electron_Spectrum->Spectrum[i] += dE_j * pt_Electron_Spectrum->Spectrum[j] * 2*pi*r_e*r_e*m_e*m_e*int_bb/(E_gamma_bb) * (Function_Integrand_Spectre_Compton(E_j+E_gamma_bb-E_e,E_j, E_gamma_bb)/((E_j)*(E_j)))/Rate_Inverse_Compton(E_e,z,pt_Spectrum_and_Precision_Parameters);
 					// cout << "Function_Integrand_Spectre_Compton(E_j+E_gamma_bb-E_e,E_j, E_gamma_bb) " << Function_Integrand_Spectre_Compton(E_j+E_gamma_bb-E_e,E_j, E_gamma_bb) << endl;
@@ -531,44 +536,7 @@ void Triangular_Spectrum(struct Structure_Particle_Physics_Model * pt_Particle_P
 			}
 
 }
-/*void Triangular_Photon_Spectrum(){
-	double E_gamma_minus_1, E_gamma_plus_1, E_j, E_j_minus_1, E_j_plus_1, dE_j;
 
-			for(double i = (Gamma_Table_Size-1); i>=0 ;i--){
-			resultat=0;
-			E_gamma = E_min*pow(E_0/E_min,i/(Gamma_Table_Size-1));
-			E_gamma_plus_1 = E_min*pow(E_0/E_min,(i+1)/(Gamma_Table_Size-1));
-			E_gamma_minus_1 = E_min*pow(E_0/E_min,(i-1)/(Gamma_Table_Size-1));
-			dE = (E_gamma_plus_1 - E_gamma_minus_1)/2.;
-			pt_Cascade_Spectrum->Energy[i] = E_gamma;
-			pt_Cascade_Spectrum->Spectrum[i] = 0;
-			if(i==(Gamma_Table_Size-1)){
-				pt_Cascade_Spectrum->Spectrum[i]=1/(dE*((rate_NPC(E_gamma,z)+rate_compton(E_gamma,z)+rate_gg_scattering(E_gamma,z))));
-			}
-			else{
-				for (int j = i+1 ; j < Gamma_Table_Size ; j ++){
-					E_j = E_min*pow(E_0/E_min,j/(Gamma_Table_Size-1));
-					E_j_plus_1 = E_min*pow(E_0/E_min,(j+1)/(Gamma_Table_Size-1));
-					E_j_minus_1 = E_min*pow(E_0/E_min,(j-1)/(Gamma_Table_Size-1));
-					dE_j = (E_j_plus_1 - E_j_minus_1)/2.;
-					if(j==i+1)pt_Cascade_Spectrum->Energy[i] = E_gamma;
-					pt_Cascade_Spectrum->Spectrum[i] += dE_j * pt_Cascade_Spectrum->Spectrum[j] * (dsigma_phph(E_j,z,E_gamma)+dsigma_compton(E_j,z,E_gamma))/(rate_NPC(E_gamma,z)+rate_compton(E_gamma,z)+rate_gg_scattering(E_gamma,z));
-				}
-			}
-			cout << " E = "<< pt_Cascade_Spectrum->Energy[i] << " pt_Cascade_Spectrum->Spectrum[i] = " << pt_Cascade_Spectrum->Spectrum[i] << endl;
-			}
-
-		check_energy_conservation(pt_Particle_Physics_Model,pt_Spectrum_and_Precision_Parameters,pt_Cascade_Spectrum,integrale);
-		// for(int i=0;i<Gamma_Table_Size;i++){
-		// 	pt_Cascade_Spectrum->Spectrum[i]=pt_Particle_Physics_Model->E_0/integrale*pt_Cascade_Spectrum->Spectrum[i];
-		// }
-		// check_energy_conservation(pt_Particle_Physics_Model,pt_Spectrum_and_Precision_Parameters,pt_Cascade_Spectrum,integrale);
-
-		if(pt_Spectrum_and_Precision_Parameters->spectrum_mode == "writing"){
-			pt_Cascade_Spectrum->spectrum_name = "Cascade_";
-			print_spectrum_automatic_names(1, pt_Cascade_Spectrum, pt_Particle_Physics_Model);
-		}
-}*/
 void  Cascade_Spectrum_Calculation(double z,
 																	 struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
 																	 struct Structure_Spectrum * pt_Cascade_Spectrum,
@@ -636,7 +604,7 @@ void  Cascade_Spectrum_Calculation(double z,
 					for(int i=0;i<Gamma_Table_Size;i++){
 						E1=E_min+i*dE;
 						pt_Cascade_Spectrum->Energy[i]=E1;
-						pt_Cascade_Spectrum->Spectrum[i]=Universal_Spectrum(E1,z,pt_Particle_Physics_Model->E_0);
+						pt_Cascade_Spectrum->Spectrum[i]=universal_spectrum(E1,z,pt_Particle_Physics_Model->E_0);
 						Electron_Spectrum.Energy[i]=E1;
 						Electron_Spectrum.Spectrum[i]=0;
 
@@ -651,7 +619,7 @@ void  Cascade_Spectrum_Calculation(double z,
 								for(int i=0;i<Gamma_Table_Size;i++){
 									E1=E_min+i*dE;
 									pt_Cascade_Spectrum->Energy[i]=E1;
-									pt_Cascade_Spectrum->Spectrum[i]=Universal_Spectrum(E1,z,pt_Particle_Physics_Model->E_0);
+									pt_Cascade_Spectrum->Spectrum[i]=universal_spectrum(E1,z,pt_Particle_Physics_Model->E_0);
 									Electron_Spectrum.Energy[i]=E1;
 									Electron_Spectrum.Spectrum[i]=0;
 								}
@@ -699,15 +667,14 @@ void  Cascade_Spectrum_Calculation(double z,
 						else if(pt_Spectrum_and_Precision_Parameters->calculation_mode == "iterative"){
 							/********First step : compute initial ICS spectrum from the electon spectrum injected**********/
 
-					 pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum(pt_Particle_Physics_Model,
-																																						pt_Spectrum_and_Precision_Parameters,
-																																						&Tmp_Electron_Spectrum);
+							for(int i=0;i<Electron_Table_Size;i++){
+									E1=E_min+i*dE;
+									Tmp_Electron_Spectrum.Energy[i]=E1;
+									Tmp_Electron_Spectrum.Spectrum[i]=pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum(E1,z,pt_Particle_Physics_Model->E_0);
+									Electron_Spectrum.Energy[i]=E1;
+									Electron_Spectrum.Spectrum[i]=Tmp_Electron_Spectrum.Spectrum[i];
+							}
 
-						for(int i=0;i<Electron_Table_Size;i++){
-								E1=E_min+i*dE;
-								Electron_Spectrum.Energy[i]=E1;
-								Electron_Spectrum.Spectrum[i]=Tmp_Electron_Spectrum.Spectrum[i];
-						}
 						for(int i=0;i<Gamma_Table_Size;i++){
 								E1=E_min+i*dE;
 								pt_Cascade_Spectrum->Energy[i]=E1;

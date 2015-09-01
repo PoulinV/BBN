@@ -50,7 +50,7 @@ struct Structure_Spectrum_and_Precision_Parameters{
   string spectrum_mode;
   string inverse_compton_scattering;
   Spectrum Injected_Gamma_Spectrum;
-  Electron_Spectrum Injected_Electron_Spectrum;
+  Spectrum Injected_Electron_Spectrum;
 
 };
 
