@@ -1,15 +1,21 @@
 #include "../Include/EM_cascade.h"
 #include "../Include/injected_spectrum.h"
+#include "../Include/structures.h"
+#include "../Include/BBN_constraints.h"
+#include "../Include/tools.h"
+using namespace std;
+
+
 int l=0;
-void Spectrum_and_cross_sections_convolution(struct Structure_Spectrum * pt_Cascade_Spectrum,
-                                             struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-                                             struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Cascade_Spectrum,
+                                            Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+                                            Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
                                              int i_min,
                                              int i_max,
                                              double &resultat,
                                              double z,
                                              long n_step,
-                                             string spectrum_choice){
+                                             const string &spectrum_choice){
   double tau = pt_Particle_Physics_Model->tau_x;
   double Z_x = pt_Particle_Physics_Model->Zeta_x;
   double E_0 = pt_Particle_Physics_Model->E_0;
@@ -95,8 +101,8 @@ void Spectrum_and_cross_sections_convolution(struct Structure_Spectrum * pt_Casc
 }
 //
 // void Check_model_from_destruction_only(string nuclei,
-//                                        struct Structure_Spectrum * pt_Cascade_Spectrum,
-//                                        struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+//                                        Structure_Spectrum * pt_Cascade_Spectrum,
+//                                        Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
 //                                        double &Abundance,
 //                                        double z_initial,
 //                                        double z_final,
@@ -211,12 +217,12 @@ void Spectrum_and_cross_sections_convolution(struct Structure_Spectrum * pt_Casc
 // }
 
 
-void Compute_Constraints_from_destruction_only(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-                                               struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-                                               struct Structure_Scan_Parameters * pt_Scan_Parameters,
-                                               struct Structure_Output_Options * pt_Output_Options){
+void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+                                              Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+                                              Structure_Scan_Parameters * pt_Scan_Parameters,
+                                              Structure_Output_Options * pt_Output_Options){
 
-  struct Structure_Spectrum Cascade_Spectrum;
+  Structure_Spectrum Cascade_Spectrum;
   vector<double> Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei;
   vector<double> Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei;
 
@@ -272,7 +278,7 @@ void Compute_Constraints_from_destruction_only(struct Structure_Particle_Physics
    z=pow(10,log10(z_initial)-j*log10_dz);
    E_c = E_c_0/(1+z);
    if(verbose>1)cout<<"redshift = " << z << " still " << z_step-j << " to go " << endl;
-   if(Structure_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "universal"){
+   if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "universal"){
      Cascade_Spectrum_Calculation(z,
                                   pt_Particle_Physics_Model,
                                   &Cascade_Spectrum,
@@ -397,10 +403,10 @@ void Compute_Constraints_from_destruction_only(struct Structure_Particle_Physics
     Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.clear();
 }
 
-void Compute_constraints_from_destruction_and_production(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-                                                         struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-                                                         struct Structure_Scan_Parameters * pt_Scan_Parameters,
-                                                         struct Structure_Output_Options * pt_Output_Options){
+void Compute_constraints_from_destruction_and_production(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+                                                        Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+                                                        Structure_Scan_Parameters * pt_Scan_Parameters,
+                                                        Structure_Output_Options * pt_Output_Options){
 
   double z,dz,h;
   double z1, z2, z3;
@@ -413,7 +419,7 @@ void Compute_constraints_from_destruction_and_production(struct Structure_Partic
   vector<double> Integration_over_z_source_term_redshift;
   vector<double> Integration_over_z_source_term;
 
-  struct Structure_Spectrum Cascade_Spectrum;
+  Structure_Spectrum Cascade_Spectrum;
   /******** This step attributes locally the values of precision and scan parameters ********/
   double tau_min, tau_max, tau_step, zeta_min, zeta_max, zeta_step, z_step, n_step, number_iterations_photon;
   tau_min = pt_Scan_Parameters->tau_min;
@@ -888,7 +894,7 @@ double  cross_section(double  x, int i)
 }
 
 
-void Check_nuclei(string nuclei,
+void Check_nuclei(const std::string &nuclei,
                   int &i_min,
                   int &i_max,
                   int &k_min,

@@ -1,4 +1,10 @@
+#include "../Include/EM_cascade.h"
 #include "../Include/injected_spectrum.h"
+#include "../Include/structures.h"
+#include "../Include/BBN_constraints.h"
+#include "../Include/tools.h"
+using namespace std;
+
 /**********************************************************************************************************************************************************************************************************/
 /**********************************************************************************************************************************************************************************************************/
 
@@ -36,7 +42,7 @@ double photon_spectrum_after_one_iteration(double  x, double  z, double E_0){
 	double T = T_0*(1+z);
 	double int_BB = 8./63.*pow(pi,4)*pow(T_0*(1+z),6);
 
-	double spectre_gamma_gamma = 1112./(10125*pi)*pow(a*r_e,2)*pow(m_e,-6)*pow(E_0,2)*pow(1-x/E_0+pow(x/E_0,2),2)*int_BB;
+	double spectre_gamma_gamma = 1112./(10125*pi)*pow(ALPHA*r_e,2)*pow(m_e,-6)*pow(E_0,2)*pow(1-x/E_0+pow(x/E_0,2),2)*int_BB;
 	double spectre_compton = pi*r_e*r_e*m_e*pow(E_0,-2)*(x/E_0+E_0/x+pow(m_e/x-m_e/E_0,2)-2*m_e*(1/x-1/E_0))*n_e*pow(1+z,3);
 	double f = (spectre_gamma_gamma+spectre_compton)/(Gamma_tot);
 	if(x>E_0)f=0;

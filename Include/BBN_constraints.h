@@ -3,55 +3,36 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <math.h>
-#include <iostream>
 #include <string>
-#include <vector>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 #include "../Include/common.h"
-void Spectrum_and_cross_sections_convolution(struct Structure_Gamma_Spectrum * pt_Cascade_Spectrum,
-                                            struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+#include "../Include/structures.h"
+
+void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Cascade_Spectrum,
+                                            Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
                                             int i_min,
                                             int i_max,
                                             double &resultat,
                                             double z,
                                             long n_step,
-                                            string spectrum_choice);
+                                            const std::string &spectrum_choice);
 
-// void Check_model_from_destruction_only(string nuclei,
-//                                        struct Structure_Gamma_Spectrum * pt_Cascade_Spectrum,
-//                                        struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-//                                        double &Abundance,
-//                                        double z_initial,
-//                                        double z_final,
-//                                        int z_step,
-//                                        long n_step,
-//                                        int iterations,
-//                                        string spectrum_choice,
-//                                        string spectrum_mode);
 
-void Compute_Constraints_from_destruction_only(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-                                               struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-                                               struct Structure_Scan_Parameters * pt_Scan_Parameters,
-                                               struct Structure_Output_Options * pt_Output_Options);
+void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+                                              Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+                                              Structure_Scan_Parameters * pt_Scan_Parameters,
+                                              Structure_Output_Options * pt_Output_Options);
 
-void Compute_constraints_from_destruction_and_production(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-                                                         struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-                                                         struct Structure_Scan_Parameters * pt_Scan_Parameters,
-                                                         struct Structure_Output_Options * pt_Output_Options);
-// 
-// void Check_model_from_destruction_and_production(string nuclei,
-//                                                  struct Structure_Gamma_Spectrum * pt_Cascade_Spectrum,
-//                                                  struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-//                                                  double &Abundance,
-//                                                  double z_initial,
-//                                                  double z_final,
-//                                                  int z_step,
-//                                                  long n_step,
-//                                                  int iterations,
-//                                                  string spectrum_choice,
-//                                                  string spectrum_mode);
+void Compute_constraints_from_destruction_and_production(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+                                                        Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+                                                        Structure_Scan_Parameters * pt_Scan_Parameters,
+                                                        Structure_Output_Options * pt_Output_Options);
+
 
 double cross_section(double  x, int i);
-void Check_nuclei(string nuclei,
+void Check_nuclei(const std::string &nuclei,
                   int &i_min,
                   int &i_max,
                   int &k_min,

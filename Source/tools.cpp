@@ -1,8 +1,12 @@
-#include "../Include/tools.h"
 #include "../Include/EM_cascade.h"
+#include "../Include/injected_spectrum.h"
+#include "../Include/structures.h"
+#include "../Include/BBN_constraints.h"
+#include "../Include/tools.h"
 
+using namespace std;
 
-void print_spectrum(ostream &file, struct Structure_Spectrum * pt_Cascade_Spectrum, struct Structure_Particle_Physics_Model * pt_Particle_Model){
+void print_spectrum(ostream &file, Structure_Spectrum * pt_Cascade_Spectrum, Structure_Particle_Physics_Model * pt_Particle_Model){
 
 
   double dE = (pt_Particle_Model->E_0 - E_min)/Gamma_Table_Size;
@@ -16,7 +20,7 @@ void print_spectrum(ostream &file, struct Structure_Spectrum * pt_Cascade_Spectr
   }
 
 }
-void print_spectrum_from_function(ostream &file, double (*func)(double,double,double),double z, struct Structure_Particle_Physics_Model * pt_Particle_Model){
+void print_spectrum_from_function(ostream &file, double (*func)(double,double,double),double z, Structure_Particle_Physics_Model * pt_Particle_Model){
 
 
   double dE = (pt_Particle_Model->E_0 - E_min)/Gamma_Table_Size;
@@ -29,7 +33,7 @@ void print_spectrum_from_function(ostream &file, double (*func)(double,double,do
   }
 
 }
-void print_spectrum_automatic_names(int iterations, struct Structure_Spectrum * pt_Cascade_Spectrum, struct Structure_Particle_Physics_Model * pt_Particle_Model){
+void print_spectrum_automatic_names(int iterations, Structure_Spectrum * pt_Cascade_Spectrum, Structure_Particle_Physics_Model * pt_Particle_Model){
   ostringstream os;
   string name;
 
@@ -98,7 +102,7 @@ void linearint(vector<double> &xa, vector<double> &ya, int n, double x, double &
         }
 }
 
-void fill_structure_particle_physics_model(double M_x, double Zeta_x, double tau_x, struct Structure_Particle_Physics_Model * pt_Particle_Model){
+void fill_structure_particle_physics_model(double M_x, double Zeta_x, double tau_x, Structure_Particle_Physics_Model * pt_Particle_Model){
 
 	pt_Particle_Model->M_x = M_x;
 	pt_Particle_Model->E_0 = M_x/2.;
@@ -109,7 +113,7 @@ void fill_structure_particle_physics_model(double M_x, double Zeta_x, double tau
 
 }
 
-void fill_structure_scan_parameters(string nuclei, double tau_min, double tau_max, double tau_step, double zeta_min, double zeta_max, double zeta_step, struct Structure_Scan_Parameters * pt_Scan_Parameters){
+void fill_structure_scan_parameters(const string &nuclei, double tau_min, double tau_max, double tau_step, double zeta_min, double zeta_max, double zeta_step, Structure_Scan_Parameters * pt_Scan_Parameters){
 
   pt_Scan_Parameters->nuclei = nuclei;
 	pt_Scan_Parameters->tau_min = tau_min;
@@ -125,14 +129,14 @@ void fill_structure_spectrum_and_precision_parameters(int number_iterations_phot
                                                       int number_iterations_electron,
                                                       int z_step,
                                                       int n_step,
-                                                      string calculation_mode,
-                                                      string photon_spectrum_choice,
-                                                      string electron_spectrum_choice,
-                                                      string spectrum_mode,
-                                                      string inverse_compton_scattering,
+                                                      const string &calculation_mode,
+                                                      const string &photon_spectrum_choice,
+                                                      const string &electron_spectrum_choice,
+                                                      const string &spectrum_mode,
+                                                      const string &inverse_compton_scattering,
                                                       double (*Gamma_Spectrum)(double, double, double),
                                                       double (*Electron_Spectrum)(double,double,double),
-                                                      struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters){
+                                                      Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters){
 
   pt_Spectrum_and_Precision_Parameters->calculation_mode = calculation_mode;
 	pt_Spectrum_and_Precision_Parameters->number_iterations_photon = number_iterations_photon;
@@ -146,10 +150,10 @@ void fill_structure_spectrum_and_precision_parameters(int number_iterations_phot
   pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum = (*Gamma_Spectrum);
   pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum = (*Electron_Spectrum);
 }
-void check_energy_conservation(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-                               struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-                               struct Structure_Spectrum * pt_Gamma_Spectrum,
-                               struct Structure_Spectrum * pt_Electron_Spectrum,
+void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+                               Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+                               Structure_Spectrum * pt_Gamma_Spectrum,
+                               Structure_Spectrum * pt_Electron_Spectrum,
                                double &integrale){
 
 double dE = (pt_Particle_Physics_Model->E_0 - E_min) / (double) (pt_Spectrum_and_Precision_Parameters->n_step - 1);
@@ -500,7 +504,7 @@ for(int i=0;i<pt_Spectrum_and_Precision_Parameters->z_step;i++){
       }
 
 }
-void fill_output_options(string print_result, string results_files, string spectrum_files, struct Structure_Output_Options * pt_Structure_Output_Options){
+void fill_output_options(const string &print_result, const string &results_files, const string &spectrum_files, Structure_Output_Options * pt_Structure_Output_Options){
 
   pt_Structure_Output_Options->print_result = print_result;
   pt_Structure_Output_Options->results_files = results_files;

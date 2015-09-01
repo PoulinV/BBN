@@ -19,7 +19,17 @@ using namespace std;
 #include "../Include/tools.h"
 #include "../Include/BBN_constraints.h"
 
-int main(void){
+
+
+int main(int argc, char** argv){
+  if(argc>2){
+    cout <<"Error : you have given too many files as an input.\n Please, restart cBBNFast with at most one '.ini' file." << endl;
+    return 0;
+  }
+
+  // maps<string,unsigned> map_parameters;
+  //
+  // fill_default_parameters(map_parameters);
 
   /******* Precision parameters : control the number of step in integration scheme, ***************
   ********** as well as the number of iterations for computing the cascade spectrum **************/
@@ -72,7 +82,7 @@ int main(void){
   // double z = 5*Particle_Physics_Model.z_x;
   mkdir("Output",01777);
   ofstream Spectrum("Output/universal_spectrum.dat");
-  print_spectrum_from_function(Spectrum, universal_spectrum, z, &Particle_Physics_Model);
+  // print_spectrum_from_function(Spectrum, universal_spectrum, &Particle_Physics_Model);
   Cascade_Spectrum_Calculation(z,
                                &Particle_Physics_Model,
                                &Cascade_Spectrum,

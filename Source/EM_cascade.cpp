@@ -1,6 +1,11 @@
 #include "../Include/EM_cascade.h"
-#include "../Include/Injected_spectrum.h"
+#include "../Include/injected_spectrum.h"
+#include "../Include/structures.h"
+#include "../Include/BBN_constraints.h"
 #include "../Include/tools.h"
+
+using namespace std;
+
 double  dsigma_compton(double  x, double  z, double g){
 
 	double  dsigma =0;
@@ -11,7 +16,7 @@ double  dsigma_compton(double  x, double  z, double g){
 }
 double  dsigma_phph(double  x, double  z,  double g){
 
-	double  dsigma = pow(T_0*(1+z),6)*8*pow(pi,4)*1112*pow(a*r_e,2)*pow(m_e,-6)*pow(x,2)*pow(1-g/x+pow(g/x,2),2)/(63*10125*pi);
+	double  dsigma = pow(T_0*(1+z),6)*8*pow(pi,4)*1112*pow(ALPHA*r_e,2)*pow(m_e,-6)*pow(x,2)*pow(1-g/x+pow(g/x,2),2)/(63*10125*pi);
 	return dsigma;
 
 }
@@ -29,7 +34,7 @@ double dsigma_NPC(double E_gamma, double z, double E_e){
 	double l = log((E_e+p)/(E_e-p));
 	double l_pos = log((E_pos+p_pos)/(E_pos-p_pos));
 
-	double result =  a*pow(r_e,2)*pow(1+z,3)*eta*n_y_0*p*p_pos/pow(E_gamma,3)
+	double result =  ALPHA*pow(r_e,2)*pow(1+z,3)*eta*n_y_0*p*p_pos/pow(E_gamma,3)
 				 *(-4./3-2*E_pos*E_e*(p_pos*p_pos+p*p)/(p*p*p_pos*p_pos)+m_e*m_e*(l*E_pos/pow(p,3)+l_pos*E_e/pow(p_pos,3)-l*l_pos/(p_pos*p))
 				 +L*(-8*E_pos*E_e/(3*p_pos*p)+E_gamma*E_gamma/pow(p_pos*p,3)*(pow(E_pos*E_e,2)+pow(p_pos*p,2)-m_e*m_e*E_pos*E_e)-m_e*m_e*E_gamma/(2*p_pos*p)*(l_pos*(E_pos*E_e-pow(p_pos,2))/pow(p_pos,3)+l*(E_pos*E_e-p*p)/pow(p,3))));
 	// result = 0;
@@ -49,7 +54,7 @@ double  rate_NPC(double  x, double  z){
 	double  k = x/m_e;
 	double  rho = (2*k-4)/(k+2+2*pow(2*k,0.5));
 	double  sigma_PCN;
-	sigma_PCN = a*pow(r_e,2)*(28/9*log(2*k)-218/27) ;
+	sigma_PCN = ALPHA*pow(r_e,2)*(28/9*log(2*k)-218/27) ;
 	double  Gamma_2 = sigma_PCN*pow(1+z,3)*eta*n_y_0;
 	return Gamma_2;
 
@@ -58,7 +63,7 @@ double  rate_NPC(double  x, double  z){
 double  rate_gg_scattering(double  x, double  z){
 
 	double  Gamma_3;
-	Gamma_3 = 0.1513*pow(a,4)*m_e*pow(x/m_e,3)*pow(T_0*(1+z)/m_e,6);
+	Gamma_3 = 0.1513*pow(ALPHA,4)*m_e*pow(x/m_e,3)*pow(T_0*(1+z)/m_e,6);
 	return Gamma_3;
 
 }
@@ -87,10 +92,10 @@ double Function_Integrand_Spectre_Compton_version_q(double q, double E_e, double
 
 	return f;
 }
-void  Spectre_electron_compton(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-													 struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-													 struct Structure_Spectrum * pt_Gamma_Spectrum,
-													 struct Structure_Spectrum * pt_Electron_Spectrum){
+void  Spectre_electron_compton(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+													 Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+													 Structure_Spectrum * pt_Gamma_Spectrum,
+													 Structure_Spectrum * pt_Electron_Spectrum){
 
  	double z = pt_Electron_Spectrum->redshift;
 	int n_step = pt_Spectrum_and_Precision_Parameters->n_step;
@@ -164,7 +169,7 @@ void  Spectre_electron_compton(struct Structure_Particle_Physics_Model * pt_Part
 
 }
 
-double Rate_Inverse_Compton(double E_e, double z, struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters){
+double Rate_Inverse_Compton(double E_e, double z, Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters){
 	double rate = 0;
  	double int_bb = 2*pow(T_0*(1+z),3)*1.20205/(pi*pi);
 	double E_gamma_bb = 2.701*T_0*(1+z);
@@ -200,10 +205,10 @@ double Rate_Inverse_Compton(double E_e, double z, struct Structure_Spectrum_and_
 	return rate;
 }
 
-void Spectrum_electron_scattered(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-																 struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-																 struct Structure_Spectrum * pt_Input_Electron_Spectrum,
-															 	 struct Structure_Spectrum * pt_Output_Electron_Spectrum){
+void Spectrum_electron_scattered(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+																 Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+																 Structure_Spectrum * pt_Input_Electron_Spectrum,
+															 	 Structure_Spectrum * pt_Output_Electron_Spectrum){
 
 	  	double z = pt_Input_Electron_Spectrum->redshift;
 		 	int n_step = pt_Spectrum_and_Precision_Parameters->n_step;
@@ -292,10 +297,10 @@ void Spectrum_electron_scattered(struct Structure_Particle_Physics_Model * pt_Pa
 
 
 
-void Spectre_gamma_compton(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-													 struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-													 struct Structure_Spectrum * pt_Electron_Spectrum,
-													 struct Structure_Spectrum * pt_Gamma_Spectrum){
+void Spectre_gamma_compton(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+													 Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+													 Structure_Spectrum * pt_Electron_Spectrum,
+													 Structure_Spectrum * pt_Gamma_Spectrum){
 
 	double z = pt_Gamma_Spectrum->redshift;
 
@@ -382,10 +387,10 @@ void Spectre_gamma_compton(struct Structure_Particle_Physics_Model * pt_Particle
 
 
 }
-void Spectrum_gamma_scattered(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-																 struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-																 struct Structure_Spectrum * pt_Input_Gamma_Spectrum,
-															 	 struct Structure_Spectrum * pt_Output_Gamma_Spectrum){
+void Spectrum_gamma_scattered(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+																 Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+																 Structure_Spectrum * pt_Input_Gamma_Spectrum,
+															 	 Structure_Spectrum * pt_Output_Gamma_Spectrum){
 
 
  double dE, dE_2, h, h2;
@@ -450,8 +455,8 @@ void Spectrum_gamma_scattered(struct Structure_Particle_Physics_Model * pt_Parti
 					pt_Output_Gamma_Spectrum->Spectrum[i]=resultat/(rate_NPC(E_gamma,z)+rate_compton(E_gamma,z)+rate_gg_scattering(E_gamma,z));
 				}
 }
-void Cascade_Spectrum_Reading_From_File(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-																				struct Structure_Spectrum * pt_Cascade_Spectrum,
+void Cascade_Spectrum_Reading_From_File(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+																				Structure_Spectrum * pt_Cascade_Spectrum,
 																				double z,
 																				int number_iterations_photon){
   ostringstream os;
@@ -485,10 +490,10 @@ void Cascade_Spectrum_Reading_From_File(struct Structure_Particle_Physics_Model 
 }
 
 
-void Triangular_Spectrum(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-																 struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-																 struct Structure_Spectrum * pt_Cascade_Spectrum,
-															 	 struct Structure_Spectrum * pt_Electron_Spectrum){
+void Triangular_Spectrum(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+																 Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+																 Structure_Spectrum * pt_Cascade_Spectrum,
+															 	 Structure_Spectrum * pt_Electron_Spectrum){
 	double E_e_minus_1, E_e_plus_1, E_j, E_j_minus_1, E_j_plus_1, dE_j, dE;
 	double resultat, E_e, E_g;
 	double z = pt_Cascade_Spectrum->redshift;
@@ -538,18 +543,18 @@ void Triangular_Spectrum(struct Structure_Particle_Physics_Model * pt_Particle_P
 }
 
 void  Cascade_Spectrum_Calculation(double z,
-																	 struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-																	 struct Structure_Spectrum * pt_Cascade_Spectrum,
-																	 struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters){
+																	 Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+																	 Structure_Spectrum * pt_Cascade_Spectrum,
+																	 Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters){
 	double dE, E1, E_e, E_gamma;
 	double resultat, integrale;
 	double E_c = E_c_0/(1+z);
-	struct Structure_Spectrum Electron_Spectrum;
-	struct Structure_Spectrum Inverse_Compton_Spectrum;
-	struct Structure_Spectrum Diffused_Gamma_Spectrum;
-	struct Structure_Spectrum Diffused_Electron_Spectrum;
-	struct Structure_Spectrum Compton_Electron_Spectrum;
-	struct Structure_Spectrum Tmp_Electron_Spectrum;
+	Structure_Spectrum Electron_Spectrum;
+	Structure_Spectrum Inverse_Compton_Spectrum;
+	Structure_Spectrum Diffused_Gamma_Spectrum;
+	Structure_Spectrum Diffused_Electron_Spectrum;
+	Structure_Spectrum Compton_Electron_Spectrum;
+	Structure_Spectrum Tmp_Electron_Spectrum;
 	double E_0 = pt_Particle_Physics_Model->E_0;
 
 	/*****Initialization****/

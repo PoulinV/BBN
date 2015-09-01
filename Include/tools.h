@@ -1,6 +1,11 @@
+#ifndef __tools__
+#define __tools__
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <math.h>
 #include <iostream>
@@ -22,40 +27,31 @@
 
 
 void Attribution_avec_correction(int &x);
-void fill_two_tables_from_file(ifstream &file, vector<double> &vector_z, vector<double> &vector_y);
-void linearint(vector<double> &xa, vector<double> &ya, int n, double x, double &y);
-void polint(vector<double> &xa, vector<double> &ya, int n, double x, double &y, double &dy);
-void print_spectrum(ostream &file, struct Structure_Spectrum * pt_Cascade_Spectrum, struct Structure_Particle_Physics_Model * pt_Particle_Model);
-void print_spectrum_from_function(ostream &file, double (*func)(double,double,double), struct Structure_Particle_Physics_Model * pt_Particle_Model);
-void print_spectrum_automatic_names(int number_files, struct Structure_Spectrum * pt_Cascade_Spectrum, struct Structure_Particle_Physics_Model * pt_Particle_Model);
-void fill_structure_particle_physics_model(double M_x, double Zeta_x, double tau_x, struct Structure_Particle_Physics_Model * pt_Particle_Model);
+void fill_two_tables_from_file(std::ifstream &file, std::vector<double> &vector_z, std::vector<double> &vector_y);
+void linearint(std::vector<double> &xa, std::vector<double> &ya, int n, double x, double &y);
+void polint(std::vector<double> &xa, std::vector<double> &ya, int n, double x, double &y, double &dy);
+void print_spectrum(std::ostream &file, Structure_Spectrum * pt_Cascade_Spectrum, Structure_Particle_Physics_Model * pt_Particle_Model);
+void print_spectrum_from_function(std::ostream &file, double (*func)(double,double,double), Structure_Particle_Physics_Model * pt_Particle_Model);
+void print_spectrum_automatic_names(int number_files, Structure_Spectrum * pt_Cascade_Spectrum, Structure_Particle_Physics_Model * pt_Particle_Model);
+void fill_structure_particle_physics_model(double M_x, double Zeta_x, double tau_x, Structure_Particle_Physics_Model * pt_Particle_Model);
 void fill_structure_spectrum_and_precision_parameters(int number_iterations_photon,
                                                       int number_iterations_electron,
                                                       int z_step,
                                                       int n_step,
-                                                      string calcutation_mode,
-                                                      string photon_spectrum_choice,
-                                                      string electron_spectrum_choice,
-                                                      string spectrum_mode,
-                                                      string inverse_compton_scattering,
+                                                      const std::string &calcutation_mode,
+                                                      const std::string &photon_spectrum_choice,
+                                                      const std::string &electron_spectrum_choice,
+                                                      const std::string &spectrum_mode,
+                                                      const std::string &inverse_compton_scattering,
                                                       double (*Gamma_Spectrum)(double, double, double),
                                                       double (*Electron_Spectrum)(double,double,double),
-                                                      struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);
-void fill_structure_scan_parameters(string nuclei, double tau_min, double tau_max, double tau_step, double zeta_min, double zeta_max, double zeta_step, struct Structure_Scan_Parameters * pt_Scan_Parameters);
-void fill_output_options(string print_result, string results_files, string spectrum_files, struct Structure_Output_Options * pt_Structure_Output_Options);
-void check_energy_conservation(struct Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-                               struct Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-                               struct Structure_Spectrum * pt_Gamma_Spectrum,
-                               struct Structure_Spectrum * pt_Electron_Spectrum,
+                                                      Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);
+void fill_structure_scan_parameters(const std::string &nuclei, double tau_min, double tau_max, double tau_step, double zeta_min, double zeta_max, double zeta_step, Structure_Scan_Parameters * pt_Scan_Parameters);
+void fill_output_options(const std::string &print_result, const std::string &results_files, const std::string &spectrum_files, Structure_Output_Options * pt_Structure_Output_Options);
+void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+                              Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+                              Structure_Spectrum * pt_Gamma_Spectrum,
+                              Structure_Spectrum * pt_Electron_Spectrum,
                                double &integrale);
 
-// double  trapzdb(double  (*func)(double,double,int,double,struct), double  a, double  b, double  d, int n, int i, struct Structure_Injected_Spectrum * pt_Injected_Spectrum);
-// double  qsimp(double  (*func)(double,double,int,double,struct), double  a, double  b, double  d, int i, struct Structure_Injected_Spectrum * pt_Injected_Spectrum);
-// double  trapzd_2(double  (*func)(double,double,int,double,struct), double  a, double  b, double  d, int n, int i, struct Structure_Injected_Spectrum * pt_Injected_Spectrum);
-// double  qsimp_2(double  (*func)(double,double,int,double,struct), double  a, double  b, double  d, int i, struct Structure_Injected_Spectrum * pt_Injected_Spectrum);
-// double  trapzd_3(double  (*func)(double,double,int,double,struct), double  a, double  b, double  d, int n, int i, struct Structure_Injected_Spectrum * pt_Injected_Spectrum);
-// double  qsimp_4(double  (*func)(double,double,int,double,struct), double  a, double  b, double  d, int i, struct Structure_Injected_Spectrum * pt_Injected_Spectrum);
-// double  trapzd_Z(double  (*func)(double,double,int,double,struct), double  a, double  b, double  d, int n, int i, struct Structure_Injected_Spectrum * pt_Injected_Spectrum);
-// double  qsimp_Z(double  (*func)(double,double,int,double,struct), double  a, double  b, double  d, int i, struct Structure_Injected_Spectrum * pt_Injected_Spectrum);
-// double  trapzd_E(double  (*func)(double,double,int,double,struct), double  a, double  b, double  d, int n, int i, struct Structure_Injected_Spectrum * pt_Injected_Spectrum);
-// double  qsimp_E(double  (*func)(double,double,int,double,struct), double  a, double  b, double  d, int i, struct Structure_Injected_Spectrum * pt_Injected_Spectrum);
+#endif
