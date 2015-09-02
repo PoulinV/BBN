@@ -6,20 +6,6 @@
 
 using namespace std;
 
-void print_spectrum(ostream &file, Structure_Spectrum * pt_Cascade_Spectrum, Structure_Particle_Physics_Model * pt_Particle_Model){
-
-
-  double dE = (pt_Particle_Model->E_0 - E_min)/Gamma_Table_Size;
-  double z = pt_Cascade_Spectrum->redshift;
-  double E = E_min;
-  int i = 0;
-  while(i<Gamma_Table_Size){
-    file << E << "   " << pt_Cascade_Spectrum->Spectrum[i]<< endl;
-    i++;
-    E+=dE;
-  }
-
-}
 void print_spectrum_from_function(ostream &file, double (*func)(double,double,double),double z, Structure_Particle_Physics_Model * pt_Particle_Model){
 
 
@@ -102,9 +88,27 @@ void linearint(vector<double> &xa, vector<double> &ya, int n, double x, double &
         }
 }
 
-void fill_structure_particle_physics_model(double M_x, double Zeta_x, double tau_x, Structure_Particle_Physics_Model * pt_Particle_Model){
+void fill_structure_particle_physics_model(char* name, const std::maps<string,string> &map_parameters, Structure_Particle_Physics_Model * pt_Particle_Model){
+  ifstream file(name);
+  if(file)cout << "Importing file " << name << " in structure Cascade_Spectrum." << endl;
+  else{
+    cout << "I couldn't recognize cascade spectrum file. Please check that it is present in the folder Cascade_Specrum_Folder with proper name : 'Spectrum_mXXX_zXXX_XXXiterations.dat' corresponding to the value of m, z and iterations you are using."<<endl;
+    return;
+  }
+  while(file){
+    string line;
+    getline(file, line);
+    // stringstream is(ligne);
+    if(line[0] == '#' or line[0] == '\0') continue;
+    file >> tmp_Energy >> tmp_Spectrum ;
+    pt_Cascade_Spectrum->Energy.push_back(tmp_Energy);
+    pt_Cascade_Spectrum->Spectrum.push_back(tmp_Spectrum*(rate_NPC(tmp_Energy,z)+rate_compton(tmp_Energy,z)+rate_gg_scattering(tmp_Energy,z)));
+      // cout << z << "  " << tmp_Energy << "  " << tmp_Spectrum<<endl;
 
-	pt_Particle_Model->M_x = M_x;
+  }
+
+  file.close();
+  pt_Particle_Model->M_x = M_x;
 	pt_Particle_Model->E_0 = M_x/2.;
 	pt_Particle_Model->Zeta_x = Zeta_x;
 	pt_Particle_Model->tau_x = tau_x;
@@ -113,8 +117,26 @@ void fill_structure_particle_physics_model(double M_x, double Zeta_x, double tau
 
 }
 
-void fill_structure_scan_parameters(const string &nuclei, double tau_min, double tau_max, double tau_step, double zeta_min, double zeta_max, double zeta_step, Structure_Scan_Parameters * pt_Scan_Parameters){
+void fill_structure_scan_parameters(char* name, const std::maps<string,string> &map_parameters, Structure_Scan_Parameters * pt_Scan_Parameters){
+  ifstream file(name);
+  if(file)cout << "Importing file " << name << " in structure Cascade_Spectrum." << endl;
+  else{
+    cout << "I couldn't recognize cascade spectrum file. Please check that it is present in the folder Cascade_Specrum_Folder with proper name : 'Spectrum_mXXX_zXXX_XXXiterations.dat' corresponding to the value of m, z and iterations you are using."<<endl;
+    return;
+  }
+  while(file){
+    string line;
+    getline(file, line);
+    // stringstream is(ligne);
+    if(line[0] == '#' or line[0] == '\0') continue;
+    file >> tmp_Energy >> tmp_Spectrum ;
+    pt_Cascade_Spectrum->Energy.push_back(tmp_Energy);
+    pt_Cascade_Spectrum->Spectrum.push_back(tmp_Spectrum*(rate_NPC(tmp_Energy,z)+rate_compton(tmp_Energy,z)+rate_gg_scattering(tmp_Energy,z)));
+      // cout << z << "  " << tmp_Energy << "  " << tmp_Spectrum<<endl;
 
+  }
+
+  file.close();
   pt_Scan_Parameters->nuclei = nuclei;
 	pt_Scan_Parameters->tau_min = tau_min;
 	pt_Scan_Parameters->tau_max = tau_max;
@@ -125,28 +147,37 @@ void fill_structure_scan_parameters(const string &nuclei, double tau_min, double
 
 }
 
-void fill_structure_spectrum_and_precision_parameters(int number_iterations_photon,
-                                                      int number_iterations_electron,
-                                                      int z_step,
-                                                      int n_step,
-                                                      const string &calculation_mode,
-                                                      const string &photon_spectrum_choice,
-                                                      const string &electron_spectrum_choice,
-                                                      const string &spectrum_mode,
-                                                      const string &inverse_compton_scattering,
-                                                      double (*Gamma_Spectrum)(double, double, double),
-                                                      double (*Electron_Spectrum)(double,double,double),
+void fill_structure_spectrum_and_precision_parameters(char* name, const std::maps<string,string> &map_parameters,(*Gamma_Spectrum),(*Electron_Spectrum),
                                                       Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters){
 
-  pt_Spectrum_and_Precision_Parameters->calculation_mode = calculation_mode;
-	pt_Spectrum_and_Precision_Parameters->number_iterations_photon = number_iterations_photon;
-  pt_Spectrum_and_Precision_Parameters->number_iterations_electron = number_iterations_electron;
-	pt_Spectrum_and_Precision_Parameters->z_step = z_step;
-	pt_Spectrum_and_Precision_Parameters->n_step = n_step;
-  pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice = photon_spectrum_choice;
-  pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice = electron_spectrum_choice;
-  pt_Spectrum_and_Precision_Parameters->spectrum_mode = spectrum_mode;
-  pt_Spectrum_and_Precision_Parameters->inverse_compton_scattering = inverse_compton_scattering;
+  ifstream file(name);
+  if(file)cout << "Importing file " << name << " in structure Cascade_Spectrum." << endl;
+	else{
+		cout << "I couldn't recognize cascade spectrum file. Please check that it is present in the folder Cascade_Specrum_Folder with proper name : 'Spectrum_mXXX_zXXX_XXXiterations.dat' corresponding to the value of m, z and iterations you are using."<<endl;
+		return;
+	}
+  while(file){
+		string line;
+    getline(file, line);
+    // stringstream is(ligne);
+    if(line[0] == '#' or line[0] == '\0') continue;
+    file >> tmp_Energy >> tmp_Spectrum ;
+		pt_Cascade_Spectrum->Energy.push_back(tmp_Energy);
+		pt_Cascade_Spectrum->Spectrum.push_back(tmp_Spectrum*(rate_NPC(tmp_Energy,z)+rate_compton(tmp_Energy,z)+rate_gg_scattering(tmp_Energy,z)));
+		  // cout << z << "  " << tmp_Energy << "  " << tmp_Spectrum<<endl;
+
+	}
+
+	file.close();
+  pt_Spectrum_and_Precision_Parameters->calculation_mode = map_parameters["calculation_mode"];
+	pt_Spectrum_and_Precision_Parameters->number_iterations_photon = map_parameters["number_iterations_photon"];
+  pt_Spectrum_and_Precision_Parameters->number_iterations_electron = map_parameters["number_iterations_electron"];
+	pt_Spectrum_and_Precision_Parameters->z_step = map_parameters["z_step"];
+	pt_Spectrum_and_Precision_Parameters->n_step = map_parameters["n_step"];
+  pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice = map_parameters["photon_spectrum_choice"];
+  pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice = map_parameters["electron_spectrum_choice"];
+  pt_Spectrum_and_Precision_Parameters->spectrum_mode = map_parameters["spectrum_mode"];
+  pt_Spectrum_and_Precision_Parameters->inverse_compton_scattering = map_parameters["inverse_compton_scattering"];
   pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum = (*Gamma_Spectrum);
   pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum = (*Electron_Spectrum);
 }
@@ -504,9 +535,85 @@ for(int i=0;i<pt_Spectrum_and_Precision_Parameters->z_step;i++){
       }
 
 }
-void fill_output_options(const string &print_result, const string &results_files, const string &spectrum_files, Structure_Output_Options * pt_Structure_Output_Options){
+void fill_output_options(char* name, const std::maps<string,string> &map_parameters, Structure_Output_Options * pt_Structure_Output_Options){
 
-  pt_Structure_Output_Options->print_result = print_result;
-  pt_Structure_Output_Options->results_files = results_files;
-  pt_Structure_Output_Options->spectrum_files = spectrum_files;
+  int i=0;
+  string name = "", value = "";
+  ifstream file(name);
+  if(file)cout << "Reading input parameters file."<< endl;
+  else{
+    cout << "I couldn't recognized input parameter file. Please check that it is present in the same folder as the executable."<<endl;
+    return;
+  }
+  while(file){
+    string line;
+    getline(file, line);
+    i++;
+    attribute_name_and_value(line,name,value);
+    if(value.size==0){
+      cout << "Problem at the line "<<i<<" of your 'input_param.ini' file. Please check that it is of the type 'parameter = value' and that parameter is a valid one."<<endl;
+    }
+    else{
+      map[name]=value;
+    }
+  }
+  pt_Structure_Output_Options->results_files = map_parameters["results_files"];
+  pt_Structure_Output_Options->spectrum_files = map_parameters["spectrum_files"];
+}
+
+fill_default_parameters(char* name, const maps<string,string> &map_parameters){
+
+  int i=0;
+  string name = "", value = "";
+  ifstream file(name);
+  if(file)cout << "Reading default parameters file."<< endl;
+  else{
+    cout << "I couldn't recognized default parameter file. Please check that it is present in the same folder as the executable."<<endl;
+    return;
+  }
+  while(file){
+    string line;
+    getline(file, line);
+    i++;
+    attribute_name_and_value(line,name,value);
+    if(value.size==0){
+      cout << "Problem at the line "<<i<<" of your 'default_param.ini' file. Please check that it is of the type 'parameter = value' and that parameter is a valid one."<<endl;
+    }
+    else{
+      map[name]=value;
+    }
+  }
+  file.close();
+  /*
+  // Choose the calculation_mode, can be either "iterative" or "triangular"
+  map_parameters["calculation_mode"]="triangular";
+  //A few options in case you choose "iterative" computation mode :
+  map_parameters["number_iterations_photon"]=5;         // Control the number of iterations for computing the photon spectrum
+  map_parameters["number_iterations_electron"]=30;      // Control the number of iterations for computing the electron spectrum
+  map_parameters["inverse_compton_scattering"]="yes";   // If you want to activate inverse compton scattering from electron onto the CMB photons. In case you injected photons only, it is a good approximation to neglect it.
+
+  // Precision parameters : control the number of step in integration scheme
+  map_parameters["z_step"]=80;
+  map_parameters["n_step"]=20;
+  // Some string useful in the program whatever calcutation_mode is chosen
+  map_parameters["nuclei"]="4He";                           //This needs to be a nuclei in the list : "2H", "4He", "3He", "7Be", "7Li".
+  map_parameters["photon_spectrum_choice"]="Dirac";         //Specify the photon spectrum : This can be either "Dirac", "universal" or user specified "from_function".
+  map_parameters["electron_spectrum_choice"]="none";        //Specify the electron spectrum : This can be either "Dirac" or user specified "from_function".
+  map_parameters["spectrum_mode"]="writing";                //If you want to write the spectrum in files to gain time for the next run : choose "writing" and next times, choose "reading". Thus, the code will read the already computed spectra.
+                                                            //If you neither want to write nor read the spectrum, choose "nothing".
+  map_parameters["results_files"]="automatic";              //You can specify the name of the file in which results of the scan are written. If "automatic" is chosen, then a default name will be given.
+  map_parameters["spectrum_files"]="automatic";             //If you only want to compute cascade spectrum at a given redshift, you can specify the name of the file in which the computed spectrum are written. If "automatic" is chosen, then a default name will be given.
+  */
+}
+attribute_name_and_value(const string &line,const string &name,const string &value){
+  int i=0;
+  while(line[i]!='='&&i<=line.size())i++;
+  for(int j=0;j<i;j++){
+    name+=line[j];
+  }
+  name.erase(remove(name.begin(),name.end(),' '));
+  for(int j=i+1;j<=line.size()){
+    value+=line[j];
+  }
+  value.erase(remove(value.begin(),value.end(),' '));
 }
