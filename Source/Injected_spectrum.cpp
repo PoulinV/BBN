@@ -34,7 +34,7 @@ double universal_spectrum(double  E, double  z, double E_0){
 	return f;
 }
 
-double photon_spectrum_after_one_iteration(double  x, double  z, double E_0){
+double photon_dirac_spectrum_after_one_iteration(double  x, double  z, double E_0){
 
 
 	double Gamma_tot = rate_NPC(E_0,z)+rate_compton(E_0,z)+rate_gg_scattering(E_0,z);
@@ -94,4 +94,33 @@ double no_electrons_injected(double x, double z, double E_0){
 
 double no_photons_injected(double x, double z, double E_0){
 	return 0;
+}
+
+
+
+
+/******************************************************************************************************************************************/
+/*************************** A few functions that you need to slightly modify if you add an injection spectrum ****************************/
+/***************************************** Those are the only functions you will have to modify ! *****************************************/
+/******************************************************************************************************************************************/
+
+void attribute_map_spectrum(map_spectrum &map_spectrum,map_parameters &map_parameters){
+	map_spectrum["no_photons_injected"]=no_photons_injected;
+	map_spectrum["no_electrons_injected"]=no_electrons_injected;
+	map_spectrum["electron_dirac_spectrum_after_one_iteration"]=electron_dirac_spectrum_after_one_iteration;
+	map_spectrum["photon_dirac_spectrum_after_one_iteration"]=photon_dirac_spectrum_after_one_iteration;
+	/*You need to add here your own spectrum of the type "Spectrum" as it is defined at the beginning of "structures.h", it means your_function(double E, double z, double E_0).*/
+}
+void check_name_spectrum(const string &value, string &error_value){
+	if(value == "Dirac" || value == "none" || value == "universal"){
+		error_value = "no";
+	}
+	/* If you want to add a spectrum, you need to add also a "error checking" line. Here is a template you can use.
+	else if{value == "name_of_your_function"}{
+		error_value = "no";
+	}
+	*/
+	else{
+		error_value = "yes";
+	}
 }

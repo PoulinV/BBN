@@ -9,10 +9,13 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
+#include <map>
 #include "common.h"
 
 typedef double (*Spectrum)(double E, double  z, double E_0);
+typedef std::map<std::string, std::string> map_parameters;
+typedef std::map<std::string, Spectrum> map_spectrum;
+
 
 struct Structure_Spectrum{
 
@@ -32,7 +35,7 @@ struct Structure_Particle_Physics_Model{
 
   double  M_x;
   double  E_0;
-  double  Zeta_x;
+  double  zeta_x;
   double  tau_x;
   double  T_x;
   double  z_x;

@@ -17,7 +17,7 @@ void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Cascade_Spe
                                              long n_step,
                                              const string &spectrum_choice){
   double tau = pt_Particle_Physics_Model->tau_x;
-  double Z_x = pt_Particle_Physics_Model->Zeta_x;
+  double Z_x = pt_Particle_Physics_Model->zeta_x;
   double E_0 = pt_Particle_Physics_Model->E_0;
   double E_c ;
   double E1,E2,E3;
@@ -95,126 +95,7 @@ void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Cascade_Spe
           }
 
       }
-
-
-    // cout << "resultat = "<<resultat << endl;
 }
-//
-// void Check_model_from_destruction_only(string nuclei,
-//                                        Structure_Spectrum * pt_Cascade_Spectrum,
-//                                        Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-//                                        double &Abundance,
-//                                        double z_initial,
-//                                        double z_final,
-//                                        int z_step,
-//                                        long n_step,
-//                                        int iterations,
-//                                        string spectrum_choice,
-//                                        string spectrum_mode){
-//
-// double Y_0, Y_min, Y_max;
-// int i_min,i_max, k_min, k_max;
-// double resultat;
-// double tau_x = pt_Particle_Physics_Model->tau_x;
-// double zeta_x = pt_Particle_Physics_Model->Zeta_x;
-// double E_0 = pt_Particle_Physics_Model->E_0;
-// double E_c;
-// double B;
-// double f1, f2, f3, z1, z2, z3, h, dz, z;
-// double log10_dz = (log10(z_initial)-log10(z_final))/(double) z_step;
-// double E1, dE;
-// vector<double> Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei;
-// vector<double> Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei;
-//
-//
-//
-//
-// Check_nuclei(nuclei, i_min, i_max, k_min, k_max, Y_min, Y_max, Y_0);
-// for(int j = 0; j<=z_step;j++){
-//
-//   z=pow(10,log10(z_initial)-j*log10_dz);
-//   E_c = E_c_0/(1+z);
-//   if(verbose>1)cout<<"redshift = " << z << " still " << z_step-j << " to go " << endl;
-//
-//   if(spectrum_choice == "Dirac"){
-//       if(spectrum_mode=="writing" || spectrum_mode == "nothing")Cascade_Spectrum_Calculation(spectrum_choice, z, pt_Particle_Physics_Model, pt_Cascade_Spectrum, n_step, iterations, spectrum_mode);
-//       else if(spectrum_mode=="reading"){
-//
-//         if(E_c <= pt_Particle_Physics_Model->E_0 ){
-//           Cascade_Spectrum_Calculation("universal", z, pt_Particle_Physics_Model, pt_Cascade_Spectrum, n_step, iterations, spectrum_mode);
-//           }
-//
-//       else Cascade_Spectrum_Reading_From_File(pt_Particle_Physics_Model,pt_Cascade_Spectrum, z, iterations);
-//       }
-//    }
-//    else if(spectrum_choice == "universal"){
-//      Cascade_Spectrum_Calculation(spectrum_choice, z, pt_Particle_Physics_Model, pt_Cascade_Spectrum, n_step, iterations, spectrum_mode);
-//    }
-//
-//   Spectrum_and_cross_sections_convolution(pt_Cascade_Spectrum, pt_Particle_Physics_Model, i_min, i_max, resultat, z, n_step, spectrum_choice);
-//
-//   Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.push_back(log10(resultat));
-//   Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei.push_back(log10(z));
-//  }
-//
-//  if(verbose>1)cout <<"I'm done generating spectrum! I start to integrate over z."<<endl;
-//
-//  dz=(z_initial-z_final)/(double) n_step;
-//  h=dz/2;
-//  resultat=0;
-//
-//  for(int i = 0; i<=n_step;i++){
-//
-//    if(i==0){
-//      z1=z_initial;
-//      }
-//    else{
-//      z1=z3;
-//    }
-//
-//
-//    z2=z1-h;
-//    z3=z2-h;
-//
-//      linearint(Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.size(), log10(z1), f1);
-//      // cout<<"redshift 1= " << z1 <<"interpolation = "<<f1<< endl;
-//      if(f1<0)f1=0;
-//      linearint(Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.size(), log10(z2), f2);
-//      // cout<<"redshift 2= " << z2 <<"interpolation = "<<f2<< endl;
-//      if(f2<0)f2=0;
-//
-//      linearint(Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.size(), log10(z3), f3);
-//      // cout<<"redshift 3= " << z3 <<"interpolation = "<<f3<< endl;
-//      if(f3<0)f3=0;
-//
-//      f1=pow(10,f1);
-//      f2=pow(10,f2);
-//      f3=pow(10,f3);
-//      f1*=exp(-1./(2*H_r*tau_x*(z1+1)*(z1+1)));
-//      f2*=exp(-1./(2*H_r*tau_x*(z2+1)*(z2+1)));
-//      f3*=exp(-1./(2*H_r*tau_x*(z3+1)*(z3+1)));
-//
-//      resultat += h * (f1/3. + 4.*f2/3. + f3/3.);
-//      // cout << " resultat integrale z = " << resultat << endl;
-//
-//  }
-//
-//
-//   B=zeta_x*n_y_0/(E_0*H_r*tau_x);
-//   if(verbose>1)cout << "zeta_x = " << zeta_x << "resultat = " << resultat << " B = " << B << endl;
-//   Abundance=exp(-resultat*B);
-//   Abundance*=Y_0;
-//
-//     cout << "The final abundance = " << Abundance << endl;
-//     if(Abundance<Y_min){
-//       cout<<"your model is ruled out"<<endl;
-//     }
-//     else cout << "your model is fine for BBN !"<<endl;
-//
-//   Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei.clear();
-//   Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.clear();
-//
-// }
 
 
 void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
@@ -239,7 +120,7 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
   number_iterations_photon = pt_Spectrum_and_Precision_Parameters->number_iterations_photon;
   /******************************************************************************************/
 
-  double z_initial =  (5*(pow(2*H_r*tau_min,-0.5)-1)), z_final =  35000, z;
+  double z_initial =  (5*(pow(2*H_r*tau_min,-0.5)-1)), z_final =  35000, z, z_x;
   int i_min, i_max, k_min, k_max;
   double zeta_x, tau_x;
   double log10_dtau = (log10(tau_max)-log10(tau_min))/(double) tau_step;
@@ -329,14 +210,14 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
    Cascade_Spectrum.Energy.clear();
    Cascade_Spectrum.Spectrum.clear();
   }
+
   for(int dtau = 0 ; dtau <= tau_step ; dtau++){
     tau_x = pow(10,log10(tau_min)+log10_dtau*dtau);
     if((dtau==tau_step) && (tau_x!=tau_max))cout<<"erreur : probleme de pas logarithmique en tau"<<endl;
 
     if(verbose>0)cout << "Current lifetime analysed : " << tau_x << endl;
-    fill_structure_particle_physics_model(pt_Particle_Physics_Model->M_x, zeta_min, tau_x, pt_Particle_Physics_Model); // MANDATORY STEP
-
-    z_initial = 5*pt_Particle_Physics_Model->z_x;
+    z_x = pow(tau_x*(2*H_r),-0.5)-1;
+    z_initial = 5*z_x;
     // z_final = z_min;
     dz=(z_initial-z_final)/(double) n_step;
     h=dz/2;
@@ -436,7 +317,7 @@ void Compute_constraints_from_destruction_and_production(Structure_Particle_Phys
   int j_min, j_max;
   int k_min, k_max;
   int l_min, l_max;
-  double zeta_x, tau_x;
+  double zeta_x, tau_x, z_x;
   // double M_x = pt_Particle_Physics_Model->M_x;
   double E1, dE;
   double z_initial =  (5*(pow(2*H_r*tau_min,-0.5)-1)), z_final =  35000;
@@ -556,8 +437,8 @@ if(verbose>1)cout <<"I'm done convoluting the spectrum with cross sections! I st
       if((dtau==tau_step) && (tau_x!=tau_max))cout<<"erreur : probleme de pas logarithmique en tau"<<endl;
 
       if(verbose>0)cout << "Current lifetime analysed : " << tau_x << endl;
-
-      z_initial = 5*pt_Particle_Physics_Model->z_x;
+      z_x = pow(tau_x*(2*H_r),-0.5)-1;
+      z_initial = 5*z_x;
       // z_final = z_min;
 
     // log10_dz=(log10(z_initial)-log10(z_final))/(double) n_step;
@@ -643,7 +524,6 @@ if(verbose>1)cout <<"I'm done convoluting the spectrum with cross sections! I st
 
     for(int dZ = 0 ; dZ <= zeta_step ; dZ++){
       zeta_x = pow(10,log10(zeta_min)+log10_dZ*dZ);
-      fill_structure_particle_physics_model(pt_Particle_Physics_Model->M_x, zeta_x, tau_x, pt_Particle_Physics_Model); // MANDATORY STEP
       B=zeta_x*n_y_0/(pt_Particle_Physics_Model->E_0*H_r*tau_x);
       // if(verbose>1)cout << "zeta_x = " << zeta_x << "resultat = " << resultat_destruc_nuclei << " B = " << B << endl;
 

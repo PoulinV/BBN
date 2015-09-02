@@ -27,16 +27,21 @@ int main(int argc, char** argv){
   }
 
   mkdir("Output",777);
-  mkdir("Output/Cascade_Spectrum_Folder",777)
-  mkdir("Output/Result_Scan_Folder",777)
+  mkdir("Output/Cascade_Spectrum_Folder",777);
+  mkdir("Output/Result_Scan_Folder",777);
 
-  maps<string,string> map_parameters;
-  ifstream file_default(default_param.ini);
+  map_parameters map_parameters;
+  ifstream file_default("default_param.ini");
   ifstream file_input(argv[1]);
   fill_default_parameters(file_default,map_parameters);
-
+  string task = "task";
+  if(argc==2)get_parameter_from_file(file_input,task,task);
+  else get_parameter_from_file(file_default,task,task);
+  if(task=="task"){
+    get_parameter_from_file(file_default,task,task);
+  }
   cout << map_parameters["spectrum_files"]<<" " << map_parameters["z_step"] << endl;
-
+  cout << task << endl;
 
 
   struct Structure_Particle_Physics_Model Particle_Physics_Model;
@@ -48,20 +53,17 @@ int main(int argc, char** argv){
 
   // /************To print cascade spectrum in a file*********/
   if(map_parameters["task"]=="compute_spectrum"){
-  double M_x = 140;
-  double T = 0.0001;
-  // double tau_x = 3*pow(10,6);
-  double tau_x = pow(T/T_0,-2)/(2*H_r);
-  double Zeta_x = pow(10,-3);
-  // double z = T/T_0-1;
-  double z = 648069;
+  struct Structure_Spectrum Cascade_Spectrum;
+  string redshift = "redshift";
   fill_structure_particle_physics_model(file_input, map_parameters, &Particle_Physics_Model); // MANDATORY STEP
   fill_structure_spectrum_and_precision_parameters(file_input, map_parameters, &Spectrum_and_Precision_Parameters);
-
-  // double z = 5*Particle_Physics_Model.z_x;
+  if(argc==2)get_parameter_from_file(file_input,redshift,redshift);
+  else get_parameter_from_file(file_default,redshift,redshift);
+  if(redshift=="redshift"){
+    get_parameter_from_file(file_default,task,task);
+  }
   ofstream Spectrum("Output/universal_spectrum.dat");
-  // print_spectrum_from_function(Spectrum, universal_spectrum, &Particle_Physics_Model);
-  Cascade_Spectrum_Calculation(z,
+  Cascade_Spectrum_Calculation(atof(redshift.c_str()),
                                &Particle_Physics_Model,
                                &Cascade_Spectrum,
                                &Spectrum_and_Precision_Parameters);
@@ -90,7 +92,7 @@ int main(int argc, char** argv){
   }
 
   fill_structure_particle_physics_model(file_input,map_parameters,&Particle_Physics_Model); // MANDATORY STEP
-  fill_structure_spectrum_and_precision_parameters(file_input,map_parameters, , ,&Spectrum_and_Precision_Parameters);
+  fill_structure_spectrum_and_precision_parameters(file_input,map_parameters,&Spectrum_and_Precision_Parameters);
   fill_structure_scan_parameters(file_input,map_parameters,&Scan_Parameters);
   fill_output_options(file_input,map_parameters,&Output_Options);
   if(map_parameters["task"]=="compute_constraints_from_destruction_only")Compute_Constraints_from_destruction_only(&Particle_Physics_Model,
@@ -105,8 +107,9 @@ int main(int argc, char** argv){
   // // /********************************************************************************/
 
 
-
-  cout << "I'm done ! Thanks for using cBBNFast" << endl;
+  file_default.close();
+  file_input.close();
+  cout << "I'm done ! Thanks for using cBBNFast." << endl;
 
   return 0;
 }
