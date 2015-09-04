@@ -37,9 +37,9 @@ void fill_default_parameters(std::ifstream &file, std::map<std::string,std::stri
 void fill_structure_scan_parameters(std::ifstream &file, std::map<std::string,std::string> &map_parameters, Structure_Scan_Parameters * pt_Scan_Parameters);
 void fill_output_options(std::ifstream &file, std::map<std::string,std::string> &map_parameters, Structure_Output_Options * pt_Structure_Output_Options);
 void attribute_name_and_value(const std::string &line,std::string &name,std::string &value);
-void check_value_and_name_error(const std::string &name,std::string &error_name, const std::string &value,std::string &error_value);
+void check_value_and_name_error(std::string &name,std::string &error_name, std::string &value,std::string &error_value);
 void check_parameter_error(const std::string &parameter, std::string &error_parameter);
-void get_parameter_from_file(std::ifstream &file, std::string &parameter, std::string &value);
+void get_parameter_from_file(std::ifstream &file, std::string &parameter);
 void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
                               Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
                               Structure_Spectrum * pt_Gamma_Spectrum,

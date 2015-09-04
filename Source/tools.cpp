@@ -6,31 +6,30 @@
 
 using namespace std;
 
-void print_spectrum_from_function(ostream &file, double (*func)(double,double,double),double z, Structure_Particle_Physics_Model * pt_Particle_Model){
+void print_spectrum_from_function(ostream &file, double (*func)(double,double,double),double z, Structure_Particle_Physics_Model * pt_Particle_Physics_Model){
 
 
-  double dE = (pt_Particle_Model->E_0 - E_min)/Gamma_Table_Size;
+  double dE = (pt_Particle_Physics_Model->E_0 - E_min)/Gamma_Table_Size;
   double E = E_min;
   int i = 0;
   while(i<Gamma_Table_Size){
-    file << E << "   " << (*func)(E,z,pt_Particle_Model->E_0) << endl;
+    file << E << "   " << (*func)(E,z,pt_Particle_Physics_Model->E_0) << endl;
     i++;
     E+=dE;
   }
 
 }
-void print_spectrum_automatic_names(int iterations, Structure_Spectrum * pt_Cascade_Spectrum, Structure_Particle_Physics_Model * pt_Particle_Model){
+void print_spectrum_automatic_names(int iterations, Structure_Spectrum * pt_Cascade_Spectrum, Structure_Particle_Physics_Model * pt_Particle_Physics_Model){
   ostringstream os;
   string name;
 
 
-  double dE = (pt_Particle_Model->E_0 - E_min)/pt_Cascade_Spectrum->Energy.size();
+  double dE = (pt_Particle_Physics_Model->E_0 - E_min)/pt_Cascade_Spectrum->Energy.size();
   double z = pt_Cascade_Spectrum->redshift;
   double E = E_min;
   int i = 0;
 
-	  mkdir("Cascade_Spectrum_Folder", 01777);
-    os << "Cascade_Spectrum_Folder/Spectrum_"<<pt_Cascade_Spectrum->spectrum_name<<"m" << pt_Particle_Model->M_x<<"_z"<< z <<"_" << iterations <<"iterations.dat";
+    os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Cascade_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << iterations <<"iterations.dat";
     name = os.str();
     ofstream file(name);
     if(verbose>1)cout << "Printing in file " << name << endl;
@@ -40,7 +39,7 @@ void print_spectrum_automatic_names(int iterations, Structure_Spectrum * pt_Casc
       file << pt_Cascade_Spectrum->Energy[i] << "   " << pt_Cascade_Spectrum->Spectrum[i] << endl;
       // file << pt_Cascade_Spectrum->Energy[i] << "   " << pt_Cascade_Spectrum->Spectrum[i]/(rate_NPC(pt_Cascade_Spectrum->Energy[i],z)+rate_compton(pt_Cascade_Spectrum->Energy[i],z)+rate_gg_scattering(pt_Cascade_Spectrum->Energy[i],z)) << endl;
       // if(i<Gamma_Table_Size-1)file << pt_Cascade_Spectrum->Energy[i] << "   " << pt_Cascade_Spectrum->Spectrum[i]/(rate_NPC(pt_Cascade_Spectrum->Energy[i],z)+rate_compton(pt_Cascade_Spectrum->Energy[i],z)+rate_gg_scattering(pt_Cascade_Spectrum->Energy[i],z)) << endl;
-      // if(i==Gamma_Table_Size-1)file << pt_Cascade_Spectrum->Energy[i] << "   " << pt_Cascade_Spectrum->Spectrum[i]/(rate_NPC(pt_Cascade_Spectrum->Energy[i],z)+rate_compton(pt_Cascade_Spectrum->Energy[i],z)+rate_gg_scattering(pt_Cascade_Spectrum->Energy[i],z))+1/(rate_NPC(pt_Particle_Model->E_0,z)+rate_compton(pt_Particle_Model->E_0,z)+rate_gg_scattering(pt_Particle_Model->E_0,z)) << endl;
+      // if(i==Gamma_Table_Size-1)file << pt_Cascade_Spectrum->Energy[i] << "   " << pt_Cascade_Spectrum->Spectrum[i]/(rate_NPC(pt_Cascade_Spectrum->Energy[i],z)+rate_compton(pt_Cascade_Spectrum->Energy[i],z)+rate_gg_scattering(pt_Cascade_Spectrum->Energy[i],z))+1/(rate_NPC(pt_Particle_Physics_Model->E_0,z)+rate_compton(pt_Particle_Physics_Model->E_0,z)+rate_gg_scattering(pt_Particle_Physics_Model->E_0,z)) << endl;
       i++;
     }
   }
@@ -88,17 +87,19 @@ void linearint(vector<double> &xa, vector<double> &ya, int n, double x, double &
         }
 }
 
-void fill_structure_particle_physics_model(ifstream &file, map_parameters &map_parameters, Structure_Particle_Physics_Model * pt_Particle_Model){
+void fill_structure_particle_physics_model(ifstream &file, map_parameters &map_parameters, Structure_Particle_Physics_Model * pt_Particle_Physics_Model){
   int i=0;
   string name = "", value = "";
   string error_name="",error_value="";
-  if(file)cout << "Reading input parameters file."<< endl;
+  if(file){if(verbose>1)cout << "(function : fill_structure_particle_physics_model) : Reading input parameters file."<< endl;}
   else{
-    cout << "I couldn't recognized input parameter file. Please check that it is present in the same folder as the executable."<<endl;
+    cout << "(function : fill_structure_particle_physics_model) : \nI couldn't recognized input parameter file. Please check that it is present in the same folder as the executable."<<endl;
     return;
   }
   while(file){
     string line;
+    name = "", value = "";
+    error_name="",error_value="";
     getline(file, line);
     i++;
     attribute_name_and_value(line,name,value);
@@ -111,28 +112,30 @@ void fill_structure_particle_physics_model(ifstream &file, map_parameters &map_p
       map_parameters[name]=value;
     }
   }
-  file.close();
 
-  pt_Particle_Model->M_x = atof(map_parameters["M_x"].c_str());
-	pt_Particle_Model->E_0 = atof(map_parameters["M_x"].c_str())/2.;
-	pt_Particle_Model->zeta_x = atof(map_parameters["zeta_x"].c_str());
-	pt_Particle_Model->tau_x = atof(map_parameters["tau_x"].c_str());
-	pt_Particle_Model->T_x	= pow(atof(map_parameters["tau_x"].c_str())*(2*H_r),-0.5)*T_0;
-	pt_Particle_Model->z_x = 	pow(atof(map_parameters["tau_x"].c_str())*(2*H_r),-0.5)-1;
-
+  pt_Particle_Physics_Model->M_x = atof(map_parameters["m_x"].c_str());
+	pt_Particle_Physics_Model->E_0 = atof(map_parameters["m_x"].c_str())/2.;
+	pt_Particle_Physics_Model->zeta_x = atof(map_parameters["zeta_x"].c_str());
+	pt_Particle_Physics_Model->tau_x = atof(map_parameters["tau_x"].c_str());
+	pt_Particle_Physics_Model->T_x	= pow(atof(map_parameters["tau_x"].c_str())*(2*H_r),-0.5)*T_0;
+	pt_Particle_Physics_Model->z_x = 	pow(atof(map_parameters["tau_x"].c_str())*(2*H_r),-0.5)-1;
+  file.clear();
+  file.seekg(0, ios::beg);
 }
 
 void fill_structure_scan_parameters(ifstream &file, map_parameters &map_parameters, Structure_Scan_Parameters * pt_Scan_Parameters){
   int i=0;
   string name = "", value = "";
   string error_name="",error_value="";
-  if(file)cout << "Reading input parameters file."<< endl;
+  if(file){if(verbose>1)cout << "(function : fill_structure_scan_parameters) : Reading input parameters file."<< endl;}
   else{
-    cout << "I couldn't recognized input parameter file. Please check that it is present in the same folder as the executable."<<endl;
+    cout << "(function : fill_structure_scan_parameters) : \nI couldn't recognized input parameter file. Please check that it is present in the same folder as the executable."<<endl;
     return;
   }
   while(file){
     string line;
+    name = "", value = "";
+    error_name="",error_value="";
     getline(file, line);
     i++;
     attribute_name_and_value(line,name,value);
@@ -145,15 +148,15 @@ void fill_structure_scan_parameters(ifstream &file, map_parameters &map_paramete
       map_parameters[name]=value;
     }
   }
-  file.close();
   pt_Scan_Parameters->nuclei = map_parameters["nuclei"];
-	pt_Scan_Parameters->tau_min = atof(map_parameters["tau_min"].c_str());
+  pt_Scan_Parameters->tau_min = atof(map_parameters["tau_min"].c_str());
 	pt_Scan_Parameters->tau_max = atof(map_parameters["tau_max"].c_str());
 	pt_Scan_Parameters->tau_step = atof(map_parameters["tau_step"].c_str());
   pt_Scan_Parameters->zeta_min = atof(map_parameters["zeta_min"].c_str());
 	pt_Scan_Parameters->zeta_max = atof(map_parameters["zeta_max"].c_str());
 	pt_Scan_Parameters->zeta_step = atof(map_parameters["zeta_step"].c_str());
-
+  file.clear();
+  file.seekg(0, ios::beg);
 }
 
 void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parameters &map_parameters,
@@ -164,13 +167,15 @@ void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parame
   int i=0;
   string name = "", value = "";
   string error_name="",error_value="";
-  if(file)cout << "Reading input parameters file."<< endl;
+  if(file){if(verbose>1)cout << "(function : fill_structure_spectrum_and_precision_parameters) : Reading input parameters file."<< endl;}
   else{
-    cout << "I couldn't recognized input parameter file. Please check that it is present in the same folder as the executable."<<endl;
+    cout << "(function : fill_structure_spectrum_and_precision_parameters) : \nI couldn't recognized input parameter file. Please check that it is present in the same folder as the executable."<<endl;
     return;
   }
   while(file){
     string line;
+    name = "", value = "";
+    error_name="",error_value="";
     getline(file, line);
     i++;
     attribute_name_and_value(line,name,value);
@@ -183,7 +188,6 @@ void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parame
       map_parameters[name]=value;
     }
   }
-  file.close();
   pt_Spectrum_and_Precision_Parameters->calculation_mode = map_parameters["calculation_mode"];
 	pt_Spectrum_and_Precision_Parameters->number_iterations_photon = atoi(map_parameters["number_iterations_photon"].c_str());
   pt_Spectrum_and_Precision_Parameters->number_iterations_electron = atoi(map_parameters["number_iterations_electron"].c_str());
@@ -213,6 +217,8 @@ void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parame
     if(map_parameters["electron_spectrum_choice"]=="none")pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum = no_electrons_injected;
     else pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum = map_spectrum[map_parameters["Electron_Spectrum"]];
   }
+  file.clear();
+  file.seekg(0, ios::beg);
 }
 
 void fill_output_options(ifstream &file, map_parameters &map_parameters, Structure_Output_Options * pt_Structure_Output_Options){
@@ -220,13 +226,15 @@ void fill_output_options(ifstream &file, map_parameters &map_parameters, Structu
   int i=0;
   string name = "", value = "";
   string error_name="",error_value="";
-  if(file)cout << "Reading input parameters file."<< endl;
+  if(file){if(verbose>1)cout << "(function : fill_output_options) : Reading input parameters file."<< endl;}
   else{
-    cout << "I couldn't recognized input parameter file. Please check that it is present in the same folder as the executable."<<endl;
+    cout << "(function : fill_output_options) : \nI couldn't recognized input parameter file. Please check that it is present in the same folder as the executable."<<endl;
     return;
   }
   while(file){
     string line;
+    name = "", value = "";
+    error_name="",error_value="";
     getline(file, line);
     i++;
     attribute_name_and_value(line,name,value);
@@ -239,9 +247,10 @@ void fill_output_options(ifstream &file, map_parameters &map_parameters, Structu
       map_parameters[name]=value;
     }
   }
-  file.close();
   pt_Structure_Output_Options->results_files = map_parameters["results_files"];
   pt_Structure_Output_Options->spectrum_files = map_parameters["spectrum_files"];
+  file.clear();
+  file.seekg(0, ios::beg);
 }
 
 void fill_default_parameters(ifstream &file, map_parameters &map_parameters){
@@ -249,13 +258,15 @@ void fill_default_parameters(ifstream &file, map_parameters &map_parameters){
   int i=0;
   string name = "", value = "";
   string error_name="",error_value="";
-  if(file)cout << "Reading default parameters file."<< endl;
+  string line;
+  if(file){if(verbose>1)cout << "(function : fill_default_parameters) : Reading default parameters file."<< endl;}
   else{
-    cout << "I couldn't recognized default parameter file. Please check that it is present in the same folder as the executable."<<endl;
+    cout << "(function : fill_default_parameters) : \nI couldn't recognized default parameter file. Please check that it is present in the same folder as the executable."<<endl;
     return;
   }
   while(file){
-    string line;
+    name = "", value = "";
+    error_name="",error_value="";
     getline(file, line);
     i++;
     attribute_name_and_value(line,name,value);
@@ -265,12 +276,13 @@ void fill_default_parameters(ifstream &file, map_parameters &map_parameters){
       return;
     }
     else{
-      map_parameters[name]=value;
+        if(name!="ignore_line" && value!="ignore_line")map_parameters[name]=value;
     }
   }
-  file.close();
+  file.clear();
+  file.seekg(0, ios::beg);
 }
-void get_parameter_from_file(ifstream &file, string &parameter, string &value){
+void get_parameter_from_file(ifstream &file, string &parameter){
   string error_parameter;
   check_parameter_error(parameter,error_parameter);
   if(error_parameter=="yes"){
@@ -278,59 +290,77 @@ void get_parameter_from_file(ifstream &file, string &parameter, string &value){
     return;
   }
   int i=0;
-  string name = "";
+  string name = "", value ="";
   string error_name="",error_value="";
-  if(file)cout << "Attribute task parameter."<< endl;
+    if(file){if(verbose>1)cout << "(function : get_parameter_from_file) : Attribute " << parameter << " parameter."<< endl;}
   else{
-    cout << "I couldn't recognized input parameter file. Please check that it is present in the same folder as the executable."<<endl;
+    cout << "(function : get_parameter_from_file) : \nI couldn't recognized input parameter file. Please check that it is present in the same folder as the executable."<<endl;
     return;
   }
-  while(name!=parameter && !file.eof()){
+
+  while(file){
     string line;
+    name = "", value = "";
+    error_name="",error_value="";
     getline(file, line);
     i++;
+    if(name!=parameter){
     attribute_name_and_value(line,name,value);
     check_value_and_name_error(name,error_name,value,error_value);
+    }
     if(error_value == "yes" || error_name == "yes"){
       cout << "Problem at the line "<<i<<" of your 'default_param.ini' file. I'm shutting down."<<endl;
       return;
     }
-    if(file.eof()){
-      cout << "I have not found the parameter from your input file. I will now attribute the default one." << endl;
+
+    if(name==parameter){
+      parameter = value;
+      break;
+    }
+    if(file.eof() && name!=parameter){
+      if(verbose>0)cout << "I have not found the parameter " << parameter <<" in your input file. I will now attribute the default one." << endl;
+      parameter = "default";
     }
   }
-
-  file.close();
+  file.clear();
+  file.seekg(0, ios::beg);
 
 }
 void attribute_name_and_value(const string &line,string &name,string &value){
   int i=0;
-  while(line[i]!='='&&i<=line.size()&&line[i]!='#')i++;
-  if(i==0) return;
-  else{
-    for(int j=0;j<i;j++){
-      name+=line[j];
+  int j=0;
+  while(line[i]!='='&&i<=line.size())i++;
+  while(line[j]!='#'&&j<=line.size())j++;
+
+  if(i<j){
+    for(int k=0;k<i;k++){
+      name+=line[k];
     }
     name.erase(remove(name.begin(),name.end(),' '));
-    for(int j=i+1;j<=line.size();j++){
-      value+=line[j];
+    for(int k=i+1;k<j-1;k++){
+      value+=line[k];
+      value.erase(remove(value.begin(),value.end(),' '));
     }
-    value.erase(remove(value.begin(),value.end(),' '));
+  }
+  else if(i>=j){
+    name = "ignore_line";
+    value = "ignore_line";
   }
 
 }
 void check_parameter_error(const string &parameter, string &error_parameter){
       if(parameter == "calculation_mode" || parameter == "task" || parameter == "number_iterations_photon" || parameter == "number_iterations_electron" || parameter == "z_step" || parameter == "n_step"
       || parameter == "photon_spectrum_choice" || parameter == "electron_spectrum_choice" || parameter == "spectrum_mode" || parameter == "inverse_compton_scattering" || parameter == "m_x" || parameter == "tau_x"
-      || parameter == "zeta_x" || parameter == "tau_min" || parameter == "tau_max" || parameter == "tau_step" || parameter == "zeta_min" || parameter == "zeta_max" || parameter == "zeta_step"){
+      || parameter == "zeta_x" || parameter == "tau_min" || parameter == "tau_max" || parameter == "tau_step" || parameter == "zeta_min" || parameter == "zeta_max" || parameter == "zeta_step" || parameter == "redshift" || parameter == "results_file" || parameter == "spectrum_files"){
         error_parameter = "no";
       }
       else error_parameter = "yes";
 }
-void check_value_and_name_error(const string &name,string &error_name, const string &value,string &error_value){
+void check_value_and_name_error(string &name,string &error_name, string &value,string &error_value){
 
     char * pEnd;
-
+    // cout << "value =_"<< value << "_ name =_" << name<<"_"<<endl;
+    error_name = "no";
     if(name == "calculation_mode"){
       if(value == "iterative" || value == "triangular"){
         error_value = "no";
@@ -342,19 +372,30 @@ void check_value_and_name_error(const string &name,string &error_name, const str
       }
     }
     else if(name == "task"){
-      if(value == "compute_cascade_spectrum" || value == "compute_constraints_from_destruction_only" || value == "Compute_constraints_from_destruction_and_production"){
+      if(value == "compute_cascade_spectrum" || value == "compute_constraints_from_destruction_only" || value == "compute_constraints_from_destruction_and_production"){
         error_value = "no";
         error_name = "no";
+
       }
       else{
         error_value = "yes";
         cout << "The task isn't reckognised, it has to be one among : 'compute_constraints_from_destruction_and_production', 'compute_constraints_from_destruction_only' and 'compute_cascade_spectrum'." << endl;
       }
     }
-    else if(name == "number_iterations_photon" || name == "number_iterations_electron"){
+    else if(name == "number_iterations_photon"){
       if(atoi(value.c_str())>20){
         error_value = "yes";
         cout << "The number of iterations for the photon spectrum is too big. Please choose a number <= 20." << endl;
+      }
+      else {
+        error_value = "no";
+        error_name =  "no";
+      }
+    }
+    else if(name == "number_iterations_electron"){
+      if(atoi(value.c_str())>100){
+        error_value = "yes";
+        cout << "The number of iterations for the photon spectrum is too big. Please choose a number <= 100." << endl;
       }
       else {
         error_value = "no";
@@ -468,12 +509,18 @@ void check_value_and_name_error(const string &name,string &error_name, const str
         error_value = "yes";
         cout << "The parameter 'tau_step' is not a double, please check."<<endl;
       }
+      else {
+        error_value = "no";
+      }
     }
     else if(name == "zeta_min"){
       strtod(value.c_str(),&pEnd);
       if(*pEnd != '\0' || pEnd == value.c_str()){
         error_value = "yes";
         cout << "The parameter 'zeta_min' is not a double, please check."<<endl;
+      }
+      else {
+        error_value = "no";
       }
     }
     else if(name == "zeta_max"){
@@ -482,6 +529,9 @@ void check_value_and_name_error(const string &name,string &error_name, const str
         error_value = "yes";
         cout << "The parameter 'zeta_max' is not a double, please check."<<endl;
       }
+      else {
+        error_value = "no";
+      }
     }
     else if(name == "zeta_step"){
       strtod(value.c_str(),&pEnd);
@@ -489,9 +539,53 @@ void check_value_and_name_error(const string &name,string &error_name, const str
         error_value = "yes";
         cout << "The parameter 'zeta_step' is not a double, please check."<<endl;
       }
+      else {
+        error_value = "no";
+      }
     }
-    else error_name = "yes";
-
+    else if(name == "nuclei"){
+      if(value == "4He" || value == "3He" || value == "2H" || value == "7Li" || value == "7Be"){
+        error_name = "no";
+        error_value = "no";
+      }
+      else {
+        error_value = "yes";
+      }
+    }
+    else if(name == "redshift"){
+      strtod(value.c_str(),&pEnd);
+      if(*pEnd != '\0' || pEnd == value.c_str()){
+        error_value = "yes";
+        cout << "The parameter 'redshift' is not a double, please check."<<endl;
+      }
+      else {
+        error_value = "no";
+      }
+    }
+    else if(name == "results_files"){
+      if(value=="automatic")error_value="no";
+      else{
+        cout << "No other option is yet available for 'results_files', I switch to 'automatic'."<<endl;
+        value = "automatic";
+        error_value="no";
+      }
+    }
+    else if(name == "spectrum_files"){
+      if(value=="automatic")error_value="no";
+      else{
+        cout << "No other option is yet available for 'spectrum_files', I switch to 'automatic'."<<endl;
+        value = "automatic";
+        error_value="no";
+      }
+    }
+    else if(name == "ignore_line" || value == "ignore_line"){
+      error_value = "no";
+      error_name= "no";
+    }
+    else {
+      error_name = "yes";
+      cout << " I couldn't reckognised the name " << name << " please check your input file." << endl;
+    }
 }
 
 void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,

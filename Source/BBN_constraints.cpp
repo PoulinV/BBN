@@ -192,9 +192,6 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
 
     }
 
-    for(int i = 0 ; i < Gamma_Table_Size ; i ++){
-      cout << z << "  " << Cascade_Spectrum.Energy[i] << "  " << Cascade_Spectrum.Spectrum[i]/(rate_NPC(Cascade_Spectrum.Energy[i],z)+rate_compton(Cascade_Spectrum.Energy[i],z)+rate_gg_scattering(Cascade_Spectrum.Energy[i],z))<<endl;
-    }
    Spectrum_and_cross_sections_convolution(&Cascade_Spectrum,
                                            pt_Particle_Physics_Model,
                                            pt_Spectrum_and_Precision_Parameters,
@@ -204,7 +201,6 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
                                            z,
                                            n_step,
                                            pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice);
-  cout << " resultat = " << resultat << " z = " << z << endl;
    Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.push_back(log10(resultat));
    Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei.push_back(log10(z));
    Cascade_Spectrum.Energy.clear();
@@ -350,7 +346,7 @@ void Compute_constraints_from_destruction_and_production(Structure_Particle_Phys
     /********************************************************************************************************************************************************************************/
     ostringstream os;
     string name;
-    os << "Output/Results_destruc_and_production_"<< pt_Scan_Parameters->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV.dat";
+    os << "Output/Result_Scan_Folder/Results_destruc_and_production_"<< pt_Scan_Parameters->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV.dat";
     name = os.str();
     ofstream file(name);
     if(file){
