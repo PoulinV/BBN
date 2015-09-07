@@ -1,11 +1,13 @@
-#include "../Include/EM_cascade.h"
-#include "../Include/injected_spectrum.h"
-#include "../Include/structures.h"
-#include "../Include/BBN_constraints.h"
-#include "../Include/tools.h"
+#include "../include/EM_cascade.h"
+#include "../include/injected_spectrum.h"
+#include "../include/structures.h"
+#include "../include/BBN_constraints.h"
+#include "../include/tools.h"
 
 using namespace std;
-
+// double integrator_Weddle_Hardy(double (*func),){
+//
+// }
 void print_spectrum_from_function(ostream &file, double (*func)(double,double,double),double z, Structure_Particle_Physics_Model * pt_Particle_Physics_Model){
 
 
@@ -19,39 +21,100 @@ void print_spectrum_from_function(ostream &file, double (*func)(double,double,do
   }
 
 }
-void print_spectrum_automatic_names(int iterations, Structure_Spectrum * pt_Cascade_Spectrum, Structure_Particle_Physics_Model * pt_Particle_Physics_Model){
+void print_spectrum(Structure_Output_Options * pt_Output_Options,
+                    Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+                    Structure_Spectrum * pt_Spectrum,
+                    Structure_Particle_Physics_Model * pt_Particle_Physics_Model){
   ostringstream os;
   string name;
 
 
-  double dE = (pt_Particle_Physics_Model->E_0 - E_min)/pt_Cascade_Spectrum->Energy.size();
-  double z = pt_Cascade_Spectrum->redshift;
+  double dE = (pt_Particle_Physics_Model->E_0 - E_min)/pt_Spectrum->Energy.size();
+  double z = pt_Spectrum->redshift;
   double E = E_min;
   int i = 0;
 
-    os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Cascade_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << iterations <<"iterations.dat";
-    name = os.str();
-    ofstream file(name);
-    if(verbose>1)cout << "Printing in file " << name << endl;
+    if(pt_Output_Options->spectrum_files=="automatic"){
+    if(pt_Spectrum->species == "photon"){
+      if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="iterative")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << pt_Spectrum_and_Precision_Parameters->number_iterations_photon <<"iterations.dat";
+      else if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="triangular")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << "triangular.dat";
+    }
+    else if(pt_Spectrum->species == "electron"){
+      if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="iterative")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << pt_Spectrum_and_Precision_Parameters->number_iterations_electron <<"iterations.dat";
+      else if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="triangular")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << "triangular.dat";
+    }
 
-    if(pt_Cascade_Spectrum->species=="photon"){
+    }
+
+    else{
+      os << pt_Output_Options->spectrum_files <<pt_Spectrum->species << ".dat";
+    }
+    name = os.str();
+
+    ofstream file(name);
+    if(pt_Output_Options->verbose>1)cout << "Printing in file " << name <<"."<<  endl;
+
+    if(pt_Spectrum->species=="photon"){
     while(i<Gamma_Table_Size){
-      file << pt_Cascade_Spectrum->Energy[i] << "   " << pt_Cascade_Spectrum->Spectrum[i] << endl;
-      // file << pt_Cascade_Spectrum->Energy[i] << "   " << pt_Cascade_Spectrum->Spectrum[i]/(rate_NPC(pt_Cascade_Spectrum->Energy[i],z)+rate_compton(pt_Cascade_Spectrum->Energy[i],z)+rate_gg_scattering(pt_Cascade_Spectrum->Energy[i],z)) << endl;
-      // if(i<Gamma_Table_Size-1)file << pt_Cascade_Spectrum->Energy[i] << "   " << pt_Cascade_Spectrum->Spectrum[i]/(rate_NPC(pt_Cascade_Spectrum->Energy[i],z)+rate_compton(pt_Cascade_Spectrum->Energy[i],z)+rate_gg_scattering(pt_Cascade_Spectrum->Energy[i],z)) << endl;
-      // if(i==Gamma_Table_Size-1)file << pt_Cascade_Spectrum->Energy[i] << "   " << pt_Cascade_Spectrum->Spectrum[i]/(rate_NPC(pt_Cascade_Spectrum->Energy[i],z)+rate_compton(pt_Cascade_Spectrum->Energy[i],z)+rate_gg_scattering(pt_Cascade_Spectrum->Energy[i],z))+1/(rate_NPC(pt_Particle_Physics_Model->E_0,z)+rate_compton(pt_Particle_Physics_Model->E_0,z)+rate_gg_scattering(pt_Particle_Physics_Model->E_0,z)) << endl;
+      file << pt_Spectrum->Energy[i] << "   " << pt_Spectrum->Spectrum[i] << endl;
       i++;
     }
   }
-    if(pt_Cascade_Spectrum->species=="electron"){
+    if(pt_Spectrum->species=="electron"){
       while(i<Electron_Table_Size){
-        file << pt_Cascade_Spectrum->Energy[i] << "   " << pt_Cascade_Spectrum->Spectrum[i] << endl;
+        file << pt_Spectrum->Energy[i] << "   " << pt_Spectrum->Spectrum[i] << endl;
         i++;
       }
     }
 
 }
+void print_results_scan(Structure_Output_Options * pt_Output_Options,
+                    Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+                    Structure_Scan_Parameters_and_Results * pt_Scan_Parameters_and_Results,
+                    Structure_Particle_Physics_Model * pt_Particle_Physics_Model){
+  ostringstream os;
+  string name;
 
+
+  int i = 0;
+  os << "Output/Result_Scan_Folder/Results_destruc_and_production_"<< pt_Scan_Parameters_and_Results->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV.dat";
+
+    if(pt_Output_Options->results_files=="automatic"){
+      if(pt_Output_Options->task=="compute_constraints_from_destruction_and_production"){
+        name = "Output/Result_Scan_Folder/Results_destruc_and_production_";
+      }
+      else if(pt_Output_Options->task=="compute_constraints_from_destruction_only"){
+        name = "Output/Result_Scan_Folder/Results_destruc_only_";
+      }
+      name += pt_Scan_Parameters_and_Results->nuclei;
+      name+= "_m_";
+      name+=pt_Particle_Physics_Model->M_x;
+      name+="_MeV.dat";
+    }
+
+    else{
+      os << pt_Output_Options->results_files << ".dat";
+    }
+    name = os.str();
+
+    ofstream file(name);
+    if(file){
+      cout << "Printing in file " << name <<"."<< endl;
+      file<< "#Scan parameters : tau in [" <<pt_Scan_Parameters_and_Results->tau_min<<","<<pt_Scan_Parameters_and_Results->tau_max<<"] and zeta in ["<<pt_Scan_Parameters_and_Results->zeta_min<<","<<pt_Scan_Parameters_and_Results->zeta_max<<"]"<<endl;
+      file <<"#You have injected photon :" <<pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice <<"and electron :" << pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice << " and used the " <<pt_Spectrum_and_Precision_Parameters->calculation_mode<<" method."<<endl;
+      if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="iterative") file<<"#You have asked for "<<pt_Spectrum_and_Precision_Parameters->number_iterations_photon<<" iterations for the photons and " <<pt_Spectrum_and_Precision_Parameters->number_iterations_electron << "iterations for the electrons."<<endl;
+        while(i<pt_Scan_Parameters_and_Results->Results_scan_tau_x.size()){
+          file << pt_Scan_Parameters_and_Results->Results_scan_tau_x[i] << "   " << pt_Scan_Parameters_and_Results->Results_scan_zeta_x[i] << "   " << pt_Scan_Parameters_and_Results->Results_scan_Abundance[i]<<endl;
+          i++;
+      }
+    }
+    else{
+      cout<<" I couldn't open file, i'm shutting down." << endl;
+      return;
+    }
+
+
+}
 void linearint(vector<double> &xa, vector<double> &ya, int n, double x, double &y){
 				int i,m,ns=1;
 				float x0,x1,y0,y1;
@@ -91,7 +154,7 @@ void fill_structure_particle_physics_model(ifstream &file, map_parameters &map_p
   int i=0;
   string name = "", value = "";
   string error_name="",error_value="";
-  if(file){if(verbose>1)cout << "(function : fill_structure_particle_physics_model) : Reading input parameters file."<< endl;}
+  if(file){cout << "(function : fill_structure_particle_physics_model) : Reading input parameters file."<< endl;}
   else{
     cout << "(function : fill_structure_particle_physics_model) : \nI couldn't recognized input parameter file. Please check that it is present in the same folder as the executable."<<endl;
     return;
@@ -123,11 +186,11 @@ void fill_structure_particle_physics_model(ifstream &file, map_parameters &map_p
   file.seekg(0, ios::beg);
 }
 
-void fill_structure_scan_parameters(ifstream &file, map_parameters &map_parameters, Structure_Scan_Parameters * pt_Scan_Parameters){
+void fill_structure_scan_parameters_and_results(ifstream &file, map_parameters &map_parameters, Structure_Scan_Parameters_and_Results * pt_Scan_Parameters_and_Results){
   int i=0;
   string name = "", value = "";
   string error_name="",error_value="";
-  if(file){if(verbose>1)cout << "(function : fill_structure_scan_parameters) : Reading input parameters file."<< endl;}
+  if(file){cout << "(function : fill_structure_scan_parameters) : Reading input parameters file."<< endl;}
   else{
     cout << "(function : fill_structure_scan_parameters) : \nI couldn't recognized input parameter file. Please check that it is present in the same folder as the executable."<<endl;
     return;
@@ -148,13 +211,13 @@ void fill_structure_scan_parameters(ifstream &file, map_parameters &map_paramete
       map_parameters[name]=value;
     }
   }
-  pt_Scan_Parameters->nuclei = map_parameters["nuclei"];
-  pt_Scan_Parameters->tau_min = atof(map_parameters["tau_min"].c_str());
-	pt_Scan_Parameters->tau_max = atof(map_parameters["tau_max"].c_str());
-	pt_Scan_Parameters->tau_step = atof(map_parameters["tau_step"].c_str());
-  pt_Scan_Parameters->zeta_min = atof(map_parameters["zeta_min"].c_str());
-	pt_Scan_Parameters->zeta_max = atof(map_parameters["zeta_max"].c_str());
-	pt_Scan_Parameters->zeta_step = atof(map_parameters["zeta_step"].c_str());
+  pt_Scan_Parameters_and_Results->nuclei = map_parameters["nuclei"];
+  pt_Scan_Parameters_and_Results->tau_min = atof(map_parameters["tau_min"].c_str());
+	pt_Scan_Parameters_and_Results->tau_max = atof(map_parameters["tau_max"].c_str());
+	pt_Scan_Parameters_and_Results->tau_step = atof(map_parameters["tau_step"].c_str());
+  pt_Scan_Parameters_and_Results->zeta_min = atof(map_parameters["zeta_min"].c_str());
+	pt_Scan_Parameters_and_Results->zeta_max = atof(map_parameters["zeta_max"].c_str());
+	pt_Scan_Parameters_and_Results->zeta_step = atof(map_parameters["zeta_step"].c_str());
   file.clear();
   file.seekg(0, ios::beg);
 }
@@ -167,7 +230,7 @@ void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parame
   int i=0;
   string name = "", value = "";
   string error_name="",error_value="";
-  if(file){if(verbose>1)cout << "(function : fill_structure_spectrum_and_precision_parameters) : Reading input parameters file."<< endl;}
+  if(file){cout << "(function : fill_structure_spectrum_and_precision_parameters) : Reading input parameters file."<< endl;}
   else{
     cout << "(function : fill_structure_spectrum_and_precision_parameters) : \nI couldn't recognized input parameter file. Please check that it is present in the same folder as the executable."<<endl;
     return;
@@ -221,12 +284,12 @@ void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parame
   file.seekg(0, ios::beg);
 }
 
-void fill_output_options(ifstream &file, map_parameters &map_parameters, Structure_Output_Options * pt_Structure_Output_Options){
+void fill_structure_output_options(ifstream &file, map_parameters &map_parameters, Structure_Output_Options * pt_Structure_Output_Options){
 
   int i=0;
   string name = "", value = "";
   string error_name="",error_value="";
-  if(file){if(verbose>1)cout << "(function : fill_output_options) : Reading input parameters file."<< endl;}
+  if(file){cout << "(function : fill_output_options) : Reading input parameters file."<< endl;}
   else{
     cout << "(function : fill_output_options) : \nI couldn't recognized input parameter file. Please check that it is present in the same folder as the executable."<<endl;
     return;
@@ -249,6 +312,8 @@ void fill_output_options(ifstream &file, map_parameters &map_parameters, Structu
   }
   pt_Structure_Output_Options->results_files = map_parameters["results_files"];
   pt_Structure_Output_Options->spectrum_files = map_parameters["spectrum_files"];
+  pt_Structure_Output_Options->task = map_parameters["task"];
+  pt_Structure_Output_Options->verbose = atoi(map_parameters["verbose"].c_str());
   file.clear();
   file.seekg(0, ios::beg);
 }
@@ -259,7 +324,7 @@ void fill_default_parameters(ifstream &file, map_parameters &map_parameters){
   string name = "", value = "";
   string error_name="",error_value="";
   string line;
-  if(file){if(verbose>1)cout << "(function : fill_default_parameters) : Reading default parameters file."<< endl;}
+  if(file){cout << "(function : fill_default_parameters) : Reading default parameters file."<< endl;}
   else{
     cout << "(function : fill_default_parameters) : \nI couldn't recognized default parameter file. Please check that it is present in the same folder as the executable."<<endl;
     return;
@@ -292,7 +357,7 @@ void get_parameter_from_file(ifstream &file, string &parameter){
   int i=0;
   string name = "", value ="";
   string error_name="",error_value="";
-    if(file){if(verbose>1)cout << "(function : get_parameter_from_file) : Attribute " << parameter << " parameter."<< endl;}
+    if(file){cout << "(function : get_parameter_from_file) : Attribute " << parameter << " parameter."<< endl;}
   else{
     cout << "(function : get_parameter_from_file) : \nI couldn't recognized input parameter file. Please check that it is present in the same folder as the executable."<<endl;
     return;
@@ -318,7 +383,7 @@ void get_parameter_from_file(ifstream &file, string &parameter){
       break;
     }
     if(file.eof() && name!=parameter){
-      if(verbose>0)cout << "I have not found the parameter " << parameter <<" in your input file. I will now attribute the default one." << endl;
+      cout << "I have not found the parameter " << parameter <<" in your input file. I will now attribute the default one." << endl;
       parameter = "default";
     }
   }
@@ -565,19 +630,30 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
     else if(name == "results_files"){
       if(value=="automatic")error_value="no";
       else{
-        cout << "No other option is yet available for 'results_files', I switch to 'automatic'."<<endl;
-        value = "automatic";
-        error_value="no";
+        ofstream file(value);
+        if(file){
+          error_value="no";
+        }
+        else{
+          cout << "I cannot open file " << value << " please make sure you have created the folder(s) before starting cBBNfast."<<endl;
+          error_value = "yes";
+        }
       }
     }
     else if(name == "spectrum_files"){
       if(value=="automatic")error_value="no";
       else{
-        cout << "No other option is yet available for 'spectrum_files', I switch to 'automatic'."<<endl;
-        value = "automatic";
-        error_value="no";
+        ofstream file(value);
+        if(file){
+          error_value="no";
+        }
+        else{
+          cout << "I cannot open file " << value << " please make sure you have created the folder(s) before starting cBBNfast."<<endl;
+          error_value = "yes";
+        }
       }
     }
+
     else if(name == "ignore_line" || value == "ignore_line"){
       error_value = "no";
       error_name= "no";
@@ -936,9 +1012,9 @@ for(int i=0;i<pt_Spectrum_and_Precision_Parameters->z_step;i++){
         }
         integrale = (resultat_1-resultat_3)+(resultat_2-resultat_4);
       }
-      if(verbose>1){cout << "The total energy contained in " <<   pt_Gamma_Spectrum->spectrum_name  << "spectrum is " << resultat_1 << " - " << resultat_3 << " = " << resultat_1-resultat_3 << " MeV";
+        cout << "The total energy contained in " <<   pt_Gamma_Spectrum->spectrum_name  << "spectrum is " << resultat_1 << " - " << resultat_3 << " = " << resultat_1-resultat_3 << " MeV";
         cout << " and in " << pt_Electron_Spectrum->spectrum_name << "spectrum is " << resultat_2 << " - " << resultat_4 << " = " << resultat_2-resultat_4 << " MeV ";
         cout << "for a total of "<< integrale <<" MeV, you had injected " << pt_Particle_Physics_Model->E_0 << " MeV." << endl;
-      }
+
 
 }

@@ -58,7 +58,7 @@ struct Structure_Spectrum_and_Precision_Parameters{
 
 };
 
-struct Structure_Scan_Parameters{
+struct Structure_Scan_Parameters_and_Results{
 
   std::string nuclei;
   double tau_min;
@@ -67,12 +67,17 @@ struct Structure_Scan_Parameters{
   double zeta_max;
   int tau_step;
   int zeta_step;
+  std::vector<double> Results_scan_tau_x;
+  std::vector<double> Results_scan_zeta_x;
+  std::vector<double> Results_scan_Abundance;
+
 };
 
 struct Structure_Output_Options{
-  std::string print_result;
   std::string results_files;
   std::string spectrum_files;
+  std::string task;
+  int verbose;
 };
 
 #endif

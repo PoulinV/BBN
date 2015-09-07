@@ -1,8 +1,8 @@
-#include "../Include/EM_cascade.h"
-#include "../Include/injected_spectrum.h"
-#include "../Include/structures.h"
-#include "../Include/BBN_constraints.h"
-#include "../Include/tools.h"
+#include "../include/EM_cascade.h"
+#include "../include/injected_spectrum.h"
+#include "../include/structures.h"
+#include "../include/BBN_constraints.h"
+#include "../include/tools.h"
 
 using namespace std;
 
@@ -41,6 +41,10 @@ double dsigma_NPC(double E_gamma, double z, double E_e){
 	return 2*result;
 }
 
+// double dsigma_pair_creation(double E_gamma, double z, double s){
+// s = pow(E_e/m_e,2);
+// }
+
 double  rate_compton(double  x, double  z){
 
 	double X = 2*x/m_e;
@@ -67,6 +71,15 @@ double  rate_gg_scattering(double  x, double  z){
 	return Gamma_3;
 
 }
+// double rate_pair_creation(double E, double z){
+// 	double E_gamma_bb = 2.701*T_0*(1+z);
+// 	double int_bb = 2*pow(T_0*(1+z),3)*1.20205/(pi*pi);
+// 	return 1/(8*E)*int_bb/pow(E_gamma_bb,2)*integrator_Weddle_Hardy(function_integrand_pair_creation,4*m_e*m_e,4*E*E_gamma_bb);
+// }
+
+
+
+
 double Function_Integrand_Spectre_Compton(long double E_gamma, double E_e, long double E_gamma_bar){
 	double f;
  	long double Gamma_e = 4*E_gamma_bar*E_e/(m_e*m_e);
@@ -455,17 +468,24 @@ void Spectrum_gamma_scattered(Structure_Particle_Physics_Model * pt_Particle_Phy
 					pt_Output_Gamma_Spectrum->Spectrum[i]=resultat/(rate_NPC(E_gamma,z)+rate_compton(E_gamma,z)+rate_gg_scattering(E_gamma,z));
 				}
 }
-void Cascade_Spectrum_Reading_From_File(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-																				Structure_Spectrum * pt_Cascade_Spectrum,
-																				double z,
-																				int number_iterations_photon){
+void Cascade_Spectrum_Reading_From_File(double z,
+																				Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+																				Structure_Spectrum * pt_Spectrum,
+																				Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters){
   ostringstream os;
   string name;
 	double tmp_Energy, tmp_Spectrum;
-  pt_Cascade_Spectrum->redshift = z;
+  pt_Spectrum->redshift = z;
 
-    os << "Cascade_Spectrum_Folder/Spectrum_m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << number_iterations_photon <<"iterations.dat";
-    name = os.str();
+	if(pt_Spectrum->species == "photon"){
+		if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="iterative")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << pt_Spectrum_and_Precision_Parameters->number_iterations_photon <<"iterations.dat";
+		else if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="triangular")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << "triangular.dat";
+	}
+	else if(pt_Spectrum->species == "electron"){
+		if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="iterative")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << pt_Spectrum_and_Precision_Parameters->number_iterations_electron <<"iterations.dat";
+		else if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="triangular")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << "triangular.dat";
+	}
+	  name = os.str();
     ifstream file(name);
     if(file)cout << "Importing file " << name << " in structure Cascade_Spectrum." << endl;
 		else{
@@ -478,8 +498,8 @@ void Cascade_Spectrum_Reading_From_File(Structure_Particle_Physics_Model * pt_Pa
 	    // stringstream is(ligne);
 	    if(line[0] == '#' or line[0] == '\0') continue;
       file >> tmp_Energy >> tmp_Spectrum ;
-			pt_Cascade_Spectrum->Energy.push_back(tmp_Energy);
-			pt_Cascade_Spectrum->Spectrum.push_back(tmp_Spectrum*(rate_NPC(tmp_Energy,z)+rate_compton(tmp_Energy,z)+rate_gg_scattering(tmp_Energy,z)));
+			pt_Spectrum->Energy.push_back(tmp_Energy);
+			pt_Spectrum->Spectrum.push_back(tmp_Spectrum*(rate_NPC(tmp_Energy,z)+rate_compton(tmp_Energy,z)+rate_gg_scattering(tmp_Energy,z)));
 			  // cout << z << "  " << tmp_Energy << "  " << tmp_Spectrum<<endl;
 
 		}
@@ -543,6 +563,7 @@ void Triangular_Spectrum(Structure_Particle_Physics_Model * pt_Particle_Physics_
 }
 
 void  Cascade_Spectrum_Calculation(double z,
+																	 Structure_Output_Options * pt_Output_Options,
 																	 Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
 																	 Structure_Spectrum * pt_Cascade_Spectrum,
 																	 Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters){
@@ -630,8 +651,8 @@ void  Cascade_Spectrum_Calculation(double z,
 								}
 								// check_energy_conservation(pt_Particle_Physics_Model,pt_Spectrum_and_Precision_Parameters,pt_Cascade_Spectrum,&Electron_Spectrum,integrale);
 								if(pt_Spectrum_and_Precision_Parameters->spectrum_mode == "writing"){
-										if(verbose>1)cout <<" I will now print the spectrum in files." << endl;
-										print_spectrum_automatic_names(0, pt_Cascade_Spectrum, pt_Particle_Physics_Model);
+										if(pt_Output_Options->verbose>1)cout <<" I will now print the spectrum in files." << endl;
+										print_spectrum(pt_Output_Options,pt_Spectrum_and_Precision_Parameters, pt_Cascade_Spectrum, pt_Particle_Physics_Model);
 								}
 					}
 
@@ -663,8 +684,8 @@ void  Cascade_Spectrum_Calculation(double z,
 																					 &Electron_Spectrum);
 
 						//  check_energy_conservation(pt_Particle_Physics_Model,pt_Spectrum_and_Precision_Parameters,pt_Cascade_Spectrum,&Electron_Spectrum,integrale);
-						 print_spectrum_automatic_names(0, &Electron_Spectrum, pt_Particle_Physics_Model);
-						 print_spectrum_automatic_names(0, pt_Cascade_Spectrum, pt_Particle_Physics_Model);
+						print_spectrum(pt_Output_Options,pt_Spectrum_and_Precision_Parameters, &Electron_Spectrum, pt_Particle_Physics_Model);
+						print_spectrum(pt_Output_Options,pt_Spectrum_and_Precision_Parameters, pt_Cascade_Spectrum, pt_Particle_Physics_Model);
 						}
 
 
@@ -704,13 +725,13 @@ void  Cascade_Spectrum_Calculation(double z,
 											cout <<"E = " << Electron_Spectrum.Energy[j] << " Tmp_Electron_Spectrum = " << Tmp_Electron_Spectrum.Spectrum[j] << " Diffused_Electron_Spectrum = " << Diffused_Electron_Spectrum.Spectrum[j]<<endl;
 
 											}
-											print_spectrum_automatic_names(i+1, &Electron_Spectrum, pt_Particle_Physics_Model);
+											print_spectrum(pt_Output_Options,pt_Spectrum_and_Precision_Parameters, &Electron_Spectrum, pt_Particle_Physics_Model);
 
 									}
 
 									if(pt_Spectrum_and_Precision_Parameters->spectrum_mode == "writing"){
 											Diffused_Electron_Spectrum.spectrum_name = "electron_diffused_from_dirac_";
-											print_spectrum_automatic_names(101, &Diffused_Electron_Spectrum, pt_Particle_Physics_Model);
+											print_spectrum(pt_Output_Options,pt_Spectrum_and_Precision_Parameters, &Diffused_Electron_Spectrum, pt_Particle_Physics_Model);
 									}
 									Spectre_gamma_compton(pt_Particle_Physics_Model,
 																				pt_Spectrum_and_Precision_Parameters,
@@ -718,8 +739,8 @@ void  Cascade_Spectrum_Calculation(double z,
 																				&Inverse_Compton_Spectrum);
 									if(pt_Spectrum_and_Precision_Parameters->spectrum_mode == "writing"){
 											Inverse_Compton_Spectrum.spectrum_name = "ICS_from_e_injection_";
-											if(verbose>1)cout <<" I will now print the spectrum in files." << endl;
-											print_spectrum_automatic_names(0, &Inverse_Compton_Spectrum, pt_Particle_Physics_Model);
+											if(pt_Output_Options->verbose>1)cout <<" I will now print the spectrum in files." << endl;
+											print_spectrum(pt_Output_Options,pt_Spectrum_and_Precision_Parameters, &Inverse_Compton_Spectrum, pt_Particle_Physics_Model);
 									}
 
 
@@ -739,14 +760,14 @@ void  Cascade_Spectrum_Calculation(double z,
 
 								if(pt_Spectrum_and_Precision_Parameters->spectrum_mode == "writing"){
 										pt_Cascade_Spectrum->spectrum_name = "Cascade_";
-										if(verbose>1)cout <<" I will now print the spectrum in files." << endl;
-										print_spectrum_automatic_names(0, pt_Cascade_Spectrum, pt_Particle_Physics_Model);
+										if(pt_Output_Options->verbose>1)cout <<" I will now print the spectrum in files." << endl;
+										print_spectrum(pt_Output_Options,pt_Spectrum_and_Precision_Parameters, pt_Cascade_Spectrum, pt_Particle_Physics_Model);
 								}
 
 
 
 							for(int k = 0; k<pt_Spectrum_and_Precision_Parameters->number_iterations_photon;k++){
-										if(verbose>1)cout<<"iteration : " << k+1 << endl;
+										if(pt_Output_Options->verbose>1)cout<<"iteration : " << k+1 << endl;
 
 
 								Spectrum_gamma_scattered(pt_Particle_Physics_Model,
@@ -763,7 +784,7 @@ void  Cascade_Spectrum_Calculation(double z,
 
 									if(pt_Spectrum_and_Precision_Parameters->spectrum_mode == "writing"){
 										pt_Cascade_Spectrum->spectrum_name = "Cascade_";
-										print_spectrum_automatic_names(k+1, pt_Cascade_Spectrum, pt_Particle_Physics_Model);
+										print_spectrum(pt_Output_Options,pt_Spectrum_and_Precision_Parameters, pt_Cascade_Spectrum, pt_Particle_Physics_Model);
 									}
 
 						}
@@ -793,14 +814,14 @@ void  Cascade_Spectrum_Calculation(double z,
 							Tmp_Electron_Spectrum.Spectrum[j]= Compton_Electron_Spectrum.Spectrum[j]+Diffused_Electron_Spectrum.Spectrum[j];
 							cout << " Electron_Spectrum = " << Electron_Spectrum.Spectrum[j] << endl;
 						}
-						print_spectrum_automatic_names(i+1, &Tmp_Electron_Spectrum, pt_Particle_Physics_Model);
+						print_spectrum(pt_Output_Options,pt_Spectrum_and_Precision_Parameters, &Tmp_Electron_Spectrum, pt_Particle_Physics_Model);
 
 					}
 					for(int j=0; j<Electron_Table_Size; j++){
 						Electron_Spectrum.Energy[j]=Tmp_Electron_Spectrum.Energy[j];
 						Electron_Spectrum.Spectrum[j]+=Tmp_Electron_Spectrum.Spectrum[j];
 					}
-					print_spectrum_automatic_names(pt_Spectrum_and_Precision_Parameters->number_iterations_electron+1, &Electron_Spectrum, pt_Particle_Physics_Model);
+					print_spectrum(pt_Output_Options,pt_Spectrum_and_Precision_Parameters, &Electron_Spectrum, pt_Particle_Physics_Model);
 
 						if(pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice == "Dirac"){
 							pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice = "from_cascade";
@@ -819,18 +840,18 @@ void  Cascade_Spectrum_Calculation(double z,
 
 							if(pt_Spectrum_and_Precision_Parameters->spectrum_mode == "writing"){
 								Compton_Electron_Spectrum.spectrum_name = "compton_electron_";
-								print_spectrum_automatic_names(0, &Compton_Electron_Spectrum, pt_Particle_Physics_Model);
+								print_spectrum(pt_Output_Options,pt_Spectrum_and_Precision_Parameters, &Compton_Electron_Spectrum, pt_Particle_Physics_Model);
 							}
 							if(pt_Spectrum_and_Precision_Parameters->spectrum_mode == "writing"){
 								pt_Cascade_Spectrum->spectrum_name = "total_";
-								print_spectrum_automatic_names(100, pt_Cascade_Spectrum, pt_Particle_Physics_Model);
+								print_spectrum(pt_Output_Options,pt_Spectrum_and_Precision_Parameters, pt_Cascade_Spectrum, pt_Particle_Physics_Model);
 							}
 
 							// check_energy_conservation(pt_Particle_Physics_Model,pt_Spectrum_and_Precision_Parameters,pt_Cascade_Spectrum,&Electron_Spectrum,integrale);
 
 							if(pt_Spectrum_and_Precision_Parameters->spectrum_mode == "writing"){
 								Inverse_Compton_Spectrum.spectrum_name = "ICS_from_cascade_";
-								print_spectrum_automatic_names(101, &Inverse_Compton_Spectrum, pt_Particle_Physics_Model);
+								print_spectrum(pt_Output_Options,pt_Spectrum_and_Precision_Parameters, &Inverse_Compton_Spectrum, pt_Particle_Physics_Model);
 							}
 						}
 						}

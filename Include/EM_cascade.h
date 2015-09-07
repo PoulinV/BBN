@@ -13,11 +13,12 @@ double dsigma_NPC(double E_gamma, double z, double E_e);
 double rate_compton(double  x, double  z);
 double rate_NPC(double  x, double  z);
 double rate_gg_scattering(double  x, double  z);
-void Cascade_Spectrum_Reading_From_File(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-																				Structure_Spectrum * pt_Cascade_Spectrum,
-																				double z,
-																				int iterations);
-void  Cascade_Spectrum_Calculation(double z,
+void Cascade_Spectrum_Reading_From_File(double z,
+																				Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+                                        Structure_Spectrum * pt_Spectrum,
+                                        Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);
+void Cascade_Spectrum_Calculation(double z,
+																	 Structure_Output_Options * pt_Output_Options,
 																	 Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
 																	 Structure_Spectrum * pt_Cascade_Spectrum,
 																	 Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);

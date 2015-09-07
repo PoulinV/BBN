@@ -1,8 +1,8 @@
-#include "../Include/EM_cascade.h"
-#include "../Include/injected_spectrum.h"
-#include "../Include/structures.h"
-#include "../Include/BBN_constraints.h"
-#include "../Include/tools.h"
+#include "../include/EM_cascade.h"
+#include "../include/injected_spectrum.h"
+#include "../include/structures.h"
+#include "../include/BBN_constraints.h"
+#include "../include/tools.h"
 using namespace std;
 
 /**********************************************************************************************************************************************************************************************************/

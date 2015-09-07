@@ -22,12 +22,12 @@ void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Cascade_Spe
 
 void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
                                               Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-                                              Structure_Scan_Parameters * pt_Scan_Parameters,
+                                              Structure_Scan_Parameters_and_Results * pt_Scan_Parameters_and_Results,
                                               Structure_Output_Options * pt_Output_Options);
 
 void Compute_constraints_from_destruction_and_production(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
                                                         Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-                                                        Structure_Scan_Parameters * pt_Scan_Parameters,
+                                                        Structure_Scan_Parameters_and_Results * pt_Scan_Parameters_and_Results,
                                                         Structure_Output_Options * pt_Output_Options);
 
 

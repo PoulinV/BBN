@@ -1,8 +1,8 @@
-#include "../Include/EM_cascade.h"
-#include "../Include/injected_spectrum.h"
-#include "../Include/structures.h"
-#include "../Include/BBN_constraints.h"
-#include "../Include/tools.h"
+#include "../include/EM_cascade.h"
+#include "../include/injected_spectrum.h"
+#include "../include/structures.h"
+#include "../include/BBN_constraints.h"
+#include "../include/tools.h"
 using namespace std;
 
 
@@ -100,7 +100,7 @@ void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Cascade_Spe
 
 void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
                                               Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-                                              Structure_Scan_Parameters * pt_Scan_Parameters,
+                                              Structure_Scan_Parameters_and_Results * pt_Scan_Parameters_and_Results,
                                               Structure_Output_Options * pt_Output_Options){
 
   Structure_Spectrum Cascade_Spectrum;
@@ -109,12 +109,12 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
 
   /******** This step attributes locally the values of precision and scan parameters ********/
   double tau_min, tau_max, tau_step, zeta_min, zeta_max, zeta_step, z_step, n_step, number_iterations_photon;
-  tau_min = pt_Scan_Parameters->tau_min;
-  tau_max = pt_Scan_Parameters->tau_max;
-  tau_step = pt_Scan_Parameters->tau_step;
-  zeta_min = pt_Scan_Parameters->zeta_min;
-  zeta_max = pt_Scan_Parameters->zeta_max;
-  zeta_step = pt_Scan_Parameters->zeta_step;
+  tau_min = pt_Scan_Parameters_and_Results->tau_min;
+  tau_max = pt_Scan_Parameters_and_Results->tau_max;
+  tau_step = pt_Scan_Parameters_and_Results->tau_step;
+  zeta_min = pt_Scan_Parameters_and_Results->zeta_min;
+  zeta_max = pt_Scan_Parameters_and_Results->zeta_max;
+  zeta_step = pt_Scan_Parameters_and_Results->zeta_step;
   n_step = pt_Spectrum_and_Precision_Parameters->n_step;
   z_step = pt_Spectrum_and_Precision_Parameters->z_step;
   number_iterations_photon = pt_Spectrum_and_Precision_Parameters->number_iterations_photon;
@@ -131,36 +131,20 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
   double f1, f2, f3, z1, z2, z3, h, dz;
   double E1, dE;
 
-    ostringstream os;
-    string name;
-    if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice=="universal")os << "Output/Results_destruc_only_"<< pt_Scan_Parameters->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV_universal_spectrum.dat";
-    else if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice=="Dirac" && pt_Spectrum_and_Precision_Parameters->calculation_mode == "iterative")os << "Output/Results_destruc_only_"<< pt_Scan_Parameters->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV_photon_Dirac_spectrum_"<<pt_Spectrum_and_Precision_Parameters->number_iterations_photon<<"iterations.dat";
-    else if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice=="Dirac" && pt_Spectrum_and_Precision_Parameters->calculation_mode == "triangular")os << "Output/Results_destruc_only_"<< pt_Scan_Parameters->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV_photon_Dirac_spectrum_triangular.dat";
-    else if(pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice=="Dirac" && pt_Spectrum_and_Precision_Parameters->calculation_mode == "iterative")os << "Output/Results_destruc_only_"<< pt_Scan_Parameters->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV_electron_Dirac_spectrum_"<<pt_Spectrum_and_Precision_Parameters->number_iterations_electron<<"iterations.dat";
-    else if(pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice=="Dirac" && pt_Spectrum_and_Precision_Parameters->calculation_mode == "triangular")os << "Output/Results_destruc_only_"<< pt_Scan_Parameters->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV_electron_Dirac_spectrum_triangular.dat";
 
-    name = os.str();
-    ofstream file(name);
-    if(file){
-      if(verbose>1)cout<<" I could open file " << name << endl;
-    }
-    else{
-      if(verbose>1)cout<<" I couldn't open file, i'm shutting down." << endl;
-      return;
-    }
-
-
- Check_nuclei(pt_Scan_Parameters->nuclei, i_min, i_max, k_min, k_max, Y_min, Y_max, Y_0);
+ Check_nuclei(pt_Scan_Parameters_and_Results->nuclei, i_min, i_max, k_min, k_max, Y_min, Y_max, Y_0);
 
  dE= (pt_Particle_Physics_Model->E_0 - E_min)/ (double) (Gamma_Table_Size-1);
- cout << " z initial = " << z_initial << " z final = " << z_final << endl;
+  if(pt_Output_Options->verbose>1)cout << " z initial = " << z_initial << " z final = " << z_final << endl;
+  cout << "I start generating spectrum for each redshift. You asked for " << z_step << " points." << endl;
  for(int j = 0; j<=z_step;j++){
 
    z=pow(10,log10(z_initial)-j*log10_dz);
    E_c = E_c_0/(1+z);
-   if(verbose>1)cout<<"redshift = " << z << " still " << z_step-j << " to go " << endl;
+   cout<<"redshift = " << z << " still " << z_step-j << " points to go." << endl;
    if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "universal"){
      Cascade_Spectrum_Calculation(z,
+                                  pt_Output_Options,
                                   pt_Particle_Physics_Model,
                                   &Cascade_Spectrum,
                                   pt_Spectrum_and_Precision_Parameters);
@@ -168,6 +152,7 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
    else{
        if(pt_Spectrum_and_Precision_Parameters->spectrum_mode=="writing" || pt_Spectrum_and_Precision_Parameters->spectrum_mode == "nothing"){
          Cascade_Spectrum_Calculation(z,
+                                      pt_Output_Options,
                                       pt_Particle_Physics_Model,
                                       &Cascade_Spectrum,
                                       pt_Spectrum_and_Precision_Parameters);
@@ -184,10 +169,14 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
          }
 
 
-      Cascade_Spectrum_Reading_From_File(pt_Particle_Physics_Model,
-                                               &Cascade_Spectrum,
-                                               z,
-                                               pt_Spectrum_and_Precision_Parameters->number_iterations_photon);
+      else Cascade_Spectrum_Reading_From_File(z,
+                                              pt_Particle_Physics_Model,
+                                              &Cascade_Spectrum,
+                                              pt_Spectrum_and_Precision_Parameters);
+      if(pt_Output_Options->verbose>2){
+        cout << "redshift" << z << endl;
+        for(int i = 0; i < Cascade_Spectrum.Spectrum.size(); i++)cout << "read spectrum from file = "<< Cascade_Spectrum.Spectrum[i]  << " energy = " << Cascade_Spectrum.Energy[i]<<endl;
+      }
      }
 
     }
@@ -203,6 +192,7 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
                                            pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice);
    Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.push_back(log10(resultat));
    Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei.push_back(log10(z));
+    if(pt_Output_Options->verbose>1)cout << "results convolution spectrum and cross section = "<< resultat << "redshift" << z << endl;
    Cascade_Spectrum.Energy.clear();
    Cascade_Spectrum.Spectrum.clear();
   }
@@ -211,7 +201,7 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
     tau_x = pow(10,log10(tau_min)+log10_dtau*dtau);
     if((dtau==tau_step) && (tau_x!=tau_max))cout<<"erreur : probleme de pas logarithmique en tau"<<endl;
 
-    if(verbose>0)cout << "Current lifetime analysed : " << tau_x << endl;
+    cout << "Current lifetime analysed : " << tau_x << endl;
     z_x = pow(tau_x*(2*H_r),-0.5)-1;
     z_initial = 5*z_x;
     // z_final = z_min;
@@ -261,20 +251,24 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
       Abundance*=Y_0;
       // cout << " B = " << B << "Abundance = "<<Abundance <<"Y0 = " << Y_0 << "Y_min = " << Y_min << endl;
 
-      if(pt_Output_Options->print_result == "yes"){
-        if(Abundance<Y_min){
-          cout << "The final abundance = " << Abundance << endl;
-          cout<<"your model is ruled out"<<endl;
-        }
-      }
-      if(Abundance < Y_min){
-        if(tau_x==tau_max)cout << "Exporting results in " << name << "."<<endl;
 
-        file << tau_x << "  " << zeta_x << "  " << Abundance << endl;
+      if(Abundance < Y_min || Abundance > Y_max){
+        if(pt_Output_Options->verbose>1){
+            cout << "The final abundance = " << Abundance << endl;
+        }
+        pt_Scan_Parameters_and_Results->Results_scan_tau_x.push_back(tau_x);
+        pt_Scan_Parameters_and_Results->Results_scan_zeta_x.push_back(zeta_x);
+        pt_Scan_Parameters_and_Results->Results_scan_Abundance.push_back(Abundance);
         break;
       }
     }
   }
+
+
+print_results_scan(pt_Output_Options,
+                   pt_Spectrum_and_Precision_Parameters,
+                   pt_Scan_Parameters_and_Results,
+                   pt_Particle_Physics_Model);
 
     Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei.clear();
     Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.clear();
@@ -282,7 +276,7 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
 
 void Compute_constraints_from_destruction_and_production(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
                                                         Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-                                                        Structure_Scan_Parameters * pt_Scan_Parameters,
+                                                        Structure_Scan_Parameters_and_Results * pt_Scan_Parameters_and_Results,
                                                         Structure_Output_Options * pt_Output_Options){
 
   double z,dz,h;
@@ -299,12 +293,12 @@ void Compute_constraints_from_destruction_and_production(Structure_Particle_Phys
   Structure_Spectrum Cascade_Spectrum;
   /******** This step attributes locally the values of precision and scan parameters ********/
   double tau_min, tau_max, tau_step, zeta_min, zeta_max, zeta_step, z_step, n_step, number_iterations_photon;
-  tau_min = pt_Scan_Parameters->tau_min;
-  tau_max = pt_Scan_Parameters->tau_max;
-  tau_step = pt_Scan_Parameters->tau_step;
-  zeta_min = pt_Scan_Parameters->zeta_min;
-  zeta_max = pt_Scan_Parameters->zeta_max;
-  zeta_step = pt_Scan_Parameters->zeta_step;
+  tau_min = pt_Scan_Parameters_and_Results->tau_min;
+  tau_max = pt_Scan_Parameters_and_Results->tau_max;
+  tau_step = pt_Scan_Parameters_and_Results->tau_step;
+  zeta_min = pt_Scan_Parameters_and_Results->zeta_min;
+  zeta_max = pt_Scan_Parameters_and_Results->zeta_max;
+  zeta_step = pt_Scan_Parameters_and_Results->zeta_step;
   n_step = pt_Spectrum_and_Precision_Parameters->n_step;
   z_step = pt_Spectrum_and_Precision_Parameters->z_step;
   number_iterations_photon = pt_Spectrum_and_Precision_Parameters->number_iterations_photon;
@@ -344,54 +338,54 @@ void Compute_constraints_from_destruction_and_production(Structure_Particle_Phys
     /**** Third step : Compute production of the nuclei through 4He destruction. The difference between this step and the previous one is that only the channels destructing 4He ****/
     /********************************************************************* and producing the nuclei are now open. *******************************************************************/
     /********************************************************************************************************************************************************************************/
-    ostringstream os;
-    string name;
-    os << "Output/Result_Scan_Folder/Results_destruc_and_production_"<< pt_Scan_Parameters->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV.dat";
-    name = os.str();
-    ofstream file(name);
-    if(file){
-      if(verbose>1)cout<<" I could open file " << name << endl;
-    }
-    else{
-      if(verbose>1)cout<<" I couldn't open file, i'm shutting down." << endl;
-      return;
-    }
-    Check_nuclei(pt_Scan_Parameters->nuclei, i_min, i_max, k_min, k_max, Y_min, Y_max, Y_0);
+
+
+    Check_nuclei(pt_Scan_Parameters_and_Results->nuclei, i_min, i_max, k_min, k_max, Y_min, Y_max, Y_0);
     Check_nuclei("4He", j_min, j_max, l_min, l_max, K_min, K_max, K_0);
-    if(verbose>1)cout << " z initial = " << z_initial << " z final = " << z_final << endl;
+    cout << "I start generating spectrum for each redshift and convolute them with cross sections. You asked for " << z_step << " points." << endl;
     for(int j = 0; j<=z_step;j++){
 
       z=pow(10,log10(z_initial)-j*log10_dz);
       E_c = E_c_0/(1+z);
-      if(verbose>1)cout<<"redshift = " << z << " still " << z_step-j << " to go " << endl;
-
-
-      if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "Dirac"){
-          if(pt_Spectrum_and_Precision_Parameters->spectrum_mode=="writing" || pt_Spectrum_and_Precision_Parameters->spectrum_mode == "nothing")
-          Cascade_Spectrum_Calculation(z,
-                                      pt_Particle_Physics_Model,
-                                      &Cascade_Spectrum,
-                                      pt_Spectrum_and_Precision_Parameters);
+      cout<<"redshift = " << z << " still " << z_step-j << " points to go. " << endl;
+      if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "universal"){
+        Cascade_Spectrum_Calculation(z,
+                                     pt_Output_Options,
+                                     pt_Particle_Physics_Model,
+                                     &Cascade_Spectrum,
+                                     pt_Spectrum_and_Precision_Parameters);
+      }
+      else{
+          if(pt_Spectrum_and_Precision_Parameters->spectrum_mode=="writing" || pt_Spectrum_and_Precision_Parameters->spectrum_mode == "nothing"){
+            Cascade_Spectrum_Calculation(z,
+                                         pt_Output_Options,
+                                         pt_Particle_Physics_Model,
+                                         &Cascade_Spectrum,
+                                         pt_Spectrum_and_Precision_Parameters);
+          }
           else if(pt_Spectrum_and_Precision_Parameters->spectrum_mode=="reading"){
-
             if(E_c <= pt_Particle_Physics_Model->E_0 ){
               Cascade_Spectrum.Energy.resize(Gamma_Table_Size);
               Cascade_Spectrum.Spectrum.resize(Gamma_Table_Size);
               for(int i=0;i<Gamma_Table_Size;i++){
                 Cascade_Spectrum.Energy[i]=E_min+i*dE;
                 Cascade_Spectrum.Spectrum[i]=universal_spectrum(E_min+i*dE,z,pt_Particle_Physics_Model->E_0);
-              }
+
+               }
             }
 
-          else Cascade_Spectrum_Reading_From_File(pt_Particle_Physics_Model,
-                                                  &Cascade_Spectrum,
-                                                  z,
-                                                  pt_Spectrum_and_Precision_Parameters->number_iterations_photon);
-          }
+
+         else Cascade_Spectrum_Reading_From_File(z,
+                                                 pt_Particle_Physics_Model,
+                                                 &Cascade_Spectrum,
+                                                 pt_Spectrum_and_Precision_Parameters);
+         if(pt_Output_Options->verbose>2){
+           cout << "redshift" << z << endl;
+           for(int i = 0; i < Cascade_Spectrum.Spectrum.size(); i++)cout << "read spectrum from file = "<< Cascade_Spectrum.Spectrum[i]  << " energy = " << Cascade_Spectrum.Energy[i]<<endl;
+         }
+        }
+
        }
-        // else if(spectrum_choice == "universal"){
-        //   Cascade_Spectrum_Calculation(spectrum_choice, z, &Particle_Physics_Model, &Cascade_Spectrum, n_step, iterations, spectrum_mode);
-        // }
 
        Spectrum_and_cross_sections_convolution(&Cascade_Spectrum, pt_Particle_Physics_Model, pt_Spectrum_and_Precision_Parameters, i_min, i_max, resultat, z, n_step, pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice);
 
@@ -399,7 +393,7 @@ void Compute_constraints_from_destruction_and_production(Structure_Particle_Phys
       Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.push_back(log10(resultat));
       Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei.push_back(log10(z));
       // cout << z << "  " << resultat  << endl;
-      // for(int l = 0;l<Gamma_Table_Size;l++)cout << Cascade_Spectrum.Energy[l] << "   " << Cascade_Spectrum.Spectrum[l] <<  endl;
+      if(pt_Output_Options->verbose>1)cout << "results convolution spectrum and cross section destruction nuclei = "<< resultat << "redshift" << z << endl;
 
 
       Spectrum_and_cross_sections_convolution(&Cascade_Spectrum, pt_Particle_Physics_Model, pt_Spectrum_and_Precision_Parameters, j_min, j_max, resultat, z, n_step, pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice);
@@ -407,32 +401,31 @@ void Compute_constraints_from_destruction_and_production(Structure_Particle_Phys
       Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_4He.push_back(log10(resultat));
       Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_4He.push_back(log10(z));
       // cout << z << "  " << resultat  << endl;
-      // for(int l = 0;l<Gamma_Table_Size;l++)cout << Cascade_Spectrum.Energy[l] << "   " << Cascade_Spectrum.Spectrum[l] <<  endl;
+      if(pt_Output_Options->verbose>1)cout << "results convolution spectrum and cross section destruction 4He = "<< resultat << "redshift" << z << endl;
 
       Spectrum_and_cross_sections_convolution(&Cascade_Spectrum, pt_Particle_Physics_Model, pt_Spectrum_and_Precision_Parameters, k_min, k_max, resultat, z, n_step, pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice);
 
       Cascade_Spectrum_Integrated_Over_Cross_Section_Production_Nuclei.push_back(log10(resultat));
       Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Production_Nuclei.push_back(log10(z));
-      // cout << z << "  " << resultat << endl;
-      // for(int l = 0;l<Gamma_Table_Size;l++)cout << Cascade_Spectrum.Energy[l] << "   " << Cascade_Spectrum.Spectrum[l] <<  endl;
+      if(pt_Output_Options->verbose>1)cout << "results convolution spectrum and cross section production nuclei = "<< resultat << "redshift" << z << endl;
+
       Cascade_Spectrum.Energy.clear();
       Cascade_Spectrum.Spectrum.clear();
     }
 
 
-  // for(int l = 0;l<Integration_over_z_source_term_redshift.size();l++)cout << Integration_over_z_source_term_redshift[l] << "   " << Integration_over_z_source_term[l] <<  endl;
   /********************************************************************************************************************************************************************************/
   /****************** Fourth step : Every integral that is independant of zeta_x is done once and for all. The source term involved a double integration over z. *******************/
   /************************************************* To do so, every step in z is stored in the table Integration_over_z_source_term. *********************************************/
   /********************************************************************************************************************************************************************************/
 
-if(verbose>1)cout <<"I'm done convoluting the spectrum with cross sections! I start to integrate over z."<<endl;
+    cout <<"I'm done convoluting the spectrum with cross sections! I start to integrate over z."<<endl;
 
     for(int dtau = 0 ; dtau <= tau_step ; dtau++){
       tau_x = pow(10,log10(tau_min)+log10_dtau*dtau);
       if((dtau==tau_step) && (tau_x!=tau_max))cout<<"erreur : probleme de pas logarithmique en tau"<<endl;
 
-      if(verbose>0)cout << "Current lifetime analysed : " << tau_x << endl;
+      cout << "Current lifetime analysed : " << tau_x << endl;
       z_x = pow(tau_x*(2*H_r),-0.5)-1;
       z_initial = 5*z_x;
       // z_final = z_min;
@@ -479,7 +472,7 @@ if(verbose>1)cout <<"I'm done convoluting the spectrum with cross sections! I st
 
         // resultat += pow(10,h) * (f1/3. + 4.*f2/3. + f3/3.);
         resultat_destruc_nuclei += h * (f1/3. + 4.*f2/3. + f3/3.);
-        // cout << " resultat_destruc_nuclei_1 integrale z = " << resultat_destruc_nuclei << " h = " << h <<  endl;
+        if(pt_Output_Options->verbose>1)cout << " resultat integrale destruc nuclei over z = " << resultat_destruc_nuclei << endl;
 
 
         //Second integral : Destruction of the nuclei
@@ -508,6 +501,7 @@ if(verbose>1)cout <<"I'm done convoluting the spectrum with cross sections! I st
         Integration_over_z_source_term_redshift.push_back(z3);
         Integration_over_z_source_term.push_back(resultat_source_term);
 
+        if(pt_Output_Options->verbose>1)cout << " result integrale over z source term = " << resultat_source_term << endl;
 
 
       }
@@ -516,12 +510,12 @@ if(verbose>1)cout <<"I'm done convoluting the spectrum with cross sections! I st
           /********************* Last step : We can now perform integrals that are not independant of zeta. Since we stored previous results in tables or variable, ***********************/
           /********************************************************* there is only one integral per zeta_x left. It is big time gain. *****************************************************/
           /********************************************************************************************************************************************************************************/
-
+    cout << "All necessary steps are done : I can start computing the resulting abundance." << endl;
 
     for(int dZ = 0 ; dZ <= zeta_step ; dZ++){
       zeta_x = pow(10,log10(zeta_min)+log10_dZ*dZ);
       B=zeta_x*n_y_0/(pt_Particle_Physics_Model->E_0*H_r*tau_x);
-      // if(verbose>1)cout << "zeta_x = " << zeta_x << "resultat = " << resultat_destruc_nuclei << " B = " << B << endl;
+      // if(pt_Output_Options->verbose>1)cout << "zeta_x = " << zeta_x << "resultat = " << resultat_destruc_nuclei << " B = " << B << endl;
 
 
       resultat=0;
@@ -581,34 +575,31 @@ if(verbose>1)cout <<"I'm done convoluting the spectrum with cross sections! I st
 
           // resultat += pow(10,h) * (f1/3. + 4.*f2/3. + f3/3.);
           resultat += h * (f1/3. + 4.*f2/3. + f3/3.);
-          // cout << " resultat integrale z = " << resultat << endl;
+          if(pt_Output_Options->verbose>1)cout << " resultat integrale z = " << resultat << endl;
 
       }
-      // if(verbose>1)cout << " resultat source term = " << resultat << " Y_0 = " << Y_0 << endl;
+      // if(pt_Output_Options->verbose>1)cout << " resultat source term = " << resultat << " Y_0 = " << Y_0 << endl;
       Abundance=exp(-resultat_destruc_nuclei*B)*(Y_0+B*resultat);
       // Abundance=exp(-resultat_destruc_nuclei*B)*(Y_0);
 
-      if(pt_Output_Options->print_result == "yes"){
-        if(Abundance<Y_min){
-          cout<<"Your model is ruled out !"<<endl;
-          cout <<"You have overdestructed "<<pt_Scan_Parameters->nuclei<<" : Y_final = " << Abundance << " < Y_min = " << Y_min << "." << endl;
-        }
-        else if(Abundance>Y_max){
-          cout<<"Your model is ruled out !"<<endl;
-          cout <<"You have overproduced "<<pt_Scan_Parameters->nuclei<<" : Y_final = " << Abundance << " > Y_max = " << Y_max << "." << endl;
-        }
-        // else {
-        //   cout << "The final abundance = " << Abundance << "." << endl;
-        //   cout << "Your model is fine for BBN !"<<endl;
-        // }
-      }
+
       if(Abundance < Y_min || Abundance > Y_max){
-        if(tau_x==tau_max)cout << "Exporting results in " << name << "."<<endl;
-        file << tau_x << "  " << zeta_x << "  " << Abundance << endl;
+        if(pt_Output_Options->verbose>1){
+            cout << "The final abundance = " << Abundance << endl;
+        }
+        pt_Scan_Parameters_and_Results->Results_scan_tau_x.push_back(tau_x);
+        pt_Scan_Parameters_and_Results->Results_scan_zeta_x.push_back(zeta_x);
+        pt_Scan_Parameters_and_Results->Results_scan_Abundance.push_back(Abundance);
         break;
       }
+
     }
     }
+    print_results_scan(pt_Output_Options,
+                       pt_Spectrum_and_Precision_Parameters,
+                       pt_Scan_Parameters_and_Results,
+                       pt_Particle_Physics_Model);
+
     Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.clear();
     Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_4He.clear();
     Cascade_Spectrum_Integrated_Over_Cross_Section_Production_Nuclei.clear();
@@ -780,11 +771,9 @@ void Check_nuclei(const std::string &nuclei,
                   double &Y_0){
 
     if(nuclei =="4He"){
-      if(verbose>1)cout<<"I could recognize nuclei, it's 4He."<<endl;
       Y_0 = Y_4He_0;
       Y_min = Y_4He_Min;
       Y_max = Y_4He_Max;
-      if(verbose>1)cout << " Y_4He_0 = " << Y_0 << " Y_4He_min = " << Y_min << " Y_4He_max = " << Y_max << endl;
       //Destruction cross-sections
       i_min = 15;
       i_max = 18;
@@ -793,11 +782,9 @@ void Check_nuclei(const std::string &nuclei,
       k_max = 0; //4He cannot be produced in significant quantities by the non-thermal BBN !
     }
     else if(nuclei=="3He"){
-      if(verbose>1)cout<<"I could recognize nuclei, it's 3He."<<endl;
       Y_0 = Y_3He_0;
       Y_min = Y_3He_Min;
       Y_max = Y_3He_Max;
-      if(verbose>1)cout << " Y_3He_0 = " << Y_0 << " Y_3He_min = " << Y_min << " Y_3He_max = " << Y_max << endl;
       //Destruction cross-sections
       i_min = 19;
       i_max = 20;
@@ -806,11 +793,9 @@ void Check_nuclei(const std::string &nuclei,
       k_max = 16;
     }
     else if(nuclei=="2H"){
-      if(verbose>1)cout<<"I could recognize nuclei, it's 2H."<<endl;
       Y_0 = Y_2H_0;
       Y_min = Y_2H_Min;
       Y_max = Y_2H_Max;
-      if(verbose>1)cout << " Y_2H_0 = " << Y_0 << " Y_2H_min = " << Y_min << " Y_2H_max = " << Y_max << endl;
       //Destruction cross-sections
       i_min = 14;
       i_max = 14;
@@ -819,12 +804,9 @@ void Check_nuclei(const std::string &nuclei,
       k_max = 18;
     }
     else if(nuclei=="7Li"){
-      if(verbose>1)cout<<"I could recognize nuclei, it's 7Li."<<endl;
       Y_0 = Y_7Li_0;
       Y_min = Y_7Li_Min;
       Y_max = Y_7Li_Max;
-
-      if(verbose>1)cout << " Y_7li_0 = " << Y_0 << " Y_7Li_min = " << Y_min << " Y_7Li_max = " << Y_max << endl;
       //Destruction cross-sections
       i_min = 0;
       i_max = 6;
@@ -833,12 +815,9 @@ void Check_nuclei(const std::string &nuclei,
       k_max = 0;
     }
     else if(nuclei=="7Be"){
-      if(verbose>1)cout<<"I could recognize nuclei, it's 7Be."<<endl;
       Y_0 = Y_7Be_0;
       Y_min = Y_7Be_Min;
       Y_max = Y_7Be_Max;
-
-      if(verbose>1)cout << " Y_7Be_0 = " << Y_0 << " Y_7Be_min = " << Y_min << " Y_7Be_max = " << Y_max << endl;
       //Destruction cross-sections
       i_min = 7;
       i_max = 13;
@@ -847,10 +826,10 @@ void Check_nuclei(const std::string &nuclei,
       k_max = 0;
     }
     else{
-      if(verbose>0){cout<<"I couldn't recognize nuclei."<<endl;
+      cout<<"I couldn't recognize nuclei."<<endl;
       cout << "The string 'nuclei' needs to be a word from this list : '4He', '3He', '2H', '7Li, '7Be'." << endl;
       cout << "Please check. " << endl;
-      }
+
       return;
       }
 
