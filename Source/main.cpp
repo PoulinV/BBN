@@ -56,11 +56,14 @@ int main(int argc, char** argv){
 
   struct Structure_Spectrum Cascade_Spectrum;
   string redshift = "redshift";
+  string temperature = "temperature";
   fill_structure_spectrum_and_precision_parameters(file_input, map_parameters, &Spectrum_and_Precision_Parameters);
   fill_structure_particle_physics_model(file_input, map_parameters, &Particle_Physics_Model); // MANDATORY STEP
   fill_structure_output_options(file_input, map_parameters, &Output_Options);
   if(argc==2)get_parameter_from_file(file_input,redshift);
-  if(redshift=="default" || argc==1)redshift=map_parameters["redshift"];
+  if(redshift=="default"){
+    redshift=map_parameters["redshift"];
+  }
   ofstream Spectrum("Output/universal_spectrum.dat");
   Cascade_Spectrum_Calculation(atof(redshift.c_str()),
                                &Output_Options,
@@ -86,7 +89,6 @@ int main(int argc, char** argv){
   fill_structure_spectrum_and_precision_parameters(file_input,map_parameters,&Spectrum_and_Precision_Parameters);
   fill_structure_scan_parameters_and_results(file_input,map_parameters,&Scan_Parameters_and_Results);
   fill_structure_output_options(file_input,map_parameters,&Output_Options);
-  cout << "here " <<endl;
   if(task=="compute_constraints_from_destruction_only")Compute_Constraints_from_destruction_only(&Particle_Physics_Model,
                                             &Spectrum_and_Precision_Parameters,
                                             &Scan_Parameters_and_Results,

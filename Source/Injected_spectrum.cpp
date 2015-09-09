@@ -26,7 +26,7 @@ double universal_spectrum(double  E, double  z, double E_0){
 	double  E_x = E_x_0/(1+z), E_c = E_c_0/(1+z);
 	double  K_0 = E_0/(pow(E_x,2)*(2+log(E_c/E_x)));
 	double  f;
-
+	cout << " E_x = " << E_x << " E_c = " << E_c <<endl;
 	if(E < E_x) f = K_0*pow(E_x/E,1.5)/(rate_NPC(E,z)+rate_compton(E,z)+rate_gg_scattering(E,z));
 	else if(E > E_x && E < E_c) f =  K_0*pow(E_x/E,2)/(rate_NPC(E,z)+rate_compton(E,z)+rate_gg_scattering(E,z));
 	else {f = 0;}

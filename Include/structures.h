@@ -53,8 +53,10 @@ struct Structure_Spectrum_and_Precision_Parameters{
   std::string electron_spectrum_choice;
   std::string spectrum_mode;
   std::string inverse_compton_scattering;
+  std::string double_photon_pair_creation;
   Spectrum Injected_Gamma_Spectrum;
   Spectrum Injected_Electron_Spectrum;
+
 
 };
 

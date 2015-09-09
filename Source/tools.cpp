@@ -5,9 +5,7 @@
 #include "../include/tools.h"
 
 using namespace std;
-// double integrator_Weddle_Hardy(double (*func),){
-//
-// }
+
 void print_spectrum_from_function(ostream &file, double (*func)(double,double,double),double z, Structure_Particle_Physics_Model * pt_Particle_Physics_Model){
 
 
@@ -36,8 +34,14 @@ void print_spectrum(Structure_Output_Options * pt_Output_Options,
 
     if(pt_Output_Options->spectrum_files=="automatic"){
     if(pt_Spectrum->species == "photon"){
-      if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="iterative")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << pt_Spectrum_and_Precision_Parameters->number_iterations_photon <<"iterations.dat";
-      else if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="triangular")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << "triangular.dat";
+      if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "universal"){
+          os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<".dat";
+      }
+      else{
+        if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="iterative")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << pt_Spectrum_and_Precision_Parameters->number_iterations_photon <<"iterations.dat";
+        else if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="triangular")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << "triangular.dat";
+      }
+
     }
     else if(pt_Spectrum->species == "electron"){
       if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="iterative")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << pt_Spectrum_and_Precision_Parameters->number_iterations_electron <<"iterations.dat";
@@ -52,7 +56,7 @@ void print_spectrum(Structure_Output_Options * pt_Output_Options,
     name = os.str();
 
     ofstream file(name);
-    if(pt_Output_Options->verbose>1)cout << "Printing in file " << name <<"."<<  endl;
+    cout << "Printing in file " << name <<"."<<  endl;
 
     if(pt_Spectrum->species=="photon"){
     while(i<Gamma_Table_Size){
@@ -260,6 +264,10 @@ void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parame
   pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice = map_parameters["electron_spectrum_choice"];
   pt_Spectrum_and_Precision_Parameters->spectrum_mode = map_parameters["spectrum_mode"];
   pt_Spectrum_and_Precision_Parameters->inverse_compton_scattering = map_parameters["inverse_compton_scattering"];
+  pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation = map_parameters["double_photon_pair_creation"];
+
+
+
   if(map_parameters["calculation_mode"] == "triangular" && map_parameters["photon_spectrum_choice"] == "Dirac"){
     pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum = no_photons_injected;
   }
@@ -653,7 +661,12 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
         }
       }
     }
-
+    else if(name == "double_photon_pair_creation"){
+      if(value == "yes" || value == "no")error_value="no";
+      else{
+        cout << "double photon pair creation : I couldn't understand your choice, please choose 'yes' if you want to take it into account and 'no' otherwise." <<endl;
+      }
+    }
     else if(name == "ignore_line" || value == "ignore_line"){
       error_value = "no";
       error_name= "no";

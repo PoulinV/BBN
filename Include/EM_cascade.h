@@ -13,6 +13,7 @@ double dsigma_NPC(double E_gamma, double z, double E_e);
 double rate_compton(double  x, double  z);
 double rate_NPC(double  x, double  z);
 double rate_gg_scattering(double  x, double  z);
+double rate_pair_creation(double E, double z, Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);
 void Cascade_Spectrum_Reading_From_File(double z,
 																				Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
                                         Structure_Spectrum * pt_Spectrum,
@@ -45,5 +46,6 @@ void Triangular_Spectrum(Structure_Particle_Physics_Model * pt_Particle_Physics_
 double Rate_Inverse_Compton(double E_e, double z, Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);
 double Function_Integrand_Spectre_Compton(long double E_gamma, double E_e, long double E_gamma_bar);
 double Function_Integrand_Spectre_Compton_version_q(double q, double E_e, double E_gamma_bar);
-
+double function_integrand_pair_creation(double E_e, double E_gamma, double E_gamma_bar);
+double integrand_rate_pair_creation(double s);
 #endif
