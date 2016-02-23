@@ -14,22 +14,23 @@
 #define  ALPHA    (1./137.)                          /* The fine structure constant */
 #define  pi       (3.14159)
 #define  r_e      (1.42*pow(10.,-2))                 /* The bohr radius */
+#define  r_0      (ALPHA)*(ALPHA)*(r_e)                /* The classical electron radius */
 #define  T_0      (2.7255*0.862*pow(10.,-10))        /* Temperature of the CMB today */
+#define  sigma_T  8*(pi)*(r_e)*(r_e)/3.              /* Thompson cross-section */
 #define  Y        0.25                               /* The primordial helium abundance */
 #define  n_y_0    (3.154*pow(10.,-30))               /* The number density of CMB photons today */
 #define  eta      (6.05*pow(10.,-10))                /* The baryon-to-photon ratio */
-#define  n_e      (eta*n_y_0*(1+Y/2))                /* The number density of electrons today */
+#define  n_e      (eta*n_y_0*(1+Y/2)/(1+Y/4))                /* The number density of electrons today */
 #define  m_e      (0.511)                            /* The mass of an electron */
 #define  E_x_0    (0.261121/(80*T_0))                /* Threshold above which photon-photon scattering starts to dominate today */
 #define  E_c_0    (0.261121/(22*T_0))                /* Pair-production threshold today */
 #define  H_0      (2.187*pow(10,-18))                /* Hubble rate today */
-#define  H_r      (H_0*pow((1+7/8*pow(4/11,4/3)*3.046)*5.46*pow(10,-5),0.5))  /* Effective Hubble parameter today */
+#define  H_r      (H_0*pow((1+7./8*pow(4./11,4./3)*3.046)*5.46*pow(10,-5),0.5))  /* Effective Hubble parameter today */
 
 
-#define Gamma_Table_Size    500                  /* Number of points in the gamma spectrum table */
-#define Electron_Table_Size 500                  /* Number of points in the electron spectrum table */
+#define Gamma_Table_Size    2000                  /* Number of points in the gamma spectrum table */
+#define Electron_Table_Size 2000                  /* Number of points in the electron spectrum table */
 #define E_min               1                    /* Minimal energy of the table, the maximum will be set by the mass of the decaying particle */
-
 
 /*****************************************************************************************************************************************************************************************/
 /************************************************************************Observationnal values of the nuclei abundances ******************************************************************/

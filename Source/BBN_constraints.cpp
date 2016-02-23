@@ -120,7 +120,7 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
   number_iterations_photon = pt_Spectrum_and_Precision_Parameters->number_iterations_photon;
   /******************************************************************************************/
 
-  double z_initial =  (5*(pow(2*H_r*tau_min,-0.5)-1)), z_final =  35000, z, z_x;
+  double z_initial =  (5*(pow(2*H_r*tau_min,-0.5)-1)), z_final =  2000, z, z_x;
   int i_min, i_max, k_min, k_max;
   double zeta_x, tau_x;
   double log10_dtau = (log10(tau_max)-log10(tau_min))/(double) tau_step;
@@ -310,7 +310,7 @@ void Compute_constraints_from_destruction_and_production(Structure_Particle_Phys
   double zeta_x, tau_x, z_x;
   // double M_x = pt_Particle_Physics_Model->M_x;
   double E1, dE;
-  double z_initial =  (5*(pow(2*H_r*tau_min,-0.5)-1)), z_final =  35000;
+  double z_initial =  (5*(pow(2*H_r*tau_min,-0.5)-1)), z_final =  2000;
   double log10_dz=(log10(z_initial)-log10(z_final))/(double) z_step;
   double log10_dtau = (log10(tau_max)-log10(tau_min))/(double) tau_step;
   double log10_dZ = (log10(zeta_max)-log10(zeta_min))/(double) zeta_step;

@@ -48,12 +48,22 @@ struct Structure_Spectrum_and_Precision_Parameters{
   int number_iterations_electron;
   int z_step;
   int n_step;
+  int eval_max;
+  std::vector<int> weight;
+  double divisor;
   std::string calculation_mode;
   std::string photon_spectrum_choice;
+  std::string photon_spectrum_file_name;
   std::string electron_spectrum_choice;
+  std::string electron_spectrum_file_name;
   std::string spectrum_mode;
   std::string inverse_compton_scattering;
   std::string double_photon_pair_creation;
+  std::string pair_creation_in_nuclei;
+  std::string compton_scattering;
+  std::string photon_photon_diffusion; 
+  std::string check_energy_conservation;
+  std::string integration_method;
   Spectrum Injected_Gamma_Spectrum;
   Spectrum Injected_Electron_Spectrum;
 

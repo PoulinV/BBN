@@ -114,7 +114,7 @@ void print_results_scan(Structure_Output_Options * pt_Output_Options,
     }
     else{
       cout<<" I couldn't open file, i'm shutting down." << endl;
-      return;
+      exit(0);
     }
 
 
@@ -126,6 +126,7 @@ void linearint(vector<double> &xa, vector<double> &ya, int n, double x, double &
 				if(isnan(xa[0])==0){
           dif=sqrt(pow(x-xa[0],2));
           y = ya[0];
+          // cout <<" x " << xa[0] << " y = " << y << endl;
         }
         else{
           cout << "careful, you're initial point isn't defined !" << endl;
@@ -140,15 +141,21 @@ void linearint(vector<double> &xa, vector<double> &ya, int n, double x, double &
 						x0=xa[i];
 						y=ya[i];
 						}
+            // cout << "dift = " << dift << " x " << x << " xa[i] " << xa[i] << endl;
+
+            // cout << "here"<<endl;
 						// if(ns!=i)break;
 				}
         if(i<n-1){
           x1=xa[ns+1];
           y1=ya[ns+1];
-          if(x1!=x0)y=y0+(x-x0)/(x1-x0)*fabs(y1-y0);
-          // cout << " y = " << y << " x - x0 = " << x-x0 << endl;
-          else y = y0;
-          if(isnan(y)==1){cout << "y is a nan ! I automatically put it to 0." << endl;
+          // if(x1!=x0){
+            y=y0+(x-x0)/(x1-x0)*(y1-y0);
+          cout << " y = " << y << " x - x0 = " << x-x0 << endl;
+        // }
+          // else y = y0;
+          if(isnan(y)==1){
+            cout << "y is a nan ! I automatically put it to 0." << endl;
           y=0;
           }
         }
@@ -173,7 +180,7 @@ void fill_structure_particle_physics_model(ifstream &file, map_parameters &map_p
     check_value_and_name_error(name,error_name,value,error_value);
     if(error_value == "yes" || error_name == "yes"){
       cout << "Problem at the line "<<i<<" of your 'input_param.ini' file. I'm shutting down."<<endl;
-      return;
+      exit(0);
     }
     else{
       map_parameters[name]=value;
@@ -209,7 +216,7 @@ void fill_structure_scan_parameters_and_results(ifstream &file, map_parameters &
     check_value_and_name_error(name,error_name,value,error_value);
     if(error_value == "yes" || error_name == "yes"){
       cout << "Problem at the line "<<i<<" of your 'input_param.ini' file. I'm shutting down."<<endl;
-      return;
+      exit(0);
     }
     else{
       map_parameters[name]=value;
@@ -249,7 +256,7 @@ void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parame
     check_value_and_name_error(name,error_name,value,error_value);
     if(error_value == "yes" || error_name == "yes"){
       cout << "Problem at the line "<<i<<" of your 'input_param.ini' file. I'm shutting down."<<endl;
-      return;
+      exit(0);
     }
     else{
       map_parameters[name]=value;
@@ -262,10 +269,16 @@ void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parame
 	pt_Spectrum_and_Precision_Parameters->n_step = atoi(map_parameters["n_step"].c_str());
   pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice = map_parameters["photon_spectrum_choice"];
   pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice = map_parameters["electron_spectrum_choice"];
+  pt_Spectrum_and_Precision_Parameters->photon_spectrum_file_name = map_parameters["photon_spectrum_file_name"];
+  pt_Spectrum_and_Precision_Parameters->electron_spectrum_file_name = map_parameters["electron_spectrum_file_name"];
   pt_Spectrum_and_Precision_Parameters->spectrum_mode = map_parameters["spectrum_mode"];
   pt_Spectrum_and_Precision_Parameters->inverse_compton_scattering = map_parameters["inverse_compton_scattering"];
   pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation = map_parameters["double_photon_pair_creation"];
-
+  pt_Spectrum_and_Precision_Parameters->pair_creation_in_nuclei = map_parameters["pair_creation_in_nuclei"];
+  pt_Spectrum_and_Precision_Parameters->compton_scattering = map_parameters["compton_scattering"];
+  pt_Spectrum_and_Precision_Parameters->photon_photon_diffusion = map_parameters["photon_photon_diffusion"];
+  pt_Spectrum_and_Precision_Parameters->check_energy_conservation = map_parameters["check_energy_conservation"];
+  pt_Spectrum_and_Precision_Parameters->integration_method = map_parameters["integration_method"];
 
 
   if(map_parameters["calculation_mode"] == "triangular" && map_parameters["photon_spectrum_choice"] == "Dirac"){
@@ -288,6 +301,37 @@ void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parame
     if(map_parameters["electron_spectrum_choice"]=="none")pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum = no_electrons_injected;
     else pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum = map_spectrum[map_parameters["Electron_Spectrum"]];
   }
+
+  if(map_parameters["integration_method"] == "simpson_1/3"){
+    pt_Spectrum_and_Precision_Parameters->eval_max = 3;
+    pt_Spectrum_and_Precision_Parameters->divisor = 6;
+    pt_Spectrum_and_Precision_Parameters->weight.push_back(1);
+    pt_Spectrum_and_Precision_Parameters->weight.push_back(4);
+    pt_Spectrum_and_Precision_Parameters->weight.push_back(1);
+  }
+  else if(map_parameters["integration_method"] == "simpson_3/8"){
+    pt_Spectrum_and_Precision_Parameters->eval_max = 4;
+    pt_Spectrum_and_Precision_Parameters->divisor = 8;
+    pt_Spectrum_and_Precision_Parameters->weight.push_back(1);
+    pt_Spectrum_and_Precision_Parameters->weight.push_back(3);
+    pt_Spectrum_and_Precision_Parameters->weight.push_back(3);
+    pt_Spectrum_and_Precision_Parameters->weight.push_back(1);
+  }
+  else if(map_parameters["integration_method"] == "weddle_hardy"){
+    pt_Spectrum_and_Precision_Parameters->eval_max = 7;
+    pt_Spectrum_and_Precision_Parameters->divisor = 840;
+    pt_Spectrum_and_Precision_Parameters->weight.push_back(41);
+    pt_Spectrum_and_Precision_Parameters->weight.push_back(216);
+    pt_Spectrum_and_Precision_Parameters->weight.push_back(27);
+    pt_Spectrum_and_Precision_Parameters->weight.push_back(272);
+    pt_Spectrum_and_Precision_Parameters->weight.push_back(27);
+    pt_Spectrum_and_Precision_Parameters->weight.push_back(216);
+    pt_Spectrum_and_Precision_Parameters->weight.push_back(41);
+
+  }
+
+
+
   file.clear();
   file.seekg(0, ios::beg);
 }
@@ -312,7 +356,7 @@ void fill_structure_output_options(ifstream &file, map_parameters &map_parameter
     check_value_and_name_error(name,error_name,value,error_value);
     if(error_value == "yes" || error_name == "yes"){
       cout << "Problem at the line "<<i<<" of your 'input_param.ini' file. I'm shutting down."<<endl;
-      return;
+      exit(0);
     }
     else{
       map_parameters[name]=value;
@@ -346,7 +390,7 @@ void fill_default_parameters(ifstream &file, map_parameters &map_parameters){
     check_value_and_name_error(name,error_name,value,error_value);
     if(error_value == "yes" || error_name == "yes"){
       cout << "Problem at the line "<<i<<" of your 'default_param.ini' file. I'm shutting down."<<endl;
-      return;
+      exit(0);
     }
     else{
         if(name!="ignore_line" && value!="ignore_line")map_parameters[name]=value;
@@ -383,7 +427,7 @@ void get_parameter_from_file(ifstream &file, string &parameter){
     }
     if(error_value == "yes" || error_name == "yes"){
       cout << "Problem at the line "<<i<<" of your 'default_param.ini' file. I'm shutting down."<<endl;
-      return;
+      exit(0);
     }
 
     if(name==parameter){
@@ -445,7 +489,7 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
       }
     }
     else if(name == "task"){
-      if(value == "compute_cascade_spectrum" || value == "compute_constraints_from_destruction_only" || value == "compute_constraints_from_destruction_and_production"){
+      if(value == "print_interaction_rate" || value == "compute_cascade_spectrum" || value == "compute_constraints_from_destruction_only" || value == "compute_constraints_from_destruction_and_production"){
         error_value = "no";
         error_name = "no";
 
@@ -495,6 +539,15 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
         error_name =  "no";
       }
     }
+    else if(name == "integration_method"){
+      if(value=="simpson_1/3" || value=="simpson_3/8" || value=="weddle_hardy"){
+        error_value = "no";
+      }
+      else {
+        cout << "Please choose an integration method between 'simpson_1/3', 'simpson_3/8' and 'weddle_hardy'." << endl;
+        error_value = "yes";
+      }
+    }
     else if(name == "photon_spectrum_choice"){
       check_name_spectrum(value, error_value);
       if(error_value=="yes"){
@@ -509,6 +562,12 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
         cout << "The function should have been correctly added in 'injected_spectrum.cpp' and 'injected_spectrum.h' before."<<endl;
       }
     }
+    else if(name == "check_energy_conservation"){
+      if(value == "yes" || value == "no")error_value="no";
+      else{
+        cout << "check_energy_conservation : I couldn't understand your choice, please choose 'yes' if you want to take it into account and 'no' otherwise." <<endl;
+      }
+    }
     else if(name == "spectrum_mode"){
       if(value == "writing" || value == "nothing" || value == "reading"){
         error_value = "no";
@@ -519,14 +578,14 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
         cout << "The parameter 'spectrum_mode' isn't reckognised, please check that it is one among : 'writing', 'reading' and 'nothing'."<<endl;
       }
     }
-    else if(name == "inverse_compton_scattering"){
+    else if(name == "inverse_compton_scattering" || name == "double_photon_pair_creation" || name == "pair_creation_in_nuclei" || name == "compton_scattering" || name =="photon_photon_diffusion"){
       if(value == "yes" || value == "no"){
         error_value = "no";
         error_name =  "no";
       }
       else {
         error_value = "yes";
-        cout << "The parameter 'inverse_compton_scattering' isn't reckognised, please check that it is one among : 'yes' and 'no'."<<endl;
+        cout << "The choice for parameter '"<< name <<"' isn't reckognised, please check that it is either 'yes' or 'no'."<<endl;
       }
     }
     else if(name == "m_x"){
@@ -571,7 +630,7 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
         error_value = "yes";
         cout << "The parameter 'tau_max' is not a double, please check."<<endl;
       }
-      if(atof(value.c_str())>1e10 || atof(value.c_str())<1e3){
+      if(atof(value.c_str())>1e12 || atof(value.c_str())<1e3){
         error_value = "yes";
         cout << "The parameter 'tau_max' isn't valid. Please choose a value in [1e3,1e10], the code isn't trustable for other lifetimes."<<endl;
       }
@@ -648,6 +707,32 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
         }
       }
     }
+    else if(name == "photon_spectrum_file_name"){
+      if(value=="automatic")error_value="no";
+      else{
+        ifstream file(value);
+        if(file){
+          error_value="no";
+        }
+        else{
+          cout << "I cannot open file " << value << " please make sure you have created the file before starting cBBNfast."<<endl;
+          error_value = "yes";
+        }
+      }
+    }
+    else if(name == "electron_spectrum_file_name"){
+      if(value=="automatic")error_value="no";
+      else{
+        ifstream file(value);
+        if(file){
+          error_value="no";
+        }
+        else{
+          cout << "I cannot open file " << value << " please make sure you have created the file before starting cBBNfast."<<endl;
+          error_value = "yes";
+        }
+      }
+    }
     else if(name == "spectrum_files"){
       if(value=="automatic")error_value="no";
       else{
@@ -659,12 +744,6 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
           cout << "I cannot open file " << value << " please make sure you have created the folder(s) before starting cBBNfast."<<endl;
           error_value = "yes";
         }
-      }
-    }
-    else if(name == "double_photon_pair_creation"){
-      if(value == "yes" || value == "no")error_value="no";
-      else{
-        cout << "double photon pair creation : I couldn't understand your choice, please choose 'yes' if you want to take it into account and 'no' otherwise." <<endl;
       }
     }
     else if(name == "ignore_line" || value == "ignore_line"){
@@ -682,66 +761,100 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
                                Structure_Spectrum * pt_Gamma_Spectrum,
                                Structure_Spectrum * pt_Electron_Spectrum,
                                double &integrale){
-
+cout << " **** Currently checking energy conservation *** " << endl;
 double dE = (pt_Particle_Physics_Model->E_0 - E_min) / (double) (pt_Spectrum_and_Precision_Parameters->n_step - 1);
 double h = dE/6.;
 double dE_2, h2;
-double E1, E2, E3, E4, E5, E6, E7, f1, f2, f3, f4, f5, f6, f7, g1, g2, g3, g4, g5, g6, g7, E_gamma, E_e;
+double E1, E2, E3, E4, E5, E6, E7, f1, f2, f3, f4, f5, f6, f7, g1, g2, g3, g4, g5, g6, g7, E_gamma, E_e, rate_E;
+double E[pt_Spectrum_and_Precision_Parameters->eval_max],f[pt_Spectrum_and_Precision_Parameters->eval_max],g[pt_Spectrum_and_Precision_Parameters->eval_max];
+double rate_E1,rate_E2,rate_E3,rate_E4,rate_E5,rate_E6,rate_E7;
 double resultat_1 = 0, resultat_2 = 0, resultat_3 = 0, resultat_4 = 0, resultat_5 = 0;
 double F1, F2, F3, F4, F5, F6, F7;
 double z = pt_Gamma_Spectrum->redshift;
+double E_gamma_bb = 2.701*T_0*(1+z);
+double E_cmb_max = 10*E_gamma_bb;
+double E_cmb_min = E_gamma_bb/100.;
 vector<double> Gamma_Spectrum_Integrated_Over_Kernel;
 vector<double> Gamma_Spectrum_Integrated_Over_Kernel_energy;
 vector<double> Electron_Spectrum_Integrated_Over_Kernel;
 vector<double> Electron_Spectrum_Integrated_Over_Kernel_energy;
-double E_gamma_bb = 2.701*T_0*(1+z);
 double int_bb = 2*pow(T_0*(1+z),3)*1.20205/(pi*pi);
 double dE_3 = (pt_Particle_Physics_Model->E_0 - E_min) / (double) (pt_Spectrum_and_Precision_Parameters->z_step - 1);
 
 
 if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice=="universal"){
-  E_gamma = 50;
-        for(int i=0;i<pt_Spectrum_and_Precision_Parameters->n_step-1;i++){
-          if(i==0){
-            E1=E_min;
-            }
-          else{
-            E1=E7;
-          }
 
-          E2=E1 + h;
-          E3=E2 + h;
-          E4=E3 + h;
-          E5=E4 + h;
-          E6=E5 + h;
-          E7=E6 + h;
-          if(E1<pt_Particle_Physics_Model->E_0)linearint(pt_Gamma_Spectrum->Energy, pt_Gamma_Spectrum->Spectrum, pt_Gamma_Spectrum->Energy.size(), E1, f1);
-          else f1=0;
-          if(E2<pt_Particle_Physics_Model->E_0)linearint(pt_Gamma_Spectrum->Energy, pt_Gamma_Spectrum->Spectrum, pt_Gamma_Spectrum->Energy.size(), E2, f2);
-          else f2=0;
-          if(E3<pt_Particle_Physics_Model->E_0)linearint(pt_Gamma_Spectrum->Energy, pt_Gamma_Spectrum->Spectrum, pt_Gamma_Spectrum->Energy.size(), E3, f3);
-          else f3=0;
-          if(E4<pt_Particle_Physics_Model->E_0)linearint(pt_Gamma_Spectrum->Energy, pt_Gamma_Spectrum->Spectrum, pt_Gamma_Spectrum->Energy.size(), E4, f4);
-          else f4=0;
-          if(E5<pt_Particle_Physics_Model->E_0)linearint(pt_Gamma_Spectrum->Energy, pt_Gamma_Spectrum->Spectrum, pt_Gamma_Spectrum->Energy.size(), E5, f5);
-          else f5=0;
-          if(E6<pt_Particle_Physics_Model->E_0)linearint(pt_Gamma_Spectrum->Energy, pt_Gamma_Spectrum->Spectrum, pt_Gamma_Spectrum->Energy.size(), E6, f6);
-          else f6=0;
-          if(E7<pt_Particle_Physics_Model->E_0)linearint(pt_Gamma_Spectrum->Energy, pt_Gamma_Spectrum->Spectrum, pt_Gamma_Spectrum->Energy.size(), E7, f7);
-          else f7=0;
+          for(int j=0; j<pt_Spectrum_and_Precision_Parameters->n_step-1;j++){
+                            // cout << "pt_Spectrum_and_Precision_Parameters->eval_max = " << pt_Spectrum_and_Precision_Parameters->eval_max << " h2 " << h2 << endl;
+                            for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++)
+                            {
+                              if(eval == 0){
+                              if(j==0)	E[eval]=E_min;
+                              else E[eval]=E[pt_Spectrum_and_Precision_Parameters->eval_max-1];
+                              }
+                              else{
+                                E[eval]=E[0]+eval*h;
+                              }
 
-          f1*=E1*(rate_NPC(E1,z)+rate_compton(E1,z)+rate_gg_scattering(E1,z));
-          f2*=E2*(rate_NPC(E2,z)+rate_compton(E2,z)+rate_gg_scattering(E2,z));
-          f3*=E3*(rate_NPC(E3,z)+rate_compton(E3,z)+rate_gg_scattering(E3,z));
-          f4*=E4*(rate_NPC(E4,z)+rate_compton(E4,z)+rate_gg_scattering(E4,z));
-          f5*=E5*(rate_NPC(E5,z)+rate_compton(E5,z)+rate_gg_scattering(E5,z));
-          f6*=E6*(rate_NPC(E6,z)+rate_compton(E6,z)+rate_gg_scattering(E6,z));
-          f7*=E7*(rate_NPC(E7,z)+rate_compton(E7,z)+rate_gg_scattering(E7,z));
-          resultat_1 += dE/840. * (41*f1+216*f2+27*f3+272*f4+27*f5+216*f6+41*f7);
+                            if(E[eval]<pt_Particle_Physics_Model->E_0)linearint(pt_Gamma_Spectrum->Energy, pt_Gamma_Spectrum->Spectrum, pt_Gamma_Spectrum->Energy.size(), E[eval], f[eval]);
+                            else f[eval]=0;
+                            rate_E = rate_NPC(E[eval],z)+rate_compton(E[eval],z)+rate_gg_scattering(E[eval],z);
+                            f[eval]*=rate_E*E[eval];
+                            resultat_1 += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
 
-        }
+                          }
 
+                          // if(res_initial==0 && resultat !=0)res_initial = resultat;
+                          // if(res_initial!=0 && resultat/res_initial<precision)break;
+                          // cout << E1 << " f1 " << f1 << " (exp(E1/T)-1) "  << (exp(E1/T)-1) << " f7 " << f7 << endl;
+
+
+                          // 	cout << "Egamma = " << E_gamma << " E7 = " << E7 << " resultat = " << resultat<< " j = " << j << endl;
+                        }
         integrale = resultat_1;
+}
+else if(pt_Spectrum_and_Precision_Parameters->calculation_mode == "triangular"){
+
+
+  for(int j=0; j<pt_Spectrum_and_Precision_Parameters->n_step-1;j++){
+        cout << " step j : " << j << " still " << pt_Spectrum_and_Precision_Parameters->n_step-1-j << " to go."<< endl;
+                    // cout << "pt_Spectrum_and_Precision_Parameters->eval_max = " << pt_Spectrum_and_Precision_Parameters->eval_max << " h2 " << h2 << endl;
+                    for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++)
+                    {
+                      if(eval == 0){
+                      if(j==0)	E[eval]=E_min;
+                      else E[eval]=E[pt_Spectrum_and_Precision_Parameters->eval_max-1];
+                      }
+                      else{
+                        E[eval]=E[0]+eval*h;
+                      }
+
+                    if(E[eval]<pt_Particle_Physics_Model->E_0)linearint(pt_Gamma_Spectrum->Energy, pt_Gamma_Spectrum->Spectrum, pt_Gamma_Spectrum->Energy.size(), E[eval], f[eval]);
+                    else f[eval]=0;
+                    rate_E = rate_NPC(E[eval],z)+rate_compton(E[eval],z)+rate_gg_scattering(E[eval],z);
+                    f[eval]*=rate_E*E[eval];
+                    if(pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation=="yes")rate_E+=rate_pair_creation(E[eval],z,pt_Spectrum_and_Precision_Parameters);
+                    resultat_1 += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
+
+                    if(E[eval]<pt_Particle_Physics_Model->E_0)linearint(pt_Electron_Spectrum->Energy, pt_Electron_Spectrum->Spectrum, pt_Electron_Spectrum->Energy.size(), E[eval], g[eval]);
+                    else g[eval]=0;
+                    g[eval]*=E[eval]*(integrator_simpson_rate_inverse_compton_v2(z,E_cmb_min,E_cmb_max,E[eval],pt_Spectrum_and_Precision_Parameters));
+                    resultat_2 += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*g[eval];
+
+                    // cout << "eval " << eval << "E = " << E[eval] << " weight = " << pt_Spectrum_and_Precision_Parameters->weight[eval] << " f[eval] = "<< f[eval] <<" resultat = " << resultat << endl;
+                  }
+
+                  // if(res_initial==0 && resultat !=0)res_initial = resultat;
+                  // if(res_initial!=0 && resultat/res_initial<precision)break;
+                  // cout << E1 << " f1 " << f1 << " (exp(E1/T)-1) "  << (exp(E1/T)-1) << " f7 " << f7 << endl;
+
+
+                  // 	cout << "Egamma = " << E_gamma << " E7 = " << E7 << " resultat = " << resultat<< " j = " << j << endl;
+                }
+
+
+  integrale = resultat_1+resultat_2;
+
 }
 else{
 for(int i=0;i<pt_Spectrum_and_Precision_Parameters->z_step;i++){
@@ -1025,6 +1138,7 @@ for(int i=0;i<pt_Spectrum_and_Precision_Parameters->z_step;i++){
         }
         integrale = (resultat_1-resultat_3)+(resultat_2-resultat_4);
       }
+      if(pt_Electron_Spectrum)
         cout << "The total energy contained in " <<   pt_Gamma_Spectrum->spectrum_name  << "spectrum is " << resultat_1 << " - " << resultat_3 << " = " << resultat_1-resultat_3 << " MeV";
         cout << " and in " << pt_Electron_Spectrum->spectrum_name << "spectrum is " << resultat_2 << " - " << resultat_4 << " = " << resultat_2-resultat_4 << " MeV ";
         cout << "for a total of "<< integrale <<" MeV, you had injected " << pt_Particle_Physics_Model->E_0 << " MeV." << endl;

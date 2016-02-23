@@ -30,6 +30,12 @@ int main(int argc, char** argv){
   mkdir("Output/Cascade_Spectrum_Folder",01777);
   mkdir("Output/Result_Scan_Folder",01777);
 
+  time_t t1,t2;
+  double duree;
+  t1 = time(NULL);
+
+  cout << "************************** Hello ! Thanks for using cBBNfast, ***************************" << endl;
+
   map_parameters map_parameters;
   ifstream file_default("default_param.ini");
   ifstream file_input(argv[1]);
@@ -49,10 +55,7 @@ int main(int argc, char** argv){
   // /************To print cascade spectrum in a file*********/
   if(task=="compute_cascade_spectrum"){
 
-    cout << "************************** Hello ! Thanks for using cBBNfast, ***************************" << endl;
     cout << "********* You're computing the cascade spectrum from a decaying particles with **********" << endl;
-    cout << "***************************** m_x = " << map_parameters["m_x"] << "MeV at z = " << map_parameters["redshift"] <<" *******************************" << endl;
-    cout << "******************************** I now start computing ! ********************************" << endl;
 
   struct Structure_Spectrum Cascade_Spectrum;
   string redshift = "redshift";
@@ -64,12 +67,37 @@ int main(int argc, char** argv){
   if(redshift=="default"){
     redshift=map_parameters["redshift"];
   }
-  ofstream Spectrum("Output/universal_spectrum.dat");
+  cout << "***************************** m_x = " << map_parameters["m_x"] << "MeV at z = " << map_parameters["redshift"] <<" *******************************" << endl;
+  cout << "******************************** I now start computing ! ********************************" << endl;
+  cout << "T = " << T_0*(1+atof(map_parameters["redshift"].c_str())) << endl;
   Cascade_Spectrum_Calculation(atof(redshift.c_str()),
                                &Output_Options,
                                &Particle_Physics_Model,
                                &Cascade_Spectrum,
                                &Spectrum_and_Precision_Parameters);
+
+  }
+  /*******************************************************/
+  // /************To print interaction rate in a file*********/
+  if(task=="print_interaction_rate"){
+
+  string redshift = "redshift";
+  string temperature = "temperature";
+  fill_structure_spectrum_and_precision_parameters(file_input, map_parameters, &Spectrum_and_Precision_Parameters);
+  fill_structure_output_options(file_input, map_parameters, &Output_Options);
+  if(argc==2)get_parameter_from_file(file_input,redshift);
+  if(redshift=="default"){
+    redshift=map_parameters["redshift"];
+  }
+  cout << "********* You're computing the interaction rate at z = " << map_parameters["redshift"] <<" *******************************" << endl;
+  cout << "******************************** I now start computing ! ********************************" << endl;
+  cout << "T = " << T_0*(1+atof(map_parameters["redshift"].c_str())) << endl;
+
+  print_interaction_rate(atof(redshift.c_str()),
+                         E_min,
+                         10000,
+                         &Output_Options,
+                         &Spectrum_and_Precision_Parameters);
   }
   /*******************************************************/
 
@@ -79,15 +107,17 @@ int main(int argc, char** argv){
   cout << "********************* Hello ! Thanks for using cBBNfast, ***********************" << endl;
   cout << "***** You're computing the constraints from BBN on EM-decaying particles *******" << endl;
   cout << "***************************** in the zeta-tau plane. ***************************" << endl;
+
+  fill_structure_particle_physics_model(file_input,map_parameters,&Particle_Physics_Model); // MANDATORY STEP
+  fill_structure_spectrum_and_precision_parameters(file_input,map_parameters,&Spectrum_and_Precision_Parameters);
+
   cout << "********** you have chosen the following range for your parameters *************" << endl;
+  fill_structure_scan_parameters_and_results(file_input,map_parameters,&Scan_Parameters_and_Results);
   cout << "==> tau in ["<<map_parameters["tau_min"]<<","<<map_parameters["tau_max"]<<"]"<<" with " << map_parameters["tau_step"] << " steps.    " << endl;
   cout << "==> zeta in ["<<map_parameters["zeta_min"]<<","<<map_parameters["zeta_max"]<<"]"<<" with " << map_parameters["zeta_step"] << " steps." << endl;
   cout << "*************************** I now start computing ! ****************************" << endl;
 
 
-  fill_structure_particle_physics_model(file_input,map_parameters,&Particle_Physics_Model); // MANDATORY STEP
-  fill_structure_spectrum_and_precision_parameters(file_input,map_parameters,&Spectrum_and_Precision_Parameters);
-  fill_structure_scan_parameters_and_results(file_input,map_parameters,&Scan_Parameters_and_Results);
   fill_structure_output_options(file_input,map_parameters,&Output_Options);
   if(task=="compute_constraints_from_destruction_only")Compute_Constraints_from_destruction_only(&Particle_Physics_Model,
                                             &Spectrum_and_Precision_Parameters,
@@ -103,7 +133,9 @@ int main(int argc, char** argv){
 
   file_default.close();
   file_input.close();
-  cout << "I'm done ! Thanks for using cBBNFast." << endl;
-
+  cout << "I'm done ! Thanks for using cBBNFast.";
+  t2 = time(NULL);
+	duree = difftime(t2,t1);
+  cout << " It has last : "<< duree << " s." << endl;
   return 0;
 }

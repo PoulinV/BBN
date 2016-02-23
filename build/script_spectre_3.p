@@ -1,10 +1,5 @@
 set logscale
-set xrange [2:71]
-plot "Cascade_Spectrum_Folder/Spectrum_total_electron_triangular_m140_z425643_0iterations_500.dat" u 1:2 w l, \
-"Cascade_Spectrum_Folder/Spectrum_total_photon_triangular_m140_z425643_0iterations_500.dat" u 1:2 w l, \
-"Cascade_Spectrum_Folder/Spectrum_total_electron_triangular_m140_z425643_0iterations.dat" u 1:2 w l, \
-"Cascade_Spectrum_Folder/Spectrum_total_photon_triangular_m140_z425643_0iterations.dat" u 1:2 w l, \
-"Cascade_Spectrum_Folder/Spectrum_total_electron_triangular_m140_z425643_0iterations_2000.dat" u 1:2 w l, \
-"Cascade_Spectrum_Folder/Spectrum_total_photon_triangular_m140_z425643_0iterations_2000.dat" u 1:2 w l , \
-"Cascade_Spectrum_Folder/Spectrum_total_electron_triangular_m140_z648069_0iterations.dat" u 1:2 w l , \
-"Cascade_Spectrum_Folder/Spectrum_total_photon_triangular_m140_z648069_0iterations.dat" u 1:2 w l
+#set xrange [2:1000]
+plot "Output/Cascade_Spectrum_Folder/Spectrum_total_photons_m200000_z425643_triangular.dat" u 1:2 w l t 'photons', \
+"Output/Cascade_Spectrum_Folder/Spectrum_universal_photon_m200000_z425643.dat" u 1:2 w l t 'universal', \
+"Output/Cascade_Spectrum_Folder/Spectrum_total_electrons_m200000_z425643_triangular.dat" u 1:2 w l t 'electrons'
