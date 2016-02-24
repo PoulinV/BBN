@@ -10,10 +10,15 @@
 double dsigma_compton(double  x, double  z, double g);
 double dsigma_phph(double  x, double  z,  double g);
 double dsigma_NPC(double E_gamma, double z, double E_e);
+double dsigma_pair_creation(double z,
+													  double E_e,
+													  double E_gamma,
+													  Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);
 double rate_compton(double  x, double  z);
 double rate_NPC(double  x, double  z);
 double rate_gg_scattering(double  x, double  z);
 double rate_pair_creation(double E, double z, Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);
+double rate_pair_creation_v2(double E_gamma, double z, Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);
 double integrator_simpson_rate_inverse_compton_v2(double z,
 																									 double E_ini,
 																									 double E_max,

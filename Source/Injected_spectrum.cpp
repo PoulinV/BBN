@@ -30,7 +30,7 @@ double universal_spectrum(double  E, double  z, double E_0){
 	cout << " E_x = " << E_x << " E_c = " << E_c <<endl;
 	double Rate_photons_E_g = rate_NPC(E,z)+rate_compton(E,z);
 	if(E < E_phph) Rate_photons_E_g += rate_gg_scattering(E,z);
-
+	cout << "r_e " << r_e << endl;
 	if(E < E_x) f = K_0*pow(E_x/E,1.5)/(Rate_photons_E_g);
 	else if(E > E_x && E < E_c) f =  K_0*pow(E_x/E,2)/(Rate_photons_E_g);
 	else {f = 0;}

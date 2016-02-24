@@ -84,6 +84,7 @@ int main(int argc, char** argv){
   string redshift = "redshift";
   string temperature = "temperature";
   fill_structure_spectrum_and_precision_parameters(file_input, map_parameters, &Spectrum_and_Precision_Parameters);
+  fill_structure_particle_physics_model(file_input, map_parameters, &Particle_Physics_Model); // MANDATORY STEP
   fill_structure_output_options(file_input, map_parameters, &Output_Options);
   if(argc==2)get_parameter_from_file(file_input,redshift);
   if(redshift=="default"){
@@ -95,7 +96,7 @@ int main(int argc, char** argv){
 
   print_interaction_rate(atof(redshift.c_str()),
                          E_min,
-                         10000,
+                         atof(map_parameters["m_x"].c_str())/2.,
                          &Output_Options,
                          &Spectrum_and_Precision_Parameters);
   }

@@ -755,7 +755,97 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
       cout << " I couldn't reckognised the name " << name << " please check your input file." << endl;
     }
 }
+double polylog_2(double z, Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters){
 
+	double ds;
+	double t[pt_Spectrum_and_Precision_Parameters->eval_max], f[pt_Spectrum_and_Precision_Parameters->eval_max];
+	double h;
+	double resultat;
+	double t_ini, t_max, factor;
+	int y;
+	if(z<0){
+		t_ini=z;
+		t_max = 0;
+		factor = 1;
+	}
+	if(z>0){
+		t_ini=0;
+		t_max = z;
+		factor = -1;
+	}
+	ds = (t_max - t_ini)/ (double) (pt_Spectrum_and_Precision_Parameters->n_step-1);
+	y = 0;
+	// while(ds>z){
+	// 	ds/=10.;
+	// 	y++;
+	// }
+	h = ds/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
+	resultat=0;
+	// cout << "ds = " << ds << " z = " << z << " y = " << y << endl;
+	for(int i=0; i<pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1;i++){
+
+				// cout << "pt_Spectrum_and_Precision_Parameters->eval_max = " << pt_Spectrum_and_Precision_Parameters->eval_max << " h2 " << h2 << endl;
+				for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++)
+				{
+					if(eval == 0){
+					if(i==0)	t[eval]=t_ini;
+					else t[eval]=t[pt_Spectrum_and_Precision_Parameters->eval_max-1];
+					}
+					else{
+						t[eval]=t[0]+eval*h;
+					}
+					f[eval]=log(1-t[eval])/t[eval];
+					if(isnan(f[eval])==1) f[eval]=0;
+					resultat += ds/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
+			}
+	}
+
+
+	// cout << " (polylog_2 : ) resultat " << factor*resultat << endl;
+
+	return factor*resultat;
+}
+double exponential_integral(double x,
+														Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters){
+	double resultat = 0, h, dt, t[pt_Spectrum_and_Precision_Parameters->eval_max], f[pt_Spectrum_and_Precision_Parameters->eval_max];
+	double t_ini = x, t_max = 10000;
+	int y = 0;
+	dt=(t_max-t_ini)/(double) (pt_Spectrum_and_Precision_Parameters->n_step-1);
+	while(dt>t_ini){
+		dt/=10.;
+		y++;
+	}
+	h = dt/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
+	for(int j=0; j<pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1;j++){
+
+		for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++)
+		{
+			if(eval == 0){
+			if(j==0)	t[eval]=t_ini;
+			else t[eval]=t[pt_Spectrum_and_Precision_Parameters->eval_max-1];
+			}
+			else{
+				t[eval]=t[0]+eval*h;
+			}
+
+		f[eval]=exp(-t[eval])/t[eval];
+		resultat += dt/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
+		// cout << "eval " << eval << "E = " << E[eval] << " weight = " << pt_Spectrum_and_Precision_Parameters->weight[eval] << " f[eval] = "<< f[eval] <<" resultat = " << resultat << endl;
+	}
+	}
+	return resultat;
+
+}
+double factorial(int n){
+	int factorial;
+	for (int i = 0; i <= n; i++){
+		if (i == 0)
+		factorial = 1;
+		else
+		factorial *=i;
+	}
+	return factorial;
+}
 void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
                                Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
                                Structure_Spectrum * pt_Gamma_Spectrum,
@@ -833,7 +923,7 @@ else if(pt_Spectrum_and_Precision_Parameters->calculation_mode == "triangular"){
                     else f[eval]=0;
                     rate_E = rate_NPC(E[eval],z)+rate_compton(E[eval],z)+rate_gg_scattering(E[eval],z);
                     f[eval]*=rate_E*E[eval];
-                    if(pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation=="yes")rate_E+=rate_pair_creation(E[eval],z,pt_Spectrum_and_Precision_Parameters);
+                    if(pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation=="yes")rate_E+=rate_pair_creation_v2(E[eval],z,pt_Spectrum_and_Precision_Parameters);
                     resultat_1 += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
 
                     if(E[eval]<pt_Particle_Physics_Model->E_0)linearint(pt_Electron_Spectrum->Energy, pt_Electron_Spectrum->Spectrum, pt_Electron_Spectrum->Energy.size(), E[eval], g[eval]);
