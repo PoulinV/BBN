@@ -772,7 +772,7 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
         }
       }
     }
-    else if(name == "EM_cascade_verbose" || name == "BBN_verbose" || name == "Input_verbose" || name == "Output_verbose"){
+    else if(name == "EM_cascade_verbose" || name == "BBN_constraints_verbose" || name == "Input_verbose" || name == "Output_verbose"){
       if(atoi(value.c_str())<0){
         error_value = "yes";
         cout << "The number '" << name <<"' has to be bigger or equal to 0. Please change accordingly." << endl;
