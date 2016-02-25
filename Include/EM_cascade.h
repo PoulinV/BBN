@@ -57,7 +57,8 @@ void Spectrum_electron_scattered(Structure_Particle_Physics_Model * pt_Particle_
 void Triangular_Spectrum(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
 												 Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
 												 Structure_Spectrum * pt_Cascade_Spectrum,
-											 	 Structure_Spectrum * pt_Electron_Spectrum);
+											 	 Structure_Spectrum * pt_Electron_Spectrum,
+											 	 Structure_Output_Options * pt_Output_Options);
 double Rate_Inverse_Compton(double E_e, double z, Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);
 double Function_Integrand_Spectre_Compton(double E_e, double E_gamma,  double E_gamma_bar);
 double Function_Integrand_Spectre_Compton_version_q(double q, double E_e, double E_gamma_bar);

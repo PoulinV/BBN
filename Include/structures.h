@@ -51,6 +51,9 @@ struct Structure_Spectrum_and_Precision_Parameters{
   int eval_max;
   std::vector<int> weight;
   double divisor;
+  double Gamma_Table_Size;
+  double Electron_Table_Size;
+  double E_min_table;
   std::string calculation_mode;
   std::string photon_spectrum_choice;
   std::string photon_spectrum_file_name;
@@ -61,9 +64,10 @@ struct Structure_Spectrum_and_Precision_Parameters{
   std::string double_photon_pair_creation;
   std::string pair_creation_in_nuclei;
   std::string compton_scattering;
-  std::string photon_photon_diffusion; 
+  std::string photon_photon_diffusion;
   std::string check_energy_conservation;
   std::string integration_method;
+
   Spectrum Injected_Gamma_Spectrum;
   Spectrum Injected_Electron_Spectrum;
 
@@ -89,7 +93,10 @@ struct Structure_Output_Options{
   std::string results_files;
   std::string spectrum_files;
   std::string task;
-  int verbose;
+  int EM_cascade_verbose;
+  int BBN_constraints_verbose;
+  int Input_verbose;
+  int Output_verbose;
 };
 
 #endif

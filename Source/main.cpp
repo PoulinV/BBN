@@ -29,6 +29,7 @@ int main(int argc, char** argv){
   mkdir("Output",01777);
   mkdir("Output/Cascade_Spectrum_Folder",01777);
   mkdir("Output/Result_Scan_Folder",01777);
+  mkdir("Output/Interaction_Rate_Folder",01777);
 
   time_t t1,t2;
   double duree;
@@ -67,9 +68,9 @@ int main(int argc, char** argv){
   if(redshift=="default"){
     redshift=map_parameters["redshift"];
   }
-  cout << "***************************** m_x = " << map_parameters["m_x"] << "MeV at z = " << map_parameters["redshift"] <<" *******************************" << endl;
+  cout << "***************************** m_x = " << map_parameters["m_x"] << "MeV at z = " << map_parameters["redshift"] <<", T = " << T_0*(1+atof(map_parameters["redshift"].c_str()))<<"  *******************************" << endl;
   cout << "******************************** I now start computing ! ********************************" << endl;
-  cout << "T = " << T_0*(1+atof(map_parameters["redshift"].c_str())) << endl;
+  cout << endl;
   Cascade_Spectrum_Calculation(atof(redshift.c_str()),
                                &Output_Options,
                                &Particle_Physics_Model,
@@ -95,7 +96,7 @@ int main(int argc, char** argv){
   cout << "T = " << T_0*(1+atof(map_parameters["redshift"].c_str())) << endl;
 
   print_interaction_rate(atof(redshift.c_str()),
-                         E_min,
+                         atof(map_parameters["E_min_table"].c_str()),
                          atof(map_parameters["m_x"].c_str())/2.,
                          &Output_Options,
                          &Spectrum_and_Precision_Parameters);

@@ -39,7 +39,7 @@ void print_results_scan(Structure_Output_Options * pt_Output_Options,
                         Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
                         Structure_Scan_Parameters_and_Results * pt_Scan_Parameters_and_Results,
                         Structure_Particle_Physics_Model * pt_Particle_Physics_Model);
-void print_spectrum_from_function(std::ifstream &file, double (*func)(double,double,double), Structure_Particle_Physics_Model * pt_Particle_Model);
+void print_spectrum_from_function(std::ifstream &file, double (*func)(double,double,double), Structure_Particle_Physics_Model * pt_Particle_Model,Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);
 void fill_structure_particle_physics_model(std::ifstream &file, std::map<std::string,std::string> &map_parameters, Structure_Particle_Physics_Model * pt_Particle_Model);
 void fill_structure_spectrum_and_precision_parameters(std::ifstream &file, std::map<std::string,std::string> &map_parameters, Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);
 void fill_default_parameters(std::ifstream &file, std::map<std::string,std::string> &map_parameters);

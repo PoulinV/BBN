@@ -30,8 +30,6 @@
 
 
 double universal_spectrum(double  E, double  z, double E_0);
-double photon_dirac_spectrum_after_one_iteration(double  x, double  z, double E_0);
-double electron_dirac_spectrum_after_one_iteration(double  E, double  z, double E_0);
 double no_electrons_injected(double x, double z, double E_0);
 double no_photons_injected(double x, double z, double E_0);
 void attribute_map_spectrum(std::map<std::string,Spectrum> &map_spectrum,std::map<std::string,std::string> &map_parameters);

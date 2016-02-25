@@ -6,13 +6,13 @@
 
 using namespace std;
 
-void print_spectrum_from_function(ostream &file, double (*func)(double,double,double),double z, Structure_Particle_Physics_Model * pt_Particle_Physics_Model){
+void print_spectrum_from_function(ostream &file, double (*func)(double,double,double),double z, Structure_Particle_Physics_Model * pt_Particle_Physics_Model,Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters){
 
 
-  double dE = (pt_Particle_Physics_Model->E_0 - E_min)/Gamma_Table_Size;
-  double E = E_min;
+  double dE = (pt_Particle_Physics_Model->E_0 - pt_Spectrum_and_Precision_Parameters->E_min_table)/pt_Spectrum_and_Precision_Parameters->Gamma_Table_Size;
+  double E = pt_Spectrum_and_Precision_Parameters->E_min_table;
   int i = 0;
-  while(i<Gamma_Table_Size){
+  while(i<pt_Spectrum_and_Precision_Parameters->Gamma_Table_Size){
     file << E << "   " << (*func)(E,z,pt_Particle_Physics_Model->E_0) << endl;
     i++;
     E+=dE;
@@ -27,9 +27,9 @@ void print_spectrum(Structure_Output_Options * pt_Output_Options,
   string name;
 
 
-  double dE = (pt_Particle_Physics_Model->E_0 - E_min)/pt_Spectrum->Energy.size();
+  double dE = (pt_Particle_Physics_Model->E_0 - pt_Spectrum_and_Precision_Parameters->E_min_table)/pt_Spectrum->Energy.size();
   double z = pt_Spectrum->redshift;
-  double E = E_min;
+  double E = pt_Spectrum_and_Precision_Parameters->E_min_table;
   int i = 0;
 
     if(pt_Output_Options->spectrum_files=="automatic"){
@@ -59,13 +59,13 @@ void print_spectrum(Structure_Output_Options * pt_Output_Options,
     cout << "Printing in file " << name <<"."<<  endl;
 
     if(pt_Spectrum->species=="photon"){
-    while(i<Gamma_Table_Size){
+    while(i<pt_Spectrum_and_Precision_Parameters->Gamma_Table_Size){
       file << pt_Spectrum->Energy[i] << "   " << pt_Spectrum->Spectrum[i] << endl;
       i++;
     }
   }
     if(pt_Spectrum->species=="electron"){
-      while(i<Electron_Table_Size){
+      while(i<pt_Spectrum_and_Precision_Parameters->Gamma_Table_Size){
         file << pt_Spectrum->Energy[i] << "   " << pt_Spectrum->Spectrum[i] << endl;
         i++;
       }
@@ -267,6 +267,9 @@ void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parame
   pt_Spectrum_and_Precision_Parameters->number_iterations_electron = atoi(map_parameters["number_iterations_electron"].c_str());
 	pt_Spectrum_and_Precision_Parameters->z_step = atoi(map_parameters["z_step"].c_str());
 	pt_Spectrum_and_Precision_Parameters->n_step = atoi(map_parameters["n_step"].c_str());
+  pt_Spectrum_and_Precision_Parameters->Electron_Table_Size = atof(map_parameters["Electron_Table_Size"].c_str());
+  pt_Spectrum_and_Precision_Parameters->Gamma_Table_Size = atof(map_parameters["Gamma_Table_Size"].c_str());
+  pt_Spectrum_and_Precision_Parameters->E_min_table = atof(map_parameters["E_min_table"].c_str());
   pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice = map_parameters["photon_spectrum_choice"];
   pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice = map_parameters["electron_spectrum_choice"];
   pt_Spectrum_and_Precision_Parameters->photon_spectrum_file_name = map_parameters["photon_spectrum_file_name"];
@@ -285,7 +288,8 @@ void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parame
     pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum = no_photons_injected;
   }
   else if(map_parameters["calculation_mode"] == "iterative" && map_parameters["photon_spectrum_choice"] == "Dirac"){
-    pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum = photon_dirac_spectrum_after_one_iteration;
+    pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum = no_photons_injected;
+    // pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum = photon_dirac_spectrum_after_one_iteration;
   }
   else{
     if(map_parameters["photon_spectrum_choice"]=="none")pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum = no_photons_injected;
@@ -295,7 +299,8 @@ void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parame
     pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum = no_electrons_injected;
   }
   else if(map_parameters["calculation_mode"] == "iterative" && map_parameters["electron_spectrum_choice"] == "Dirac"){
-    pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum = electron_dirac_spectrum_after_one_iteration;
+    pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum = no_electrons_injected;
+    // pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum = electron_dirac_spectrum_after_one_iteration;
   }
   else{
     if(map_parameters["electron_spectrum_choice"]=="none")pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum = no_electrons_injected;
@@ -365,7 +370,10 @@ void fill_structure_output_options(ifstream &file, map_parameters &map_parameter
   pt_Structure_Output_Options->results_files = map_parameters["results_files"];
   pt_Structure_Output_Options->spectrum_files = map_parameters["spectrum_files"];
   pt_Structure_Output_Options->task = map_parameters["task"];
-  pt_Structure_Output_Options->verbose = atoi(map_parameters["verbose"].c_str());
+  pt_Structure_Output_Options->EM_cascade_verbose = atoi(map_parameters["EM_cascade_verbose"].c_str());
+  pt_Structure_Output_Options->BBN_constraints_verbose = atoi(map_parameters["BBN_constraints_verbose"].c_str());
+  pt_Structure_Output_Options->Input_verbose = atoi(map_parameters["Input_verbose"].c_str());
+  pt_Structure_Output_Options->Output_verbose = atoi(map_parameters["Output_verbose"].c_str());
   file.clear();
   file.seekg(0, ios::beg);
 }
@@ -588,6 +596,24 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
         cout << "The choice for parameter '"<< name <<"' isn't reckognised, please check that it is either 'yes' or 'no'."<<endl;
       }
     }
+    else if(name == "Electron_Table_Size" || name == "Gamma_Table_Size"){
+      strtod(value.c_str(),&pEnd);
+      if(*pEnd != '\0' || pEnd == value.c_str()){
+        error_value = "yes";
+        cout << "The parameter '" << name << "' is not a double, please check."<<endl;
+      }
+    }
+    else if(name == "E_min_table"){
+      strtod(value.c_str(),&pEnd);
+      if(*pEnd != '\0' || pEnd == value.c_str()){
+        error_value = "yes";
+        cout << "The parameter 'E_min_table' is not a double, please check."<<endl;
+      }
+      if(atof(value.c_str())<1){
+        error_value = "yes";
+        cout << "The code is not reliable for E < 1 MeV. Please change your minimal energy." << endl;
+      }
+    }
     else if(name == "m_x"){
       strtod(value.c_str(),&pEnd);
       if(*pEnd != '\0' || pEnd == value.c_str()){
@@ -746,6 +772,16 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
         }
       }
     }
+    else if(name == "EM_cascade_verbose" || name == "BBN_verbose" || name == "Input_verbose" || name == "Output_verbose"){
+      if(atoi(value.c_str())<0){
+        error_value = "yes";
+        cout << "The number '" << name <<"' has to be bigger or equal to 0. Please change accordingly." << endl;
+      }
+      else {
+        error_value = "no";
+        error_name =  "no";
+      }
+    }
     else if(name == "ignore_line" || value == "ignore_line"){
       error_value = "no";
       error_name= "no";
@@ -852,7 +888,7 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
                                Structure_Spectrum * pt_Electron_Spectrum,
                                double &integrale){
 cout << " **** Currently checking energy conservation *** " << endl;
-double dE = (pt_Particle_Physics_Model->E_0 - E_min) / (double) (pt_Spectrum_and_Precision_Parameters->n_step - 1);
+double dE = (pt_Particle_Physics_Model->E_0 - pt_Spectrum_and_Precision_Parameters->E_min_table) / (double) (pt_Spectrum_and_Precision_Parameters->n_step - 1);
 double h = dE/6.;
 double dE_2, h2;
 double E1, E2, E3, E4, E5, E6, E7, f1, f2, f3, f4, f5, f6, f7, g1, g2, g3, g4, g5, g6, g7, E_gamma, E_e, rate_E;
@@ -861,6 +897,8 @@ double rate_E1,rate_E2,rate_E3,rate_E4,rate_E5,rate_E6,rate_E7;
 double resultat_1 = 0, resultat_2 = 0, resultat_3 = 0, resultat_4 = 0, resultat_5 = 0;
 double F1, F2, F3, F4, F5, F6, F7;
 double z = pt_Gamma_Spectrum->redshift;
+double E_c = E_c_0/(1+z);
+
 double E_gamma_bb = 2.701*T_0*(1+z);
 double E_cmb_max = 10*E_gamma_bb;
 double E_cmb_min = E_gamma_bb/100.;
@@ -869,7 +907,7 @@ vector<double> Gamma_Spectrum_Integrated_Over_Kernel_energy;
 vector<double> Electron_Spectrum_Integrated_Over_Kernel;
 vector<double> Electron_Spectrum_Integrated_Over_Kernel_energy;
 double int_bb = 2*pow(T_0*(1+z),3)*1.20205/(pi*pi);
-double dE_3 = (pt_Particle_Physics_Model->E_0 - E_min) / (double) (pt_Spectrum_and_Precision_Parameters->z_step - 1);
+double dE_3 = (pt_Particle_Physics_Model->E_0 - pt_Spectrum_and_Precision_Parameters->E_min_table) / (double) (pt_Spectrum_and_Precision_Parameters->z_step - 1);
 
 
 if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice=="universal"){
@@ -879,7 +917,7 @@ if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice=="universal"){
                             for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++)
                             {
                               if(eval == 0){
-                              if(j==0)	E[eval]=E_min;
+                              if(j==0)	E[eval]=pt_Spectrum_and_Precision_Parameters->E_min_table;
                               else E[eval]=E[pt_Spectrum_and_Precision_Parameters->eval_max-1];
                               }
                               else{
@@ -912,7 +950,7 @@ else if(pt_Spectrum_and_Precision_Parameters->calculation_mode == "triangular"){
                     for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++)
                     {
                       if(eval == 0){
-                      if(j==0)	E[eval]=E_min;
+                      if(j==0)	E[eval]=pt_Spectrum_and_Precision_Parameters->E_min_table;
                       else E[eval]=E[pt_Spectrum_and_Precision_Parameters->eval_max-1];
                       }
                       else{
@@ -922,13 +960,15 @@ else if(pt_Spectrum_and_Precision_Parameters->calculation_mode == "triangular"){
                     if(E[eval]<pt_Particle_Physics_Model->E_0)linearint(pt_Gamma_Spectrum->Energy, pt_Gamma_Spectrum->Spectrum, pt_Gamma_Spectrum->Energy.size(), E[eval], f[eval]);
                     else f[eval]=0;
                     rate_E = rate_NPC(E[eval],z)+rate_compton(E[eval],z)+rate_gg_scattering(E[eval],z);
-                    f[eval]*=rate_E*E[eval];
                     if(pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation=="yes")rate_E+=rate_pair_creation_v2(E[eval],z,pt_Spectrum_and_Precision_Parameters);
+                    // rate_E = 1;
+                    f[eval]*=rate_E*E[eval];
                     resultat_1 += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
 
                     if(E[eval]<pt_Particle_Physics_Model->E_0)linearint(pt_Electron_Spectrum->Energy, pt_Electron_Spectrum->Spectrum, pt_Electron_Spectrum->Energy.size(), E[eval], g[eval]);
                     else g[eval]=0;
-                    g[eval]*=E[eval]*(integrator_simpson_rate_inverse_compton_v2(z,E_cmb_min,E_cmb_max,E[eval],pt_Spectrum_and_Precision_Parameters));
+                    g[eval]*=E[eval];
+                    // g[eval]*=E[eval]*(integrator_simpson_rate_inverse_compton_v2(z,E_cmb_min,E_cmb_max,E[eval],pt_Spectrum_and_Precision_Parameters));
                     resultat_2 += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*g[eval];
 
                     // cout << "eval " << eval << "E = " << E[eval] << " weight = " << pt_Spectrum_and_Precision_Parameters->weight[eval] << " f[eval] = "<< f[eval] <<" resultat = " << resultat << endl;
@@ -948,7 +988,7 @@ else if(pt_Spectrum_and_Precision_Parameters->calculation_mode == "triangular"){
 }
 else{
 for(int i=0;i<pt_Spectrum_and_Precision_Parameters->z_step;i++){
-  E_gamma = E_min+i*dE_3;
+  E_gamma = pt_Spectrum_and_Precision_Parameters->E_min_table+i*dE_3;
   E_e = E_gamma;
   resultat_1 = 0;
   resultat_2 = 0;
@@ -1106,7 +1146,7 @@ for(int i=0;i<pt_Spectrum_and_Precision_Parameters->z_step;i++){
   resultat_4 = 0;
         for(int i=0;i<pt_Spectrum_and_Precision_Parameters->n_step-1;i++){
           if(i==0){
-            E1=E_min;
+            E1=pt_Spectrum_and_Precision_Parameters->E_min_table;
             }
           else{
             E1=E7;
