@@ -134,7 +134,7 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
 
  Check_nuclei(pt_Scan_Parameters_and_Results->nuclei, i_min, i_max, k_min, k_max, Y_min, Y_max, Y_0);
 
- dE= (pt_Particle_Physics_Model->E_0 - pt_Spectrum_and_Precision_Parameters->E_min_table)/ (double) (pt_Spectrum_and_Precision_Parameters->Gamma_Table_Size-1);
+ dE= (pt_Particle_Physics_Model->E_0 - pt_Spectrum_and_Precision_Parameters->E_min_table)/ (double) (pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1);
   if(pt_Output_Options->BBN_constraints_verbose>1)cout << " z initial = " << z_initial << " z final = " << z_final << endl;
   cout << "I start generating spectrum for each redshift. You asked for " << z_step << " points." << endl;
  for(int j = 0; j<=z_step;j++){
@@ -159,9 +159,9 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
        }
        else if(pt_Spectrum_and_Precision_Parameters->spectrum_mode=="reading"){
          if(E_c <= pt_Particle_Physics_Model->E_0 ){
-           Cascade_Spectrum.Energy.resize(pt_Spectrum_and_Precision_Parameters->Gamma_Table_Size);
-           Cascade_Spectrum.Spectrum.resize(pt_Spectrum_and_Precision_Parameters->Gamma_Table_Size);
-           for(int i=0;i<pt_Spectrum_and_Precision_Parameters->Gamma_Table_Size;i++){
+           Cascade_Spectrum.Energy.resize(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size);
+           Cascade_Spectrum.Spectrum.resize(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size);
+           for(int i=0;i<pt_Spectrum_and_Precision_Parameters->Energy_Table_Size;i++){
              Cascade_Spectrum.Energy[i]=pt_Spectrum_and_Precision_Parameters->E_min_table+i*dE;
              Cascade_Spectrum.Spectrum[i]=universal_spectrum(pt_Spectrum_and_Precision_Parameters->E_min_table+i*dE,z,pt_Particle_Physics_Model->E_0);
 
@@ -365,9 +365,9 @@ void Compute_constraints_from_destruction_and_production(Structure_Particle_Phys
           }
           else if(pt_Spectrum_and_Precision_Parameters->spectrum_mode=="reading"){
             if(E_c <= pt_Particle_Physics_Model->E_0 ){
-              Cascade_Spectrum.Energy.resize(pt_Spectrum_and_Precision_Parameters->Gamma_Table_Size);
-              Cascade_Spectrum.Spectrum.resize(pt_Spectrum_and_Precision_Parameters->Gamma_Table_Size);
-              for(int i=0;i<pt_Spectrum_and_Precision_Parameters->Gamma_Table_Size;i++){
+              Cascade_Spectrum.Energy.resize(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size);
+              Cascade_Spectrum.Spectrum.resize(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size);
+              for(int i=0;i<pt_Spectrum_and_Precision_Parameters->Energy_Table_Size;i++){
                 Cascade_Spectrum.Energy[i]=pt_Spectrum_and_Precision_Parameters->E_min_table+i*dE;
                 Cascade_Spectrum.Spectrum[i]=universal_spectrum(pt_Spectrum_and_Precision_Parameters->E_min_table+i*dE,z,pt_Particle_Physics_Model->E_0);
 

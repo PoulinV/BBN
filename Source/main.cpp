@@ -60,18 +60,22 @@ int main(int argc, char** argv){
 
   struct Structure_Spectrum Cascade_Spectrum;
   string redshift = "redshift";
+  double double_redshift;
   string temperature = "temperature";
   fill_structure_spectrum_and_precision_parameters(file_input, map_parameters, &Spectrum_and_Precision_Parameters);
   fill_structure_particle_physics_model(file_input, map_parameters, &Particle_Physics_Model); // MANDATORY STEP
   fill_structure_output_options(file_input, map_parameters, &Output_Options);
   if(argc==2)get_parameter_from_file(file_input,redshift);
-  if(redshift=="default"){
-    redshift=map_parameters["redshift"];
-  }
-  cout << "***************************** m_x = " << map_parameters["m_x"] << "MeV at z = " << map_parameters["redshift"] <<", T = " << T_0*(1+atof(map_parameters["redshift"].c_str()))<<"  *******************************" << endl;
+  if(redshift=="default" && argc!=1){
+      get_parameter_from_file(file_input,temperature);
+      if(temperature!="default")double_redshift=atof(temperature.c_str())/T_0-1;
+      else double_redshift=atof(map_parameters["redshift"].c_str());
+    }
+  else double_redshift=atof(map_parameters["redshift"].c_str());
+  cout << "***************************** m_x = " << map_parameters["m_x"] << "MeV at z = " << double_redshift <<", T = " << T_0*(1+double_redshift)<<"  *******************************" << endl;
   cout << "******************************** I now start computing ! ********************************" << endl;
   cout << endl;
-  Cascade_Spectrum_Calculation(atof(redshift.c_str()),
+  Cascade_Spectrum_Calculation(double_redshift,
                                &Output_Options,
                                &Particle_Physics_Model,
                                &Cascade_Spectrum,
@@ -83,19 +87,22 @@ int main(int argc, char** argv){
   if(task=="print_interaction_rate"){
 
   string redshift = "redshift";
+  double double_redshift;
   string temperature = "temperature";
   fill_structure_spectrum_and_precision_parameters(file_input, map_parameters, &Spectrum_and_Precision_Parameters);
   fill_structure_particle_physics_model(file_input, map_parameters, &Particle_Physics_Model); // MANDATORY STEP
   fill_structure_output_options(file_input, map_parameters, &Output_Options);
   if(argc==2)get_parameter_from_file(file_input,redshift);
-  if(redshift=="default"){
-    redshift=map_parameters["redshift"];
-  }
-  cout << "********* You're computing the interaction rate at z = " << map_parameters["redshift"] <<" *******************************" << endl;
+  if(redshift=="default" && argc!=1){
+      get_parameter_from_file(file_input,temperature);
+      if(temperature!="default")double_redshift=atof(temperature.c_str())/T_0-1;
+      else double_redshift=atof(map_parameters["redshift"].c_str());
+    }
+  else double_redshift=atof(map_parameters["redshift"].c_str());
+  cout << "********* You're computing the interaction rate at z = " << double_redshift <<", T = " << T_0*(1+double_redshift)<< " *******************************" << endl;
   cout << "******************************** I now start computing ! ********************************" << endl;
-  cout << "T = " << T_0*(1+atof(map_parameters["redshift"].c_str())) << endl;
 
-  print_interaction_rate(atof(redshift.c_str()),
+  print_interaction_rate(double_redshift,
                          atof(map_parameters["E_min_table"].c_str()),
                          atof(map_parameters["m_x"].c_str())/2.,
                          &Output_Options,

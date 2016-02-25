@@ -21,6 +21,7 @@ struct Structure_Spectrum{
 
   int iterations;
   double redshift;
+  double temperature;
   std::vector<double> Energy;
   std::vector<double> Spectrum;
   std::string spectrum_name;
@@ -52,7 +53,7 @@ struct Structure_Spectrum_and_Precision_Parameters{
   std::vector<int> weight;
   double divisor;
   double Gamma_Table_Size;
-  double Electron_Table_Size;
+  double Energy_Table_Size;
   double E_min_table;
   std::string calculation_mode;
   std::string photon_spectrum_choice;
@@ -92,7 +93,10 @@ struct Structure_Scan_Parameters_and_Results{
 struct Structure_Output_Options{
   std::string results_files;
   std::string spectrum_files;
+  std::string interaction_rate_files;
+  std::string test_files;
   std::string task;
+  std::string task_test;
   int EM_cascade_verbose;
   int BBN_constraints_verbose;
   int Input_verbose;

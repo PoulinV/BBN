@@ -30,6 +30,7 @@
 void linearint(std::vector<double> &xa, std::vector<double> &ya, int n, double x, double &y);
 double polylog_2(double z, Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);
 double exponential_integral(double x, Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);
+double expint(const int n, const double x);
 double factorial(int n);
 void print_spectrum(Structure_Output_Options * pt_Output_Options,
                     Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,

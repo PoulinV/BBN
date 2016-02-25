@@ -9,10 +9,10 @@ using namespace std;
 void print_spectrum_from_function(ostream &file, double (*func)(double,double,double),double z, Structure_Particle_Physics_Model * pt_Particle_Physics_Model,Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters){
 
 
-  double dE = (pt_Particle_Physics_Model->E_0 - pt_Spectrum_and_Precision_Parameters->E_min_table)/pt_Spectrum_and_Precision_Parameters->Gamma_Table_Size;
+  double dE = (pt_Particle_Physics_Model->E_0 - pt_Spectrum_and_Precision_Parameters->E_min_table)/pt_Spectrum_and_Precision_Parameters->Energy_Table_Size;
   double E = pt_Spectrum_and_Precision_Parameters->E_min_table;
   int i = 0;
-  while(i<pt_Spectrum_and_Precision_Parameters->Gamma_Table_Size){
+  while(i<pt_Spectrum_and_Precision_Parameters->Energy_Table_Size){
     file << E << "   " << (*func)(E,z,pt_Particle_Physics_Model->E_0) << endl;
     i++;
     E+=dE;
@@ -59,13 +59,13 @@ void print_spectrum(Structure_Output_Options * pt_Output_Options,
     cout << "Printing in file " << name <<"."<<  endl;
 
     if(pt_Spectrum->species=="photon"){
-    while(i<pt_Spectrum_and_Precision_Parameters->Gamma_Table_Size){
+    while(i<pt_Spectrum_and_Precision_Parameters->Energy_Table_Size){
       file << pt_Spectrum->Energy[i] << "   " << pt_Spectrum->Spectrum[i] << endl;
       i++;
     }
   }
     if(pt_Spectrum->species=="electron"){
-      while(i<pt_Spectrum_and_Precision_Parameters->Gamma_Table_Size){
+      while(i<pt_Spectrum_and_Precision_Parameters->Energy_Table_Size){
         file << pt_Spectrum->Energy[i] << "   " << pt_Spectrum->Spectrum[i] << endl;
         i++;
       }
@@ -81,19 +81,15 @@ void print_results_scan(Structure_Output_Options * pt_Output_Options,
 
 
   int i = 0;
-  os << "Output/Result_Scan_Folder/Results_destruc_and_production_"<< pt_Scan_Parameters_and_Results->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV.dat";
+  // os << "Output/Result_Scan_Folder/Results_destruc_and_production_"<< pt_Scan_Parameters_and_Results->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV.dat";
 
     if(pt_Output_Options->results_files=="automatic"){
       if(pt_Output_Options->task=="compute_constraints_from_destruction_and_production"){
-        name = "Output/Result_Scan_Folder/Results_destruc_and_production_";
+        os << "Output/Result_Scan_Folder/Results_destruc_and_production_"<< pt_Scan_Parameters_and_Results->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV_"<<pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice<<".dat";
       }
       else if(pt_Output_Options->task=="compute_constraints_from_destruction_only"){
-        name = "Output/Result_Scan_Folder/Results_destruc_only_";
+        os << "Output/Result_Scan_Folder/Results_destruc_only_"<< pt_Scan_Parameters_and_Results->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV_"<<pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice<<".dat";
       }
-      name += pt_Scan_Parameters_and_Results->nuclei;
-      name+= "_m_";
-      name+=pt_Particle_Physics_Model->M_x;
-      name+="_MeV.dat";
     }
 
     else{
@@ -267,8 +263,7 @@ void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parame
   pt_Spectrum_and_Precision_Parameters->number_iterations_electron = atoi(map_parameters["number_iterations_electron"].c_str());
 	pt_Spectrum_and_Precision_Parameters->z_step = atoi(map_parameters["z_step"].c_str());
 	pt_Spectrum_and_Precision_Parameters->n_step = atoi(map_parameters["n_step"].c_str());
-  pt_Spectrum_and_Precision_Parameters->Electron_Table_Size = atof(map_parameters["Electron_Table_Size"].c_str());
-  pt_Spectrum_and_Precision_Parameters->Gamma_Table_Size = atof(map_parameters["Gamma_Table_Size"].c_str());
+  pt_Spectrum_and_Precision_Parameters->Energy_Table_Size = atof(map_parameters["Energy_Table_Size"].c_str());
   pt_Spectrum_and_Precision_Parameters->E_min_table = atof(map_parameters["E_min_table"].c_str());
   pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice = map_parameters["photon_spectrum_choice"];
   pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice = map_parameters["electron_spectrum_choice"];
@@ -369,7 +364,10 @@ void fill_structure_output_options(ifstream &file, map_parameters &map_parameter
   }
   pt_Structure_Output_Options->results_files = map_parameters["results_files"];
   pt_Structure_Output_Options->spectrum_files = map_parameters["spectrum_files"];
+  pt_Structure_Output_Options->interaction_rate_files = map_parameters["interaction_rate_files"];
+  pt_Structure_Output_Options->test_files = map_parameters["test_files"];
   pt_Structure_Output_Options->task = map_parameters["task"];
+  pt_Structure_Output_Options->task_test = map_parameters["task_test"];
   pt_Structure_Output_Options->EM_cascade_verbose = atoi(map_parameters["EM_cascade_verbose"].c_str());
   pt_Structure_Output_Options->BBN_constraints_verbose = atoi(map_parameters["BBN_constraints_verbose"].c_str());
   pt_Structure_Output_Options->Input_verbose = atoi(map_parameters["Input_verbose"].c_str());
@@ -474,9 +472,9 @@ void attribute_name_and_value(const string &line,string &name,string &value){
 
 }
 void check_parameter_error(const string &parameter, string &error_parameter){
-      if(parameter == "calculation_mode" || parameter == "task" || parameter == "number_iterations_photon" || parameter == "number_iterations_electron" || parameter == "z_step" || parameter == "n_step"
+      if(parameter == "calculation_mode" || parameter == "task" || parameter == "task_test" ||parameter == "number_iterations_photon" || parameter == "number_iterations_electron" || parameter == "z_step" || parameter == "n_step"
       || parameter == "photon_spectrum_choice" || parameter == "electron_spectrum_choice" || parameter == "spectrum_mode" || parameter == "inverse_compton_scattering" || parameter == "m_x" || parameter == "tau_x"
-      || parameter == "zeta_x" || parameter == "tau_min" || parameter == "tau_max" || parameter == "tau_step" || parameter == "zeta_min" || parameter == "zeta_max" || parameter == "zeta_step" || parameter == "redshift" || parameter == "results_file" || parameter == "spectrum_files"){
+      || parameter == "zeta_x" || parameter == "tau_min" || parameter == "tau_max" || parameter == "tau_step" || parameter == "zeta_min" || parameter == "zeta_max" || parameter == "zeta_step" || parameter == "temperature" || parameter == "redshift" || parameter == "results_file" || parameter == "spectrum_files"){
         error_parameter = "no";
       }
       else error_parameter = "yes";
@@ -505,6 +503,17 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
       else{
         error_value = "yes";
         cout << "The task isn't reckognised, it has to be one among : 'compute_constraints_from_destruction_and_production', 'compute_constraints_from_destruction_only' and 'compute_cascade_spectrum'." << endl;
+      }
+    }
+    else if(name == "task_test"){
+      if(value == "print_interaction_rate" || value == "print_polylog"){
+        error_value = "no";
+        error_name = "no";
+
+      }
+      else{
+        error_value = "yes";
+        cout << "The task_test isn't reckognised, it has to be one among : 'print_interaction_rate', 'print_polylog'." << endl;
       }
     }
     else if(name == "number_iterations_photon"){
@@ -596,7 +605,7 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
         cout << "The choice for parameter '"<< name <<"' isn't reckognised, please check that it is either 'yes' or 'no'."<<endl;
       }
     }
-    else if(name == "Electron_Table_Size" || name == "Gamma_Table_Size"){
+    else if(name == "Energy_Table_Size"){
       strtod(value.c_str(),&pEnd);
       if(*pEnd != '\0' || pEnd == value.c_str()){
         error_value = "yes";
@@ -720,6 +729,16 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
         error_value = "no";
       }
     }
+    else if(name == "temperature"){
+      strtod(value.c_str(),&pEnd);
+      if(*pEnd != '\0' || pEnd == value.c_str()){
+        error_value = "yes";
+        cout << "The parameter 'temperature' is not a double, please check."<<endl;
+      }
+      else {
+        error_value = "no";
+      }
+    }
     else if(name == "results_files"){
       if(value=="automatic")error_value="no";
       else{
@@ -733,6 +752,31 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
         }
       }
     }
+    else if(name == "interaction_rate_files"){
+      if(value=="automatic")error_value="no";
+      else{
+        ofstream file(value);
+        if(file){
+          error_value="no";
+        }
+        else{
+          cout << "I cannot open file " << value << " please make sure you have created the folder(s) before starting cBBNfast."<<endl;
+          error_value = "yes";
+        }
+      }
+    }    else if(name == "test_files"){
+          if(value=="automatic")error_value="no";
+          else{
+            ofstream file(value);
+            if(file){
+              error_value="no";
+            }
+            else{
+              cout << "I cannot open file " << value << " please make sure you have created the folder(s) before starting cBBNfast."<<endl;
+              error_value = "yes";
+            }
+          }
+        }
     else if(name == "photon_spectrum_file_name"){
       if(value=="automatic")error_value="no";
       else{
@@ -796,50 +840,112 @@ double polylog_2(double z, Structure_Spectrum_and_Precision_Parameters * pt_Spec
 	double ds;
 	double t[pt_Spectrum_and_Precision_Parameters->eval_max], f[pt_Spectrum_and_Precision_Parameters->eval_max];
 	double h;
-	double resultat;
+	double resultat=0;
 	double t_ini, t_max, factor;
 	int y;
-	if(z<0){
-		t_ini=z;
-		t_max = 0;
-		factor = 1;
-	}
-	if(z>0){
-		t_ini=0;
-		t_max = z;
-		factor = -1;
-	}
-	ds = (t_max - t_ini)/ (double) (pt_Spectrum_and_Precision_Parameters->n_step-1);
-	y = 0;
-	// while(ds>z){
-	// 	ds/=10.;
-	// 	y++;
-	// }
-	h = ds/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
-	resultat=0;
-	// cout << "ds = " << ds << " z = " << z << " y = " << y << endl;
-	for(int i=0; i<pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1;i++){
+  if(z>1)cout << " z bigger than 1 ! " << endl;
+  if(fabs(z)<=1){
+    factor = 1;
+      for(int i = 1 ; i < 1000; i++){
+  		resultat += pow(z,i)/(i*i);
+  	}
+  }
+  else {
+    if(z<0){
+      t_ini=z;
+      t_max = 0;
+      factor = 1;
+    }
+    if(z>0){
+      t_ini=0;
+      t_max = z;
+      factor = -1;
+    }
+    ds = (t_max - t_ini)/ (double) (pt_Spectrum_and_Precision_Parameters->n_step-1);
+    y = 0;
+    // while(ds>z){
+    // 	ds/=10.;
+    // 	y++;
+    // }
+    h = ds/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
+    resultat=0;
+    // cout << "ds = " << ds << " z = " << z << " y = " << y << endl;
+    for(int i=0; i<pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1;i++){
 
-				// cout << "pt_Spectrum_and_Precision_Parameters->eval_max = " << pt_Spectrum_and_Precision_Parameters->eval_max << " h2 " << h2 << endl;
-				for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++)
-				{
-					if(eval == 0){
-					if(i==0)	t[eval]=t_ini;
-					else t[eval]=t[pt_Spectrum_and_Precision_Parameters->eval_max-1];
-					}
-					else{
-						t[eval]=t[0]+eval*h;
-					}
-					f[eval]=log(1-t[eval])/t[eval];
-					if(isnan(f[eval])==1) f[eval]=0;
-					resultat += ds/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
-			}
-	}
+          // cout << "pt_Spectrum_and_Precision_Parameters->eval_max = " << pt_Spectrum_and_Precision_Parameters->eval_max << " h2 " << h2 << endl;
+          for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++)
+          {
+            if(eval == 0){
+            if(i==0)	t[eval]=t_ini;
+            else t[eval]=t[pt_Spectrum_and_Precision_Parameters->eval_max-1];
+            }
+            else{
+              t[eval]=t[0]+eval*h;
+            }
+            f[eval]=log(1-t[eval])/t[eval];
+            if(isnan(f[eval])==1) f[eval]=0;
+            resultat += ds/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
+        }
+    }
+  }
 
 
-	// cout << " (polylog_2 : ) resultat " << factor*resultat << endl;
+
+	// cout << " (polylog_2 : )" <<  " z = " << z << " resultat " << factor*resultat << endl;
 
 	return factor*resultat;
+}
+double expint(const int n, const double x)
+{
+	static const int MAXIT=100;
+	static const double EULER=0.577215664901533,
+		EPS=numeric_limits<double>::epsilon(),
+		BIG=numeric_limits<double>::max()*EPS;
+	int i,ii,nm1=n-1;
+	double a,b,c,d,del,fact,h,psi,ans;
+	if (n < 0 || x < 0.0 || (x==0.0 && (n==0 || n==1)))
+		throw("bad arguments in expint");
+	if (n == 0) ans=exp(-x)/x;
+	else {
+		if (x == 0.0) ans=1.0/nm1;
+		else {
+			if (x > 1.0) {
+				b=x+n;
+				c=BIG;
+				d=1.0/b;
+				h=d;
+				for (i=1;i<=MAXIT;i++) {
+					a = -i*(nm1+i);
+					b += 2.0;
+					d=1.0/(a*d+b);
+					c=b+a/c;
+					del=c*d;
+					h *= del;
+					if (fabs(del-1.0) <= EPS) {
+						ans=h*exp(-x);
+						return ans;
+					}
+				}
+				throw("continued fraction failed in expint");
+			} else {
+				ans = (nm1!=0 ? 1.0/nm1 : -log(x)-EULER);
+				fact=1.0;
+				for (i=1;i<=MAXIT;i++) {
+					fact *= -x/i;
+					if (i != nm1) del = -fact/(i-nm1);
+					else {
+						psi = -EULER;
+						for (ii=1;ii<=nm1;ii++) psi += 1.0/ii;
+						del=fact*(-log(x)+psi);
+					}
+					ans += del;
+					if (fabs(del) < fabs(ans)*EPS) return ans;
+				}
+				throw("series failed in expint");
+			}
+		}
+	}
+	return ans;
 }
 double exponential_integral(double x,
 														Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters){
@@ -959,9 +1065,9 @@ else if(pt_Spectrum_and_Precision_Parameters->calculation_mode == "triangular"){
 
                     if(E[eval]<pt_Particle_Physics_Model->E_0)linearint(pt_Gamma_Spectrum->Energy, pt_Gamma_Spectrum->Spectrum, pt_Gamma_Spectrum->Energy.size(), E[eval], f[eval]);
                     else f[eval]=0;
-                    rate_E = rate_NPC(E[eval],z)+rate_compton(E[eval],z)+rate_gg_scattering(E[eval],z);
-                    if(pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation=="yes")rate_E+=rate_pair_creation_v2(E[eval],z,pt_Spectrum_and_Precision_Parameters);
-                    // rate_E = 1;
+                    // rate_E = rate_NPC(E[eval],z)+rate_compton(E[eval],z)+rate_gg_scattering(E[eval],z);
+                    // if(pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation=="yes")rate_E+=rate_pair_creation_v2(E[eval],z,pt_Spectrum_and_Precision_Parameters);
+                    rate_E = 1;
                     f[eval]*=rate_E*E[eval];
                     resultat_1 += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
 
@@ -983,7 +1089,7 @@ else if(pt_Spectrum_and_Precision_Parameters->calculation_mode == "triangular"){
                 }
 
 
-  integrale = resultat_1+resultat_2;
+  integrale = resultat_1;
 
 }
 else{
