@@ -880,21 +880,23 @@ void Cascade_Spectrum_Reading_From_File(double z,
   pt_Spectrum->redshift = z;
 
 	if(pt_Spectrum->species == "photon"){
-		if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="iterative")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << pt_Spectrum_and_Precision_Parameters->number_iterations_photon <<"iterations.dat";
-		else if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="triangular")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << "triangular.dat";
+		if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="iterative")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"_m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << pt_Spectrum_and_Precision_Parameters->number_iterations_photon <<"iterations.dat";
+		else if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="triangular")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"_m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << "triangular.dat";
 	}
 	else if(pt_Spectrum->species == "electron"){
 		// if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="iterative")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << pt_Spectrum_and_Precision_Parameters->number_iterations_electron <<"iterations.dat";
 		// else if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="triangular")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << "triangular.dat";
-		if(pt_Spectrum_and_Precision_Parameters->electron_spectrum_file_name=="automatic")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << "triangular.dat";
+		if(pt_Spectrum_and_Precision_Parameters->electron_spectrum_file_name=="automatic")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"_m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << "triangular.dat";
 		else os << pt_Spectrum_and_Precision_Parameters->electron_spectrum_file_name;
 		// cout  << pt_Spectrum_and_Precision_Parameters->electron_spectrum_file_name;
 	}
 	  name = os.str();
     ifstream file(name);
+
     if(file)cout << "Importing file " << name << " in structure " << pt_Spectrum->spectrum_name << "." <<endl;
 		else{
 			cout << "I couldn't recognize cascade spectrum file. Please check that it is present in the folder Cascade_Specrum_Folder with proper name : 'Spectrum_mXXX_zXXX_XXXiterations.dat' corresponding to the value of m, z and iterations you are using."<<endl;
+			cout << "File I could read is " << name << endl;
 			return;
 		}
     while(file){
@@ -903,8 +905,7 @@ void Cascade_Spectrum_Reading_From_File(double z,
 	    // stringstream is(ligne);
 	    // if(line[0] == '#' or line[0] == '\0') continue;
       file >> tmp_Energy >> tmp_Spectrum ;
-			cout << z << "  " << tmp_Energy << "  " << tmp_Spectrum<<endl;
-
+			// cout << z << "  " << tmp_Energy << "  " << tmp_Spectrum<<endl;
 			pt_Spectrum->Energy.push_back(tmp_Energy);
 			pt_Spectrum->Spectrum.push_back(tmp_Spectrum);
 			// pt_Spectrum->Spectrum.push_back(tmp_Spectrum*(rate_NPC(tmp_Energy,z)+rate_compton(tmp_Energy,z)+rate_gg_scattering(tmp_Energy,z)));

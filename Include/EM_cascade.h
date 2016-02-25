@@ -5,7 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include "common.h"
-#include "../Include/structures.h"
+#include "../include/structures.h"
 
 double dsigma_compton(double  x, double  z, double g);
 double dsigma_phph(double  x, double  z,  double g);

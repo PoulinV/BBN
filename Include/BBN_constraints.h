@@ -7,8 +7,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "../Include/common.h"
-#include "../Include/structures.h"
+#include "../include/common.h"
+#include "../include/structures.h"
 
 void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Cascade_Spectrum,
                                             Structure_Particle_Physics_Model * pt_Particle_Physics_Model,

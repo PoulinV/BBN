@@ -104,6 +104,9 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
                                               Structure_Output_Options * pt_Output_Options){
 
   Structure_Spectrum Cascade_Spectrum;
+  Cascade_Spectrum.species="photon";
+  Cascade_Spectrum.spectrum_name="total_photons";
+
   vector<double> Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei;
   vector<double> Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei;
 
@@ -158,23 +161,24 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
                                       pt_Spectrum_and_Precision_Parameters);
        }
        else if(pt_Spectrum_and_Precision_Parameters->spectrum_mode=="reading"){
-         if(E_c <= pt_Particle_Physics_Model->E_0 ){
-           Cascade_Spectrum.Energy.resize(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size);
-           Cascade_Spectrum.Spectrum.resize(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size);
-           for(int i=0;i<pt_Spectrum_and_Precision_Parameters->Energy_Table_Size;i++){
-             Cascade_Spectrum.Energy[i]=pt_Spectrum_and_Precision_Parameters->E_min_table+i*dE;
-             Cascade_Spectrum.Spectrum[i]=universal_spectrum(pt_Spectrum_and_Precision_Parameters->E_min_table+i*dE,z,pt_Particle_Physics_Model->E_0);
-
-            }
-         }
-
-
-      else Cascade_Spectrum_Reading_From_File(z,
+      //    if(E_c <= pt_Particle_Physics_Model->E_0 ){
+      //      Cascade_Spectrum.Energy.resize(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size);
+      //      Cascade_Spectrum.Spectrum.resize(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size);
+      //      for(int i=0;i<pt_Spectrum_and_Precision_Parameters->Energy_Table_Size;i++){
+      //        Cascade_Spectrum.Energy[i]=pt_Spectrum_and_Precision_Parameters->E_min_table+i*dE;
+      //        Cascade_Spectrum.Spectrum[i]=universal_spectrum(pt_Spectrum_and_Precision_Parameters->E_min_table+i*dE,z,pt_Particle_Physics_Model->E_0);
+      //
+      //       }
+      //    }
+      //
+      //
+      // else
+      Cascade_Spectrum_Reading_From_File(z,
                                               pt_Particle_Physics_Model,
                                               &Cascade_Spectrum,
                                               pt_Spectrum_and_Precision_Parameters);
       if(pt_Output_Options->BBN_constraints_verbose>2){
-        cout << "redshift" << z << endl;
+        cout << "redshift " << z << endl;
         for(int i = 0; i < Cascade_Spectrum.Spectrum.size(); i++)cout << "read spectrum from file = "<< Cascade_Spectrum.Spectrum[i]  << " energy = " << Cascade_Spectrum.Energy[i]<<endl;
       }
      }
@@ -291,6 +295,7 @@ void Compute_constraints_from_destruction_and_production(Structure_Particle_Phys
   vector<double> Integration_over_z_source_term;
 
   Structure_Spectrum Cascade_Spectrum;
+  Cascade_Spectrum.species="photon";
   /******** This step attributes locally the values of precision and scan parameters ********/
   double tau_min, tau_max, tau_step, zeta_min, zeta_max, zeta_step, z_step, n_step, number_iterations_photon;
   tau_min = pt_Scan_Parameters_and_Results->tau_min;
