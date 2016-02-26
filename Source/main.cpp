@@ -18,6 +18,7 @@ using namespace std;
 #include "../include/injected_spectrum.h"
 #include "../include/tools.h"
 #include "../include/BBN_constraints.h"
+#include "../include/test_functions.h"
 
 
 int main(int argc, char** argv){

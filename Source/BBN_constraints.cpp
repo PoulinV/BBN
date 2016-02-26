@@ -3,6 +3,8 @@
 #include "../include/structures.h"
 #include "../include/BBN_constraints.h"
 #include "../include/tools.h"
+#include "../include/test_functions.h"
+
 using namespace std;
 
 
@@ -38,10 +40,10 @@ void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Cascade_Spe
       resultat = 0;
       dE = (E_max - pt_Spectrum_and_Precision_Parameters->E_min_table)/ (double) n_step;
       y = 0;
-      while(dE>pt_Spectrum_and_Precision_Parameters->E_min_table){
-        dE/=10.;
-        y++;
-      }
+      // while(dE>pt_Spectrum_and_Precision_Parameters->E_min_table){
+      //   dE/=10.;
+      //   y++;
+      // }
       h = dE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
 
       // cout << " dE = " << dE  << " y " << y << endl;
@@ -249,10 +251,10 @@ if(pt_Output_Options->BBN_constraints_verbose > 0)   cout<<"redshift = " << z <<
 
 
       y = 0;
-      while(dz>z_initial){
-        dz/=10.;
-        y++;
-      }
+      // while(dz>z_initial){
+      //   dz/=10.;
+      //   y++;
+      // }
       h = dz/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
 
       // cout << " dE = " << dE  << " y " << y << endl;

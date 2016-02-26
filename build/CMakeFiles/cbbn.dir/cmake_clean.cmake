@@ -3,6 +3,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/cbbn.dir/source/EM_cascade.cpp.o"
   "CMakeFiles/cbbn.dir/source/Injected_spectrum.cpp.o"
   "CMakeFiles/cbbn.dir/source/tools.cpp.o"
+  "CMakeFiles/cbbn.dir/source/test_functions.cpp.o"
   "CMakeFiles/cbbn.dir/source/main.cpp.o"
   "cbbn.pdb"
   "cbbn"

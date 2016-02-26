@@ -3,6 +3,8 @@
 #include "../include/structures.h"
 #include "../include/BBN_constraints.h"
 #include "../include/tools.h"
+#include "../include/test_functions.h"
+
 using namespace std;
 
 /**********************************************************************************************************************************************************************************************************/

@@ -6,6 +6,7 @@ CMakeFiles/cbbn.dir/source/BBN_constraints.cpp.o: ../include/EM_cascade.h
 CMakeFiles/cbbn.dir/source/BBN_constraints.cpp.o: ../include/common.h
 CMakeFiles/cbbn.dir/source/BBN_constraints.cpp.o: ../include/injected_spectrum.h
 CMakeFiles/cbbn.dir/source/BBN_constraints.cpp.o: ../include/structures.h
+CMakeFiles/cbbn.dir/source/BBN_constraints.cpp.o: ../include/test_functions.h
 CMakeFiles/cbbn.dir/source/BBN_constraints.cpp.o: ../include/tools.h
 CMakeFiles/cbbn.dir/source/BBN_constraints.cpp.o: ../source/BBN_constraints.cpp
 
@@ -14,6 +15,7 @@ CMakeFiles/cbbn.dir/source/EM_cascade.cpp.o: ../include/EM_cascade.h
 CMakeFiles/cbbn.dir/source/EM_cascade.cpp.o: ../include/common.h
 CMakeFiles/cbbn.dir/source/EM_cascade.cpp.o: ../include/injected_spectrum.h
 CMakeFiles/cbbn.dir/source/EM_cascade.cpp.o: ../include/structures.h
+CMakeFiles/cbbn.dir/source/EM_cascade.cpp.o: ../include/test_functions.h
 CMakeFiles/cbbn.dir/source/EM_cascade.cpp.o: ../include/tools.h
 CMakeFiles/cbbn.dir/source/EM_cascade.cpp.o: ../source/EM_cascade.cpp
 
@@ -22,6 +24,7 @@ CMakeFiles/cbbn.dir/source/Injected_spectrum.cpp.o: ../include/EM_cascade.h
 CMakeFiles/cbbn.dir/source/Injected_spectrum.cpp.o: ../include/common.h
 CMakeFiles/cbbn.dir/source/Injected_spectrum.cpp.o: ../include/injected_spectrum.h
 CMakeFiles/cbbn.dir/source/Injected_spectrum.cpp.o: ../include/structures.h
+CMakeFiles/cbbn.dir/source/Injected_spectrum.cpp.o: ../include/test_functions.h
 CMakeFiles/cbbn.dir/source/Injected_spectrum.cpp.o: ../include/tools.h
 CMakeFiles/cbbn.dir/source/Injected_spectrum.cpp.o: ../source/Injected_spectrum.cpp
 
@@ -30,14 +33,25 @@ CMakeFiles/cbbn.dir/source/main.cpp.o: ../include/EM_cascade.h
 CMakeFiles/cbbn.dir/source/main.cpp.o: ../include/common.h
 CMakeFiles/cbbn.dir/source/main.cpp.o: ../include/injected_spectrum.h
 CMakeFiles/cbbn.dir/source/main.cpp.o: ../include/structures.h
+CMakeFiles/cbbn.dir/source/main.cpp.o: ../include/test_functions.h
 CMakeFiles/cbbn.dir/source/main.cpp.o: ../include/tools.h
 CMakeFiles/cbbn.dir/source/main.cpp.o: ../source/main.cpp
+
+CMakeFiles/cbbn.dir/source/test_functions.cpp.o: ../include/BBN_constraints.h
+CMakeFiles/cbbn.dir/source/test_functions.cpp.o: ../include/EM_cascade.h
+CMakeFiles/cbbn.dir/source/test_functions.cpp.o: ../include/common.h
+CMakeFiles/cbbn.dir/source/test_functions.cpp.o: ../include/injected_spectrum.h
+CMakeFiles/cbbn.dir/source/test_functions.cpp.o: ../include/structures.h
+CMakeFiles/cbbn.dir/source/test_functions.cpp.o: ../include/test_functions.h
+CMakeFiles/cbbn.dir/source/test_functions.cpp.o: ../include/tools.h
+CMakeFiles/cbbn.dir/source/test_functions.cpp.o: ../source/test_functions.cpp
 
 CMakeFiles/cbbn.dir/source/tools.cpp.o: ../include/BBN_constraints.h
 CMakeFiles/cbbn.dir/source/tools.cpp.o: ../include/EM_cascade.h
 CMakeFiles/cbbn.dir/source/tools.cpp.o: ../include/common.h
 CMakeFiles/cbbn.dir/source/tools.cpp.o: ../include/injected_spectrum.h
 CMakeFiles/cbbn.dir/source/tools.cpp.o: ../include/structures.h
+CMakeFiles/cbbn.dir/source/tools.cpp.o: ../include/test_functions.h
 CMakeFiles/cbbn.dir/source/tools.cpp.o: ../include/tools.h
 CMakeFiles/cbbn.dir/source/tools.cpp.o: ../source/tools.cpp
 

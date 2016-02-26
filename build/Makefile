@@ -280,6 +280,36 @@ source/test.cpp.s:
 	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/test.cpp.s
 .PHONY : source/test.cpp.s
 
+source/test_functions.o: source/test_functions.cpp.o
+
+.PHONY : source/test_functions.o
+
+# target to build an object file
+source/test_functions.cpp.o:
+	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/test_functions.cpp.o
+	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/test_functions.cpp.o
+.PHONY : source/test_functions.cpp.o
+
+source/test_functions.i: source/test_functions.cpp.i
+
+.PHONY : source/test_functions.i
+
+# target to preprocess a source file
+source/test_functions.cpp.i:
+	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/test_functions.cpp.i
+	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/test_functions.cpp.i
+.PHONY : source/test_functions.cpp.i
+
+source/test_functions.s: source/test_functions.cpp.s
+
+.PHONY : source/test_functions.s
+
+# target to generate assembly for a file
+source/test_functions.cpp.s:
+	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/test_functions.cpp.s
+	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/test_functions.cpp.s
+.PHONY : source/test_functions.cpp.s
+
 source/tools.o: source/tools.cpp.o
 
 .PHONY : source/tools.o
@@ -335,6 +365,9 @@ help:
 	@echo "... source/test.o"
 	@echo "... source/test.i"
 	@echo "... source/test.s"
+	@echo "... source/test_functions.o"
+	@echo "... source/test_functions.i"
+	@echo "... source/test_functions.s"
 	@echo "... source/tools.o"
 	@echo "... source/tools.i"
 	@echo "... source/tools.s"
