@@ -137,9 +137,9 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
   if(pt_Output_Options->BBN_constraints_verbose>1)cout << " z initial = " << z_initial << " z final = " << z_final << endl;
 if(pt_Output_Options->BBN_constraints_verbose > 0)  cout << "I start generating spectrum for each redshift. You asked for " << z_step << " points." << endl;
  for(int j = 0; j<=z_step;j++){
-   z = z_initial*pow(z_final/z_initial,(double) j/(z_step));
+  //  z = z_initial*pow(z_final/z_initial,(double) j/(z_step));
 
-  //  z=pow(10,log10(z_initial)-j*log10_dz);
+   z=pow(10,log10(z_initial)-j*log10_dz);
    E_c = E_c_0/(1+z);
 if(pt_Output_Options->BBN_constraints_verbose > 0)   cout<<"redshift = " << z << " still " << z_step-j << " points to go." << endl;
    if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "universal"){
@@ -200,8 +200,8 @@ if(pt_Output_Options->BBN_constraints_verbose > 0)   cout<<"redshift = " << z <<
   if(pt_Output_Options->BBN_constraints_verbose > 0)cout <<"I'm done convoluting the spectrum with cross sections! I start to integrate over z."<<endl;
 
   for(int dtau = 0 ; dtau <= tau_step ; dtau++){
-    // tau_x = pow(10,log10(tau_min)+log10_dtau*dtau);
-    tau_x = tau_min*pow(tau_max/tau_min,(double) dtau/(tau_step));
+    tau_x = pow(10,log10(tau_min)+log10_dtau*dtau);
+    // tau_x = tau_min*pow(tau_max/tau_min,(double) dtau/(tau_step));
 
     if((dtau==tau_step) && (tau_x!=tau_max))cout<<"erreur : probleme de pas logarithmique en tau"<<endl;
 
@@ -212,83 +212,83 @@ if(pt_Output_Options->BBN_constraints_verbose > 0)   cout<<"redshift = " << z <<
     // z_final = z_min;
     dz=(z_initial-z_final)/(double) n_step;
 
-    // h=dz/2;
+    h=dz/2;
     resultat= 0;
-    // for(int i = 0; i<=n_step;i++){
-    //
-    //   if(i==0){
-    //     z1=z_initial;
-    //     }
-    //   else{
-    //     z1=z3;
-    //   }
-    //
-    //   z2=z1-h;
-    //   z3=z2-h;
-    //   // for(int l = 0;l<Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.size();l++)cout << Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei[l] << "   " << Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei[l] <<  endl;
-    //
-    //     linearint(Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.size(), log10(z1), f1);
-    //     // cout<<"redshift 1= " << z1 <<"interpolation = "<<f1<< endl;
-    //     if(f1<0)f1=0;
-    //     linearint(Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.size(), log10(z2), f2);
-    //     // cout<<"redshift 2= " << z2 <<"interpolation = "<<f2<< endl;
-    //     if(f2<0)f2=0;
-    //
-    //     linearint(Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.size(), log10(z3), f3);
-    //     // cout<<"redshift 3= " << z3 <<"interpolation = "<<f3<< endl;
-    //     if(f3<0)f3=0;
-    //
-    //     f1=pow(10,f1);
-    //     f2=pow(10,f2);
-    //     f3=pow(10,f3);
-    //     f1*=exp(-1./(2*H_r*tau_x*(z1+1)*(z1+1)));
-    //     f2*=exp(-1./(2*H_r*tau_x*(z2+1)*(z2+1)));
-    //     f3*=exp(-1./(2*H_r*tau_x*(z3+1)*(z3+1)));
-    //
-    //     // resultat += pow(10,h) * (f1/3. + 4.*f2/3. + f3/3.);
-    //     resultat += h * (f1/3. + 4.*f2/3. + f3/3.);
-    //   }
+    for(int i = 0; i<=n_step;i++){
+
+      if(i==0){
+        z1=z_initial;
+        }
+      else{
+        z1=z3;
+      }
+
+      z2=z1-h;
+      z3=z2-h;
+      // for(int l = 0;l<Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.size();l++)cout << Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei[l] << "   " << Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei[l] <<  endl;
+
+        linearint(Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.size(), log10(z1), f1);
+        // cout<<"redshift 1= " << z1 <<"interpolation = "<<f1<< endl;
+        if(f1<0)f1=0;
+        linearint(Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.size(), log10(z2), f2);
+        // cout<<"redshift 2= " << z2 <<"interpolation = "<<f2<< endl;
+        if(f2<0)f2=0;
+
+        linearint(Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.size(), log10(z3), f3);
+        // cout<<"redshift 3= " << z3 <<"interpolation = "<<f3<< endl;
+        if(f3<0)f3=0;
+
+        f1=pow(10,f1);
+        f2=pow(10,f2);
+        f3=pow(10,f3);
+        f1*=exp(-1./(2*H_r*tau_x*(z1+1)*(z1+1)));
+        f2*=exp(-1./(2*H_r*tau_x*(z2+1)*(z2+1)));
+        f3*=exp(-1./(2*H_r*tau_x*(z3+1)*(z3+1)));
+
+        // resultat += pow(10,h) * (f1/3. + 4.*f2/3. + f3/3.);
+        resultat += h * (f1/3. + 4.*f2/3. + f3/3.);
+      }
 
 
-      y = 0;
+      // y = 0;
       // while(dz>z_initial){
       //   dz/=10.;
       //   y++;
       // }
-      h = dz/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
-
-      // cout << " dE = " << dE  << " y " << y << endl;
-      // ds = (E*E_gamma_bb/(m_e*m_e) - 1)/ (double) (pt_Spectrum_and_Precision_Parameters->n_step-1);
-
-      for(int i=0; i<pow(10,y)*n_step;i++){
-
-        // cout << "pt_Spectrum_and_Precision_Parameters->eval_max = " << pt_Spectrum_and_Precision_Parameters->eval_max << " h2 " << h2 << endl;
-        for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++)
-        {
-          if(eval == 0){
-          if(i==0)	z_array[eval]=z_initial;
-          else z_array[eval]=z_array[pt_Spectrum_and_Precision_Parameters->eval_max-1];
-          }
-          else{
-            z_array[eval]=z_array[0]-eval*h;
-          }
-
-
-          linearint(Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.size(), log10(z_array[eval]), f[eval]);
-          // cout<<"redshift 1= " << z1 <<"interpolation = "<<f1<< endl;
-          if(f[eval]<0)f[eval]=0;
-          f[eval]=pow(10,f[eval]);
-          f[eval]*=exp(-1./(2*H_r*tau_x*(z_array[eval]+1)*(z_array[eval]+1)));
-
-        resultat += dz/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
-        // cout << "eval " << eval << "E = " << E[eval] << " weight = " << pt_Spectrum_and_Precision_Parameters->weight[eval] << " f[eval] = "<< f[eval] <<" resultat = " << resultat << endl;
-      }
-      }
+      // h = dz/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
+      //
+      // // cout << " dE = " << dE  << " y " << y << endl;
+      // // ds = (E*E_gamma_bb/(m_e*m_e) - 1)/ (double) (pt_Spectrum_and_Precision_Parameters->n_step-1);
+      //
+      // for(int i=0; i<pow(10,y)*n_step;i++){
+      //
+      //   // cout << "pt_Spectrum_and_Precision_Parameters->eval_max = " << pt_Spectrum_and_Precision_Parameters->eval_max << " h2 " << h2 << endl;
+      //   for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++)
+      //   {
+      //     if(eval == 0){
+      //     if(i==0)	z_array[eval]=z_initial;
+      //     else z_array[eval]=z_array[pt_Spectrum_and_Precision_Parameters->eval_max-1];
+      //     }
+      //     else{
+      //       z_array[eval]=z_array[0]-eval*h;
+      //     }
+      //
+      //
+      //     linearint(Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei, Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.size(), log10(z_array[eval]), f[eval]);
+      //     // cout<<"redshift 1= " << z1 <<"interpolation = "<<f1<< endl;
+      //     if(f[eval]<0)f[eval]=0;
+      //     f[eval]=pow(10,f[eval]);
+      //     f[eval]*=exp(-1./(2*H_r*tau_x*(z_array[eval]+1)*(z_array[eval]+1)));
+      //
+      //   resultat += dz/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
+      //   // cout << "eval " << eval << "E = " << E[eval] << " weight = " << pt_Spectrum_and_Precision_Parameters->weight[eval] << " f[eval] = "<< f[eval] <<" resultat = " << resultat << endl;
+      // }
+      // }
 
 
       for(int dzeta = 0 ; dzeta <= zeta_step ; dzeta++){
-      // zeta_x = pow(10,log10(zeta_min)+log10_dZ*dZ);
-      zeta_x = zeta_min*pow(zeta_max/zeta_min,(double) dzeta/(zeta_step));
+      zeta_x = pow(10,log10(zeta_min)+log10_dZ*dzeta);
+      // zeta_x = zeta_min*pow(zeta_max/zeta_min,(double) dzeta/(zeta_step));
 
       // cout << "tau_x = "<< tau_x<<" zeta_x = " << zeta_x << "resultat = " << resultat << "E0" << pt_Particle_Physics_Model->E_0<<endl;
       // B=zeta_x*n_y_0/(H_r*tau_x);
