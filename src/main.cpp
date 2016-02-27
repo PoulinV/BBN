@@ -12,13 +12,13 @@
 
 using namespace std;
 
-#include "../include/common.h"
-#include "../include/structures.h"
-#include "../include/EM_cascade.h"
-#include "../include/injected_spectrum.h"
-#include "../include/tools.h"
-#include "../include/BBN_constraints.h"
-#include "../include/test_functions.h"
+#include "bbn/common.h"
+#include "bbn/structures.h"
+#include "bbn/EM_cascade.h"
+#include "bbn/injected_spectrum.h"
+#include "bbn/tools.h"
+#include "bbn/BBN_constraints.h"
+#include "bbn/test_functions.h"
 
 
 int main(int argc, char** argv){
