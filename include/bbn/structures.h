@@ -1,5 +1,5 @@
-#ifndef __structures__
-#define __structures__
+#ifndef __BBN_INJECTED_STRUCTURES_H__
+#define __BBN_INJECTED_STRUCTURES_H__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -104,4 +104,4 @@ struct Structure_Output_Options{
   int Output_verbose;
 };
 
-#endif
+#endif // __BBN_INJECTED_STRUCTURES_H__

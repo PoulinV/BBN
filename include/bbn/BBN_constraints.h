@@ -1,3 +1,6 @@
+#ifndef __BBN_BBN_CONSTRAINTS_H__
+#define __BBN_BBN_CONSTRAINTS_H__
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -41,3 +44,5 @@ void Check_nuclei(const std::string &nuclei,
                   double &Y_min,
                   double &Y_max,
                   double &Y_0);
+
+#endif // __BBN_BBN_CONSTRAINTS_H__

@@ -1,5 +1,5 @@
-#ifndef __em_cascade__
-#define __em_cascade__
+#ifndef __BBN_EM_CASCADE_H__
+#define __BBN_EM_CASCADE_H__
 
 #include <iostream>
 #include <fstream>
@@ -65,4 +65,5 @@ double Function_Integrand_Spectre_Compton(double E_e, double E_gamma,  double E_
 double Function_Integrand_Spectre_Compton_version_q(double q, double E_e, double E_gamma_bar);
 double function_integrand_pair_creation(double E_e, double E_gamma, double E_gamma_bar);
 double integrand_rate_pair_creation(double s);
-#endif
+
+#endif // __BBN_EM_CASCADE_H__

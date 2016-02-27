@@ -1,6 +1,5 @@
-#ifndef __tools__
-#define __tools__
-
+#ifndef __BBN_TOOLS_H__
+#define __BBN_TOOLS_H__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -58,5 +57,4 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
                               Structure_Spectrum * pt_Electron_Spectrum,
                               double &integrale);
 
-
-#endif
+#endif // __BBN_TOOLS_H__

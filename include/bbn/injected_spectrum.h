@@ -1,5 +1,5 @@
-#ifndef __injected_spectrum__
-#define __injected_spectrum__
+#ifndef __BBN_INJECTED_SPECTRUM_H__
+#define __BBN_INJECTED_SPECTRUM_H__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,4 +36,5 @@ double no_electrons_injected(double x, double z, double E_0);
 double no_photons_injected(double x, double z, double E_0);
 void attribute_map_spectrum(std::map<std::string,Spectrum> &map_spectrum,std::map<std::string,std::string> &map_parameters);
 void check_name_spectrum(const std::string &value, std::string &error_value);
-#endif
+
+#endif // __BBN_INJECTED_SPECTRUM_H__
