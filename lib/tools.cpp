@@ -450,6 +450,18 @@ void get_parameter_from_file(ifstream &file, string &parameter){
   file.seekg(0, ios::beg);
 
 }
+
+string trim(string const &str) {
+    if(str.empty())
+        return str;
+
+    std::size_t firstScan = str.find_first_not_of(' ');
+    std::size_t first     = firstScan == std::string::npos ? str.length() : firstScan;
+    std::size_t last      = str.find_last_not_of(' ');
+
+    return str.substr(first, last-first+1);
+}
+
 void attribute_name_and_value(const string &line,string &name,string &value){
   int i=0;
   int j=0;
@@ -460,11 +472,13 @@ void attribute_name_and_value(const string &line,string &name,string &value){
     for(int k=0;k<i;k++){
       name+=line[k];
     }
-    name.erase(remove(name.begin(),name.end(),' '));
+
     for(int k=i+1;k<j-1;k++){
       value+=line[k];
-      value.erase(remove(value.begin(),value.end(),' '));
     }
+    
+    name = trim(name);
+    value = trim(value);
   }
   else if(i>=j){
     name = "ignore_line";
