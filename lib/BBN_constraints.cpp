@@ -8,7 +8,6 @@
 using namespace std;
 
 
-int l=0;
 void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Cascade_Spectrum,
                                             Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
                                             Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
