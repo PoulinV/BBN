@@ -124,17 +124,17 @@ map
 bbn/common.h
 ../include/bbn/bbn/common.h
 
-/Users/gauthierl/Codes/bbn/BBN/tests/test.cpp
+/Users/poulin/Documents/Labo/BBN/tests/test.cpp
 bbn/EM_cascade.h
-/Users/gauthierl/Codes/bbn/BBN/tests/bbn/EM_cascade.h
+/Users/poulin/Documents/Labo/BBN/tests/bbn/EM_cascade.h
 bbn/injected_spectrum.h
-/Users/gauthierl/Codes/bbn/BBN/tests/bbn/injected_spectrum.h
+/Users/poulin/Documents/Labo/BBN/tests/bbn/injected_spectrum.h
 bbn/structures.h
-/Users/gauthierl/Codes/bbn/BBN/tests/bbn/structures.h
+/Users/poulin/Documents/Labo/BBN/tests/bbn/structures.h
 bbn/BBN_constraints.h
-/Users/gauthierl/Codes/bbn/BBN/tests/bbn/BBN_constraints.h
+/Users/poulin/Documents/Labo/BBN/tests/bbn/BBN_constraints.h
 bbn/tools.h
-/Users/gauthierl/Codes/bbn/BBN/tests/bbn/tools.h
+/Users/poulin/Documents/Labo/BBN/tests/bbn/tools.h
 bbn/test_functions.h
-/Users/gauthierl/Codes/bbn/BBN/tests/bbn/test_functions.h
+/Users/poulin/Documents/Labo/BBN/tests/bbn/test_functions.h
 

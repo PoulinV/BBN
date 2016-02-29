@@ -48,13 +48,24 @@ RM = /usr/local/Cellar/cmake/3.3.2/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/poulin/Documents/Labo/Devel_ProgrammeBBN
+CMAKE_SOURCE_DIR = /Users/poulin/Documents/Labo/BBN
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/poulin/Documents/Labo/Devel_ProgrammeBBN/build
+CMAKE_BINARY_DIR = /Users/poulin/Documents/Labo/BBN/build
 
 #=============================================================================
 # Targets provided globally by CMake.
+
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
+	/usr/local/Cellar/cmake/3.3.2/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+
+.PHONY : test/fast
 
 # Special rule for the target edit_cache
 edit_cache:
@@ -80,9 +91,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/poulin/Documents/Labo/Devel_ProgrammeBBN/build/CMakeFiles /Users/poulin/Documents/Labo/Devel_ProgrammeBBN/build/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/poulin/Documents/Labo/BBN/build/CMakeFiles /Users/poulin/Documents/Labo/BBN/build/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/poulin/Documents/Labo/Devel_ProgrammeBBN/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/poulin/Documents/Labo/BBN/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -111,17 +122,30 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named cbbn
+# Target rules for targets named cbbn_library
 
 # Build rule for target.
-cbbn: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 cbbn
-.PHONY : cbbn
+cbbn_library: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 cbbn_library
+.PHONY : cbbn_library
 
 # fast build rule for target.
-cbbn/fast:
-	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/build
-.PHONY : cbbn/fast
+cbbn_library/fast:
+	$(MAKE) -f lib/CMakeFiles/cbbn_library.dir/build.make lib/CMakeFiles/cbbn_library.dir/build
+.PHONY : cbbn_library/fast
+
+#=============================================================================
+# Target rules for targets named cbbn_binary
+
+# Build rule for target.
+cbbn_binary: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 cbbn_binary
+.PHONY : cbbn_binary
+
+# fast build rule for target.
+cbbn_binary/fast:
+	$(MAKE) -f src/CMakeFiles/cbbn_binary.dir/build.make src/CMakeFiles/cbbn_binary.dir/build
+.PHONY : cbbn_binary/fast
 
 #=============================================================================
 # Target rules for targets named cbbn_test
@@ -133,212 +157,8 @@ cbbn_test: cmake_check_build_system
 
 # fast build rule for target.
 cbbn_test/fast:
-	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/build
+	$(MAKE) -f tests/CMakeFiles/cbbn_test.dir/build.make tests/CMakeFiles/cbbn_test.dir/build
 .PHONY : cbbn_test/fast
-
-source/BBN_constraints.o: source/BBN_constraints.cpp.o
-
-.PHONY : source/BBN_constraints.o
-
-# target to build an object file
-source/BBN_constraints.cpp.o:
-	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/BBN_constraints.cpp.o
-	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/BBN_constraints.cpp.o
-.PHONY : source/BBN_constraints.cpp.o
-
-source/BBN_constraints.i: source/BBN_constraints.cpp.i
-
-.PHONY : source/BBN_constraints.i
-
-# target to preprocess a source file
-source/BBN_constraints.cpp.i:
-	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/BBN_constraints.cpp.i
-	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/BBN_constraints.cpp.i
-.PHONY : source/BBN_constraints.cpp.i
-
-source/BBN_constraints.s: source/BBN_constraints.cpp.s
-
-.PHONY : source/BBN_constraints.s
-
-# target to generate assembly for a file
-source/BBN_constraints.cpp.s:
-	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/BBN_constraints.cpp.s
-	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/BBN_constraints.cpp.s
-.PHONY : source/BBN_constraints.cpp.s
-
-source/EM_cascade.o: source/EM_cascade.cpp.o
-
-.PHONY : source/EM_cascade.o
-
-# target to build an object file
-source/EM_cascade.cpp.o:
-	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/EM_cascade.cpp.o
-	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/EM_cascade.cpp.o
-.PHONY : source/EM_cascade.cpp.o
-
-source/EM_cascade.i: source/EM_cascade.cpp.i
-
-.PHONY : source/EM_cascade.i
-
-# target to preprocess a source file
-source/EM_cascade.cpp.i:
-	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/EM_cascade.cpp.i
-	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/EM_cascade.cpp.i
-.PHONY : source/EM_cascade.cpp.i
-
-source/EM_cascade.s: source/EM_cascade.cpp.s
-
-.PHONY : source/EM_cascade.s
-
-# target to generate assembly for a file
-source/EM_cascade.cpp.s:
-	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/EM_cascade.cpp.s
-	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/EM_cascade.cpp.s
-.PHONY : source/EM_cascade.cpp.s
-
-source/Injected_spectrum.o: source/Injected_spectrum.cpp.o
-
-.PHONY : source/Injected_spectrum.o
-
-# target to build an object file
-source/Injected_spectrum.cpp.o:
-	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/Injected_spectrum.cpp.o
-	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/Injected_spectrum.cpp.o
-.PHONY : source/Injected_spectrum.cpp.o
-
-source/Injected_spectrum.i: source/Injected_spectrum.cpp.i
-
-.PHONY : source/Injected_spectrum.i
-
-# target to preprocess a source file
-source/Injected_spectrum.cpp.i:
-	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/Injected_spectrum.cpp.i
-	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/Injected_spectrum.cpp.i
-.PHONY : source/Injected_spectrum.cpp.i
-
-source/Injected_spectrum.s: source/Injected_spectrum.cpp.s
-
-.PHONY : source/Injected_spectrum.s
-
-# target to generate assembly for a file
-source/Injected_spectrum.cpp.s:
-	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/Injected_spectrum.cpp.s
-	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/Injected_spectrum.cpp.s
-.PHONY : source/Injected_spectrum.cpp.s
-
-source/main.o: source/main.cpp.o
-
-.PHONY : source/main.o
-
-# target to build an object file
-source/main.cpp.o:
-	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/main.cpp.o
-.PHONY : source/main.cpp.o
-
-source/main.i: source/main.cpp.i
-
-.PHONY : source/main.i
-
-# target to preprocess a source file
-source/main.cpp.i:
-	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/main.cpp.i
-.PHONY : source/main.cpp.i
-
-source/main.s: source/main.cpp.s
-
-.PHONY : source/main.s
-
-# target to generate assembly for a file
-source/main.cpp.s:
-	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/main.cpp.s
-.PHONY : source/main.cpp.s
-
-source/test.o: source/test.cpp.o
-
-.PHONY : source/test.o
-
-# target to build an object file
-source/test.cpp.o:
-	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/test.cpp.o
-.PHONY : source/test.cpp.o
-
-source/test.i: source/test.cpp.i
-
-.PHONY : source/test.i
-
-# target to preprocess a source file
-source/test.cpp.i:
-	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/test.cpp.i
-.PHONY : source/test.cpp.i
-
-source/test.s: source/test.cpp.s
-
-.PHONY : source/test.s
-
-# target to generate assembly for a file
-source/test.cpp.s:
-	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/test.cpp.s
-.PHONY : source/test.cpp.s
-
-source/test_functions.o: source/test_functions.cpp.o
-
-.PHONY : source/test_functions.o
-
-# target to build an object file
-source/test_functions.cpp.o:
-	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/test_functions.cpp.o
-	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/test_functions.cpp.o
-.PHONY : source/test_functions.cpp.o
-
-source/test_functions.i: source/test_functions.cpp.i
-
-.PHONY : source/test_functions.i
-
-# target to preprocess a source file
-source/test_functions.cpp.i:
-	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/test_functions.cpp.i
-	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/test_functions.cpp.i
-.PHONY : source/test_functions.cpp.i
-
-source/test_functions.s: source/test_functions.cpp.s
-
-.PHONY : source/test_functions.s
-
-# target to generate assembly for a file
-source/test_functions.cpp.s:
-	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/test_functions.cpp.s
-	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/test_functions.cpp.s
-.PHONY : source/test_functions.cpp.s
-
-source/tools.o: source/tools.cpp.o
-
-.PHONY : source/tools.o
-
-# target to build an object file
-source/tools.cpp.o:
-	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/tools.cpp.o
-	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/tools.cpp.o
-.PHONY : source/tools.cpp.o
-
-source/tools.i: source/tools.cpp.i
-
-.PHONY : source/tools.i
-
-# target to preprocess a source file
-source/tools.cpp.i:
-	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/tools.cpp.i
-	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/tools.cpp.i
-.PHONY : source/tools.cpp.i
-
-source/tools.s: source/tools.cpp.s
-
-.PHONY : source/tools.s
-
-# target to generate assembly for a file
-source/tools.cpp.s:
-	$(MAKE) -f CMakeFiles/cbbn.dir/build.make CMakeFiles/cbbn.dir/source/tools.cpp.s
-	$(MAKE) -f CMakeFiles/cbbn_test.dir/build.make CMakeFiles/cbbn_test.dir/source/tools.cpp.s
-.PHONY : source/tools.cpp.s
 
 # Help Target
 help:
@@ -346,31 +166,12 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... cbbn_test"
+	@echo "... test"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... cbbn"
-	@echo "... source/BBN_constraints.o"
-	@echo "... source/BBN_constraints.i"
-	@echo "... source/BBN_constraints.s"
-	@echo "... source/EM_cascade.o"
-	@echo "... source/EM_cascade.i"
-	@echo "... source/EM_cascade.s"
-	@echo "... source/Injected_spectrum.o"
-	@echo "... source/Injected_spectrum.i"
-	@echo "... source/Injected_spectrum.s"
-	@echo "... source/main.o"
-	@echo "... source/main.i"
-	@echo "... source/main.s"
-	@echo "... source/test.o"
-	@echo "... source/test.i"
-	@echo "... source/test.s"
-	@echo "... source/test_functions.o"
-	@echo "... source/test_functions.i"
-	@echo "... source/test_functions.s"
-	@echo "... source/tools.o"
-	@echo "... source/tools.i"
-	@echo "... source/tools.s"
+	@echo "... cbbn_library"
+	@echo "... cbbn_binary"
+	@echo "... cbbn_test"
 .PHONY : help
 
 

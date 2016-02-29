@@ -1,1 +1,1 @@
-/Library/Developer/CommandLineTools/usr/bin/c++    -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/cbbn_test.dir/test.cpp.o  -o cbbn_test  ../lib/libcbbn.dylib -Wl,-rpath,/Users/gauthierl/Codes/bbn/BBN/build/lib 
+/Library/Developer/CommandLineTools/usr/bin/c++    -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/cbbn_test.dir/test.cpp.o  -o cbbn_test  ../lib/libcbbn.dylib -Wl,-rpath,/Users/poulin/Documents/Labo/BBN/build/lib 

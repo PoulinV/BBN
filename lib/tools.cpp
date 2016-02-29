@@ -507,14 +507,14 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
       }
     }
     else if(name == "task_test"){
-      if(value == "print_interaction_rate" || value == "print_polylog"){
+      if(value == "print_interaction_rate" || value == "print_polylog" || value == "print_func_kawmor"){
         error_value = "no";
         error_name = "no";
 
       }
       else{
         error_value = "yes";
-        cout << "The task_test isn't reckognised, it has to be one among : 'print_interaction_rate', 'print_polylog'." << endl;
+        cout << "The task_test isn't reckognised, it has to be one among : 'print_interaction_rate', 'print_polylog', 'print_func_kawmor'." << endl;
       }
     }
     else if(name == "number_iterations_photon"){
@@ -996,7 +996,7 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
                                double &integrale){
 cout << " **** Currently checking energy conservation *** " << endl;
 double dE = (pt_Particle_Physics_Model->E_0 - pt_Spectrum_and_Precision_Parameters->E_min_table) / (double) (pt_Spectrum_and_Precision_Parameters->n_step - 1);
-double h = dE/6.;
+double h;
 double dE_2, h2;
 double E1, E2, E3, E4, E5, E6, E7, f1, f2, f3, f4, f5, f6, f7, g1, g2, g3, g4, g5, g6, g7, E_gamma, E_e, rate_E;
 double E[pt_Spectrum_and_Precision_Parameters->eval_max],f[pt_Spectrum_and_Precision_Parameters->eval_max],g[pt_Spectrum_and_Precision_Parameters->eval_max];
@@ -1005,7 +1005,7 @@ double resultat_1 = 0, resultat_2 = 0, resultat_3 = 0, resultat_4 = 0, resultat_
 double F1, F2, F3, F4, F5, F6, F7;
 double z = pt_Gamma_Spectrum->redshift;
 double E_c = E_c_0/(1+z);
-
+int y = 0;
 double E_gamma_bb = 2.701*T_0*(1+z);
 double E_cmb_max = 10*E_gamma_bb;
 double E_cmb_min = E_gamma_bb/100.;
@@ -1015,11 +1015,15 @@ vector<double> Electron_Spectrum_Integrated_Over_Kernel;
 vector<double> Electron_Spectrum_Integrated_Over_Kernel_energy;
 double int_bb = 2*pow(T_0*(1+z),3)*1.20205/(pi*pi);
 double dE_3 = (pt_Particle_Physics_Model->E_0 - pt_Spectrum_and_Precision_Parameters->E_min_table) / (double) (pt_Spectrum_and_Precision_Parameters->z_step - 1);
-
+while(dE > pt_Spectrum_and_Precision_Parameters->E_min_table*10){
+  dE/=10.;
+  y++;
+}
+ h = dE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
 
 if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice=="universal"){
 
-          for(int j=0; j<pt_Spectrum_and_Precision_Parameters->n_step-1;j++){
+          for(int j=0; j<pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1;j++){
                             // cout << "pt_Spectrum_and_Precision_Parameters->eval_max = " << pt_Spectrum_and_Precision_Parameters->eval_max << " h2 " << h2 << endl;
                             for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++)
                             {
@@ -1034,7 +1038,9 @@ if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice=="universal"){
                             if(E[eval]<pt_Particle_Physics_Model->E_0)linearint(pt_Gamma_Spectrum->Energy, pt_Gamma_Spectrum->Spectrum, pt_Gamma_Spectrum->Energy.size(), E[eval], f[eval]);
                             else f[eval]=0;
                             rate_E = rate_NPC(E[eval],z)+rate_compton(E[eval],z)+rate_gg_scattering(E[eval],z);
+                            // rate_E = 1;
                             f[eval]*=rate_E*E[eval];
+                            // f[eval]=universal_spectrum(E[eval],   z, pt_Particle_Physics_Model->E_0)*E[eval];
                             resultat_1 += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
 
                           }
@@ -1050,9 +1056,8 @@ if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice=="universal"){
 }
 else if(pt_Spectrum_and_Precision_Parameters->calculation_mode == "triangular"){
 
-
-  for(int j=0; j<pt_Spectrum_and_Precision_Parameters->n_step-1;j++){
-        cout << " step j : " << j << " still " << pt_Spectrum_and_Precision_Parameters->n_step-1-j << " to go."<< endl;
+  for(int j=0; j<pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1;j++){
+        cout << " step j : " << j << " still " << pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1-j << " to go."<< endl;
                     // cout << "pt_Spectrum_and_Precision_Parameters->eval_max = " << pt_Spectrum_and_Precision_Parameters->eval_max << " h2 " << h2 << endl;
                     for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++)
                     {
@@ -1066,9 +1071,9 @@ else if(pt_Spectrum_and_Precision_Parameters->calculation_mode == "triangular"){
 
                     if(E[eval]<pt_Particle_Physics_Model->E_0)linearint(pt_Gamma_Spectrum->Energy, pt_Gamma_Spectrum->Spectrum, pt_Gamma_Spectrum->Energy.size(), E[eval], f[eval]);
                     else f[eval]=0;
-                    // rate_E = rate_NPC(E[eval],z)+rate_compton(E[eval],z)+rate_gg_scattering(E[eval],z);
-                    // if(pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation=="yes")rate_E+=rate_pair_creation_v2(E[eval],z,pt_Spectrum_and_Precision_Parameters);
-                    rate_E = 1;
+                    rate_E = rate_NPC(E[eval],z)+rate_compton(E[eval],z)+rate_gg_scattering(E[eval],z);
+                    if(pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation=="yes" && E[eval] >= E_c)rate_E+=rate_pair_creation_v2(E[eval],z,pt_Spectrum_and_Precision_Parameters);
+                    // rate_E = 1;
                     f[eval]*=rate_E*E[eval];
                     resultat_1 += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
 
@@ -1088,7 +1093,6 @@ else if(pt_Spectrum_and_Precision_Parameters->calculation_mode == "triangular"){
 
                   // 	cout << "Egamma = " << E_gamma << " E7 = " << E7 << " resultat = " << resultat<< " j = " << j << endl;
                 }
-
 
   integrale = resultat_1;
 

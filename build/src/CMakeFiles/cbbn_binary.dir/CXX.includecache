@@ -124,7 +124,7 @@ map
 bbn/common.h
 ../include/bbn/bbn/common.h
 
-/Users/gauthierl/Codes/bbn/BBN/src/main.cpp
+/Users/poulin/Documents/Labo/BBN/src/main.cpp
 stdio.h
 -
 stdlib.h
@@ -148,17 +148,17 @@ fstream
 sstream
 -
 bbn/common.h
-/Users/gauthierl/Codes/bbn/BBN/src/bbn/common.h
+/Users/poulin/Documents/Labo/BBN/src/bbn/common.h
 bbn/structures.h
-/Users/gauthierl/Codes/bbn/BBN/src/bbn/structures.h
+/Users/poulin/Documents/Labo/BBN/src/bbn/structures.h
 bbn/EM_cascade.h
-/Users/gauthierl/Codes/bbn/BBN/src/bbn/EM_cascade.h
+/Users/poulin/Documents/Labo/BBN/src/bbn/EM_cascade.h
 bbn/injected_spectrum.h
-/Users/gauthierl/Codes/bbn/BBN/src/bbn/injected_spectrum.h
+/Users/poulin/Documents/Labo/BBN/src/bbn/injected_spectrum.h
 bbn/tools.h
-/Users/gauthierl/Codes/bbn/BBN/src/bbn/tools.h
+/Users/poulin/Documents/Labo/BBN/src/bbn/tools.h
 bbn/BBN_constraints.h
-/Users/gauthierl/Codes/bbn/BBN/src/bbn/BBN_constraints.h
+/Users/poulin/Documents/Labo/BBN/src/bbn/BBN_constraints.h
 bbn/test_functions.h
-/Users/gauthierl/Codes/bbn/BBN/src/bbn/test_functions.h
+/Users/poulin/Documents/Labo/BBN/src/bbn/test_functions.h
 

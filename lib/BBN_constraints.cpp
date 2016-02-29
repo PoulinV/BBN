@@ -29,21 +29,22 @@ void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Cascade_Spe
 
   double h,dE;
   int y;
-  if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "universal" || pt_Spectrum_and_Precision_Parameters->calculation_mode== "simplified"){
-    E_max = E_0;
-    if(E_0 > 1.5*E_c)E_max = 1.5*E_c;
-  }
-  else{
-    E_max = E_0;
-  }
-
+  // if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "universal" || pt_Spectrum_and_Precision_Parameters->calculation_mode== "simplified"){
+  //   E_max = E_0;
+  //   if(E_0 > 1.5*E_c)E_max = 1.5*E_c;
+  // }
+  // else{
+  //   E_max = E_0;
+  // }
+  E_max = E_0;
+  if(E_0 > 1.5*E_c)E_max = 1.5*E_c;
       resultat = 0;
       dE = (E_max - pt_Spectrum_and_Precision_Parameters->E_min_table)/ (double) n_step;
       y = 0;
-      // while(dE>pt_Spectrum_and_Precision_Parameters->E_min_table){
-      //   dE/=10.;
-      //   y++;
-      // }
+      while(dE>pt_Spectrum_and_Precision_Parameters->E_min_table){
+        dE/=10.;
+        y++;
+      }
       h = dE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
 
       // cout << " dE = " << dE  << " y " << y << endl;

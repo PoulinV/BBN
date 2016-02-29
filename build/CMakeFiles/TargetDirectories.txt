@@ -1,2 +1,3 @@
-/Users/poulin/Documents/Labo/Devel_ProgrammeBBN/build/CMakeFiles/cbbn_test.dir
-/Users/poulin/Documents/Labo/Devel_ProgrammeBBN/build/CMakeFiles/cbbn.dir
+/Users/poulin/Documents/Labo/BBN/build/src/CMakeFiles/cbbn_binary.dir
+/Users/poulin/Documents/Labo/BBN/build/tests/CMakeFiles/cbbn_test.dir
+/Users/poulin/Documents/Labo/BBN/build/lib/CMakeFiles/cbbn_library.dir

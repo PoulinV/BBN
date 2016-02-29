@@ -75,7 +75,20 @@ if(task == "print_interaction_rate"){
                          &Spectrum_and_Precision_Parameters);
 }
 
+if(task == "print_func_kawmor"){
+  string redshift = "redshift";
+  double redshift_d;
+  string temperature = "temperature";
+  if(argc==2)get_parameter_from_file(file_input,redshift);
+  if(redshift=="default" && argc!=1){
+      get_parameter_from_file(file_input,temperature);
+      if(temperature!="default")redshift_d=atof(temperature.c_str())/T_0-1;
+      else redshift_d=atof(map_parameters["redshift"].c_str());
+    }
+    else redshift_d=atof(map_parameters["redshift"].c_str());
 
+    print_func_kawmor( redshift_d, atof(map_parameters["m_x"].c_str())/2., &Spectrum_and_Precision_Parameters);
+}
 
 file_input.close();
 file_default.close();

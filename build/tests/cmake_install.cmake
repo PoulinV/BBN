@@ -1,4 +1,4 @@
-# Install script for directory: /Users/gauthierl/Codes/bbn/BBN/tests
+# Install script for directory: /Users/poulin/Documents/Labo/BBN/tests
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
