@@ -950,8 +950,8 @@ void Triangular_Spectrum(Structure_Particle_Physics_Model * pt_Particle_Physics_
 			if(pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation=="yes" && E_g >= E_c)rate_DP=rate_pair_creation_v2(E_g,z,pt_Spectrum_and_Precision_Parameters);
 			else rate_DP = 0.;
 			if(pt_Spectrum_and_Precision_Parameters->photon_photon_diffusion == "yes" && E_g < E_phph )rate_PP=rate_gg_scattering(E_g,z);
-			else rate_PP=rate_gg_scattering(E_phph,z);
-			// else rate_PP = 0.;
+			// else rate_PP=rate_gg_scattering(E_phph,z);
+			else rate_PP = 0.;
 			Rate_photons_E_g += rate_PP;
 			Rate_photons_E_g += rate_NP;
 			Rate_photons_E_g += rate_COM;
@@ -1034,8 +1034,8 @@ void Triangular_Spectrum(Structure_Particle_Physics_Model * pt_Particle_Physics_
 					if(pt_Output_Options->EM_cascade_verbose > 1)cout <<"(Scattering electrons : ) at E = " << E_e << " E_j = " <<  E_j <<  " COM = " << COM << " NPC = " << NPC << " ICS_e = " << ICS_e << " DP = " << DP << endl;
 					if(Rate_photons_E_g!=0){
 					if(	pt_Spectrum_and_Precision_Parameters->photon_photon_diffusion == "yes" &&  E_j < E_phph)	PP = dE_j * pt_Cascade_Spectrum->Spectrum[j] * (dsigma_phph(E_j,z,E_g,pt_Output_Options));
-					else  PP = dE_j * pt_Cascade_Spectrum->Spectrum[j] * (dsigma_phph(E_phph,z,E_g,pt_Output_Options));
-					// else PP = 0;
+					// else  PP = dE_j * pt_Cascade_Spectrum->Spectrum[j] * (dsigma_phph(E_phph,z,E_g,pt_Output_Options));
+					else PP = 0;
 					if(pt_Spectrum_and_Precision_Parameters->compton_scattering == "yes") CS = dE_j * pt_Cascade_Spectrum->Spectrum[j] * (dsigma_compton(E_j,z,E_g,pt_Output_Options));
 					else CS = 0;
 
