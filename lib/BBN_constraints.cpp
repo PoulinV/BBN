@@ -11,12 +11,12 @@ using namespace std;
 void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Cascade_Spectrum,
                                             Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
                                             Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-                                             int i_min,
-                                             int i_max,
-                                             double &resultat,
-                                             double z,
-                                             long n_step,
-                                             const string &spectrum_choice){
+                                            const int i_min,
+                                            const int i_max,
+                                            double &resultat,
+                                            double z,
+                                            long n_step,
+                                            const string &spectrum_choice){
   double tau = pt_Particle_Physics_Model->tau_x;
   double Z_x = pt_Particle_Physics_Model->zeta_x;
   double E_0 = pt_Particle_Physics_Model->E_0;
@@ -40,10 +40,10 @@ void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Cascade_Spe
       resultat = 0;
       dE = (E_max - pt_Spectrum_and_Precision_Parameters->E_min_table)/ (double) n_step;
       y = 0;
-      while(dE>pt_Spectrum_and_Precision_Parameters->E_min_table){
-        dE/=10.;
-        y++;
-      }
+      // while(dE>pt_Spectrum_and_Precision_Parameters->E_min_table){
+      //   dE/=10.;
+      //   y++;
+      // }
       h = dE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
 
       // cout << " dE = " << dE  << " y " << y << endl;
@@ -68,7 +68,6 @@ void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Cascade_Spe
 
 
         linearint(pt_Cascade_Spectrum->Energy, pt_Cascade_Spectrum->Spectrum, pt_Cascade_Spectrum->Energy.size(), E[eval], f[eval]);
-
         for(int j = i_min; j<=i_max;j++){
           cross_sections[eval] += cross_section(E[eval],j);
           /**** If you are including 2H production, the channel 17 has a multiplicity of 2, it is now taken into account ****/
@@ -89,7 +88,7 @@ void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Cascade_Spe
               if(i_min == 17 && i_max == 18 && i == i_min)resultat+=cross_section(pt_Particle_Physics_Model->E_0,i)/(rate_NPC(pt_Particle_Physics_Model->E_0,z)+rate_compton(pt_Particle_Physics_Model->E_0,z)+rate_gg_scattering(pt_Particle_Physics_Model->E_0,z));
             }
           }
-
+          // cout << "resultat " << resultat << endl;
 }
 
 static void  Compute_Constraints_from_destruction_only_loop(const int step,
@@ -98,14 +97,16 @@ static void  Compute_Constraints_from_destruction_only_loop(const int step,
                                                             Structure_Scan_Parameters_and_Results * pt_Scan_Parameters_and_Results,
                                                             Structure_Output_Options * pt_Output_Options,
                                                             vector<double> &Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei,
-                                                            vector<double> &Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei){
+                                                            vector<double> &Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei,
+                                                            const int i_min,
+                                                            const int i_max){
 
 
         double z_step, n_step;
         double tau_min;
         double z_initial, z_final, z_x;
-        int i_min, i_max, k_min, k_max;
         double  E_c, z;
+
 
         z_step = pt_Spectrum_and_Precision_Parameters->z_step;
         n_step = pt_Spectrum_and_Precision_Parameters->n_step;
@@ -120,10 +121,16 @@ static void  Compute_Constraints_from_destruction_only_loop(const int step,
         Cascade_Spectrum.species="photon";
         Cascade_Spectrum.spectrum_name="total_photons";
 
-
-                //  z=pow(10,log10(z_initial)-j*log10_dz);
+                //  z=pow(10,log10(z_initial)-j*log10_dz);aa
                  E_c = E_c_0/(1+z);
-              if(pt_Output_Options->BBN_constraints_verbose > 0)   cout<<"redshift = " << z << " still " << z_step-step << " points to go." << endl;
+                 if(pt_Output_Options->BBN_constraints_verbose > 0)  {
+                   #pragma omp critical(dataupdate)
+                   {
+                       cout<<"redshift = " << z << " still " << z_step-step << " points to go." << endl;
+
+                   }
+                 }
+
                  if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "universal"){
                    Cascade_Spectrum_Calculation(z,
                                                 pt_Output_Options,
@@ -157,8 +164,11 @@ static void  Compute_Constraints_from_destruction_only_loop(const int step,
                                                       &Cascade_Spectrum,
                                                       pt_Spectrum_and_Precision_Parameters);
                     if(pt_Output_Options->BBN_constraints_verbose>2){
-                      cout << "redshift " << z << endl;
-                      for(int i = 0; i < Cascade_Spectrum.Spectrum.size(); i++)cout << "read spectrum from file = "<< Cascade_Spectrum.Spectrum[i]  << " energy = " << Cascade_Spectrum.Energy[i]<<endl;
+                      #pragma omp critical(dataupdate)
+                      {
+                          cout << "redshift " << z << endl;
+                          for(int i = 0; i < Cascade_Spectrum.Spectrum.size(); i++)cout << "read spectrum from file = "<< Cascade_Spectrum.Spectrum[i]  << " energy = " << Cascade_Spectrum.Energy[i]<<endl;
+                      }
                     }
                    }
 
@@ -241,14 +251,14 @@ if(pt_Output_Options->BBN_constraints_verbose > 0)  cout << "I start generating 
                                                   pt_Scan_Parameters_and_Results,
                                                   pt_Output_Options,
                                                   Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei,
-                                                  Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei);
+                                                  Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei,
+                                                  i_min,
+                                                  i_max);
 
 
       }
 }
-for(int j = 0; j<=z_step;j++){
-      cout << pow(10,Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei[j]) << " " << pow(10,Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei[j]) << endl;
-}
+
   if(pt_Output_Options->BBN_constraints_verbose > 0)cout <<"I'm done convoluting the spectrum with cross sections! I start to integrate over z."<<endl;
 
   for(int dtau = 0 ; dtau <= tau_step ; dtau++){
