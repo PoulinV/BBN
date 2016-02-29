@@ -27,10 +27,10 @@ int main(int argc, char** argv){
     return 0;
   }
 
-  mkdir("Output",01777);
-  mkdir("Output/Cascade_Spectrum_Folder",01777);
-  mkdir("Output/Result_Scan_Folder",01777);
-  mkdir("Output/Interaction_Rate_Folder",01777);
+  mkdir("output",01777);
+  mkdir("output/Cascade_Spectrum_Folder",01777);
+  mkdir("output/Result_Scan_Folder",01777);
+  mkdir("output/Interaction_Rate_Folder",01777);
 
   time_t t1,t2;
   double duree;
@@ -46,7 +46,7 @@ int main(int argc, char** argv){
   if(argc==2)get_parameter_from_file(file_input,task);
   if(task=="default" || argc==1) task=map_parameters["task"];
 
-
+  
   struct Structure_Particle_Physics_Model Particle_Physics_Model;
   struct Structure_Spectrum_and_Precision_Parameters Spectrum_and_Precision_Parameters;
   struct Structure_Scan_Parameters_and_Results Scan_Parameters_and_Results;

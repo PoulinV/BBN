@@ -36,17 +36,17 @@ void print_spectrum(Structure_Output_Options * pt_Output_Options,
     if(pt_Output_Options->spectrum_files=="automatic"){
     if(pt_Spectrum->species == "photon"){
       if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "universal"){
-          os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<".dat";
+          os << "output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<".dat";
       }
       else{
-        if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="iterative")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << pt_Spectrum_and_Precision_Parameters->number_iterations_photon <<"iterations.dat";
-        else if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="triangular")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << "triangular.dat";
+        if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="iterative")  os << "output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << pt_Spectrum_and_Precision_Parameters->number_iterations_photon <<"iterations.dat";
+        else if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="triangular")  os << "output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << "triangular.dat";
       }
 
     }
     else if(pt_Spectrum->species == "electron"){
-      if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="iterative")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << pt_Spectrum_and_Precision_Parameters->number_iterations_electron <<"iterations.dat";
-      else if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="triangular")  os << "Output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << "triangular.dat";
+      if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="iterative")  os << "output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << pt_Spectrum_and_Precision_Parameters->number_iterations_electron <<"iterations.dat";
+      else if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="triangular")  os << "output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << "triangular.dat";
     }
 
     }
@@ -86,10 +86,10 @@ void print_results_scan(Structure_Output_Options * pt_Output_Options,
 
     if(pt_Output_Options->results_files=="automatic"){
       if(pt_Output_Options->task=="compute_constraints_from_destruction_and_production"){
-        os << "Output/Result_Scan_Folder/Results_destruc_and_production_"<< pt_Scan_Parameters_and_Results->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV_"<<pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice<<".dat";
+        os << "output/Result_Scan_Folder/Results_destruc_and_production_"<< pt_Scan_Parameters_and_Results->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV_"<<pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice<<".dat";
       }
       else if(pt_Output_Options->task=="compute_constraints_from_destruction_only"){
-        os << "Output/Result_Scan_Folder/Results_destruc_only_"<< pt_Scan_Parameters_and_Results->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV_"<<pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice<<".dat";
+        os << "output/Result_Scan_Folder/Results_destruc_only_"<< pt_Scan_Parameters_and_Results->nuclei << "_m"<<pt_Particle_Physics_Model->M_x<<"MeV_"<<pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice<<".dat";
       }
     }
 
@@ -476,7 +476,7 @@ void attribute_name_and_value(const string &line,string &name,string &value){
     for(int k=i+1;k<j-1;k++){
       value+=line[k];
     }
-    
+
     name = trim(name);
     value = trim(value);
   }

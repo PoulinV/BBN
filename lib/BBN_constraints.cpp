@@ -92,15 +92,107 @@ void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Cascade_Spe
 
 }
 
+static void  Compute_Constraints_from_destruction_only_loop(const int step,
+                                                            Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+                                                            Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+                                                            Structure_Scan_Parameters_and_Results * pt_Scan_Parameters_and_Results,
+                                                            Structure_Output_Options * pt_Output_Options,
+                                                            vector<double> &Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei,
+                                                            vector<double> &Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei){
+
+
+        double z_step, n_step;
+        double tau_min;
+        double z_initial, z_final, z_x;
+        int i_min, i_max, k_min, k_max;
+        double  E_c, z;
+
+        z_step = pt_Spectrum_and_Precision_Parameters->z_step;
+        n_step = pt_Spectrum_and_Precision_Parameters->n_step;
+        tau_min = pt_Scan_Parameters_and_Results->tau_min;
+        z_initial =  (5*(pow(2*H_r*tau_min,-0.5)-1));
+        z_final =  2000;
+        z = z_initial*pow(z_final/z_initial,(double) step/(z_step));
+
+        double resultat;
+
+        Structure_Spectrum Cascade_Spectrum;
+        Cascade_Spectrum.species="photon";
+        Cascade_Spectrum.spectrum_name="total_photons";
+
+
+                //  z=pow(10,log10(z_initial)-j*log10_dz);
+                 E_c = E_c_0/(1+z);
+              if(pt_Output_Options->BBN_constraints_verbose > 0)   cout<<"redshift = " << z << " still " << z_step-step << " points to go." << endl;
+                 if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "universal"){
+                   Cascade_Spectrum_Calculation(z,
+                                                pt_Output_Options,
+                                                pt_Particle_Physics_Model,
+                                                &Cascade_Spectrum,
+                                                pt_Spectrum_and_Precision_Parameters);
+                 }
+                 else{
+                     if(pt_Spectrum_and_Precision_Parameters->spectrum_mode=="writing" || pt_Spectrum_and_Precision_Parameters->spectrum_mode == "nothing"){
+                       Cascade_Spectrum_Calculation(z,
+                                                    pt_Output_Options,
+                                                    pt_Particle_Physics_Model,
+                                                    &Cascade_Spectrum,
+                                                    pt_Spectrum_and_Precision_Parameters);
+                     }
+                     else if(pt_Spectrum_and_Precision_Parameters->spectrum_mode=="reading"){
+                    //    if(E_c <= pt_Particle_Physics_Model->E_0 ){
+                    //      Cascade_Spectrum.Energy.resize(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size);
+                    //      Cascade_Spectrum.Spectrum.resize(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size);
+                    //      for(int i=0;i<pt_Spectrum_and_Precision_Parameters->Energy_Table_Size;i++){
+                    //        Cascade_Spectrum.Energy[i]=pt_Spectrum_and_Precision_Parameters->E_min_table+i*dE;
+                    //        Cascade_Spectrum.Spectrum[i]=universal_spectrum(pt_Spectrum_and_Precision_Parameters->E_min_table+i*dE,z,pt_Particle_Physics_Model->E_0);
+                    //
+                    //       }
+                    //    }
+                    //
+                    //
+                    // else
+                    Cascade_Spectrum_Reading_From_File(z,
+                                                      pt_Particle_Physics_Model,
+                                                      &Cascade_Spectrum,
+                                                      pt_Spectrum_and_Precision_Parameters);
+                    if(pt_Output_Options->BBN_constraints_verbose>2){
+                      cout << "redshift " << z << endl;
+                      for(int i = 0; i < Cascade_Spectrum.Spectrum.size(); i++)cout << "read spectrum from file = "<< Cascade_Spectrum.Spectrum[i]  << " energy = " << Cascade_Spectrum.Energy[i]<<endl;
+                    }
+                   }
+
+                  }
+
+                 Spectrum_and_cross_sections_convolution(&Cascade_Spectrum,
+                                                         pt_Particle_Physics_Model,
+                                                         pt_Spectrum_and_Precision_Parameters,
+                                                         i_min,
+                                                         i_max,
+                                                         resultat,
+                                                         z,
+                                                         n_step,
+                                                         pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice);
+                 #pragma omp critical(dataupdate)
+                 {
+                   Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei[step]=log10(resultat);
+                   Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei[step]=log10(z);
+                 }
+
+                  if(pt_Output_Options->BBN_constraints_verbose>1)cout << "results convolution spectrum and cross section = "<< resultat << " redshift " << z << endl;
+                 Cascade_Spectrum.Energy.clear();
+                 Cascade_Spectrum.Spectrum.clear();
+
+
+
+}
 
 void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
                                               Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
                                               Structure_Scan_Parameters_and_Results * pt_Scan_Parameters_and_Results,
                                               Structure_Output_Options * pt_Output_Options){
 
-  Structure_Spectrum Cascade_Spectrum;
-  Cascade_Spectrum.species="photon";
-  Cascade_Spectrum.spectrum_name="total_photons";
+
 
   vector<double> Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei;
   vector<double> Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei;
@@ -117,8 +209,10 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
   z_step = pt_Spectrum_and_Precision_Parameters->z_step;
   number_iterations_photon = pt_Spectrum_and_Precision_Parameters->number_iterations_photon;
   /******************************************************************************************/
+  Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.resize(z_step+1);
+  Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei.resize(z_step+1);
 
-  double z_initial =  (5*(pow(2*H_r*tau_min,-0.5)-1)), z_final =  2000, z, z_x;
+  double z_initial =  (5*(pow(2*H_r*tau_min,-0.5)-1)), z_final =  2000, z_x;
   int i_min, i_max, k_min, k_max;
   double zeta_x, tau_x;
   double log10_dtau = (log10(tau_max)-log10(tau_min))/(double) tau_step;
@@ -136,67 +230,25 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
  dE= (pt_Particle_Physics_Model->E_0 - pt_Spectrum_and_Precision_Parameters->E_min_table)/ (double) (pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1);
   if(pt_Output_Options->BBN_constraints_verbose>1)cout << " z initial = " << z_initial << " z final = " << z_final << endl;
 if(pt_Output_Options->BBN_constraints_verbose > 0)  cout << "I start generating spectrum for each redshift. You asked for " << z_step << " points." << endl;
- for(int j = 0; j<=z_step;j++){
-   z = z_initial*pow(z_final/z_initial,(double) j/(z_step));
+{
+  int end = z_step;
+ #pragma omp parallel for ordered schedule(dynamic)
+  for(int j = 0; j<=end;j++){
 
-  //  z=pow(10,log10(z_initial)-j*log10_dz);
-   E_c = E_c_0/(1+z);
-if(pt_Output_Options->BBN_constraints_verbose > 0)   cout<<"redshift = " << z << " still " << z_step-j << " points to go." << endl;
-   if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "universal"){
-     Cascade_Spectrum_Calculation(z,
-                                  pt_Output_Options,
-                                  pt_Particle_Physics_Model,
-                                  &Cascade_Spectrum,
-                                  pt_Spectrum_and_Precision_Parameters);
-   }
-   else{
-       if(pt_Spectrum_and_Precision_Parameters->spectrum_mode=="writing" || pt_Spectrum_and_Precision_Parameters->spectrum_mode == "nothing"){
-         Cascade_Spectrum_Calculation(z,
-                                      pt_Output_Options,
-                                      pt_Particle_Physics_Model,
-                                      &Cascade_Spectrum,
-                                      pt_Spectrum_and_Precision_Parameters);
-       }
-       else if(pt_Spectrum_and_Precision_Parameters->spectrum_mode=="reading"){
-      //    if(E_c <= pt_Particle_Physics_Model->E_0 ){
-      //      Cascade_Spectrum.Energy.resize(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size);
-      //      Cascade_Spectrum.Spectrum.resize(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size);
-      //      for(int i=0;i<pt_Spectrum_and_Precision_Parameters->Energy_Table_Size;i++){
-      //        Cascade_Spectrum.Energy[i]=pt_Spectrum_and_Precision_Parameters->E_min_table+i*dE;
-      //        Cascade_Spectrum.Spectrum[i]=universal_spectrum(pt_Spectrum_and_Precision_Parameters->E_min_table+i*dE,z,pt_Particle_Physics_Model->E_0);
-      //
-      //       }
-      //    }
-      //
-      //
-      // else
-      Cascade_Spectrum_Reading_From_File(z,
-                                              pt_Particle_Physics_Model,
-                                              &Cascade_Spectrum,
-                                              pt_Spectrum_and_Precision_Parameters);
-      if(pt_Output_Options->BBN_constraints_verbose>2){
-        cout << "redshift " << z << endl;
-        for(int i = 0; i < Cascade_Spectrum.Spectrum.size(); i++)cout << "read spectrum from file = "<< Cascade_Spectrum.Spectrum[i]  << " energy = " << Cascade_Spectrum.Energy[i]<<endl;
+    Compute_Constraints_from_destruction_only_loop(j,
+                                                  pt_Particle_Physics_Model,
+                                                  pt_Spectrum_and_Precision_Parameters,
+                                                  pt_Scan_Parameters_and_Results,
+                                                  pt_Output_Options,
+                                                  Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei,
+                                                  Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei);
+
+
       }
-     }
-
-    }
-
-   Spectrum_and_cross_sections_convolution(&Cascade_Spectrum,
-                                           pt_Particle_Physics_Model,
-                                           pt_Spectrum_and_Precision_Parameters,
-                                           i_min,
-                                           i_max,
-                                           resultat,
-                                           z,
-                                           n_step,
-                                           pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice);
-   Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.push_back(log10(resultat));
-   Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei.push_back(log10(z));
-    if(pt_Output_Options->BBN_constraints_verbose>1)cout << "results convolution spectrum and cross section = "<< resultat << "redshift" << z << endl;
-   Cascade_Spectrum.Energy.clear();
-   Cascade_Spectrum.Spectrum.clear();
-  }
+}
+for(int j = 0; j<=z_step;j++){
+      cout << pow(10,Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei[j]) << " " << pow(10,Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei[j]) << endl;
+}
   if(pt_Output_Options->BBN_constraints_verbose > 0)cout <<"I'm done convoluting the spectrum with cross sections! I start to integrate over z."<<endl;
 
   for(int dtau = 0 ; dtau <= tau_step ; dtau++){
