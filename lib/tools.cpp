@@ -1030,21 +1030,30 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
     h = dE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
 
     if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice=="universal") {
+      {
+      int end = pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1;
+      int end2 = pt_Spectrum_and_Precision_Parameters->eval_max;
+      #pragma omp parallel for ordered schedule(dynamic)
 
-        for(int j=0; j<pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1; j++) {
-          double E[pt_Spectrum_and_Precision_Parameters->eval_max],f[pt_Spectrum_and_Precision_Parameters->eval_max],g[pt_Spectrum_and_Precision_Parameters->eval_max], rate_E;
-
-            // cout << "pt_Spectrum_and_Precision_Parameters->eval_max = " << pt_Spectrum_and_Precision_Parameters->eval_max << " h2 " << h2 << endl;
-            for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++) {
-                if(eval == 0) {
-                    if(j==0)	{
-                        E[eval]=pt_Spectrum_and_Precision_Parameters->E_min_table;
-                    } else {
-                        E[eval]=E[pt_Spectrum_and_Precision_Parameters->eval_max-1];
-                    }
-                } else {
-                    E[eval]=E[0]+eval*h;
-                }
+        for(int j=0; j<end; j++) {
+          #pragma omp critical(print)
+          {
+            cout << " step j : " << j << " still " << pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1-j << " to go."<< endl;
+          }
+          double E[end2],f[end2], rate_E;
+          double resultat_photons = 0;
+            // cout << "end2 = " << end2 << " h2 " << h2 << endl;
+            for(int eval=0; eval < end2; eval++) {
+                // if(eval == 0) {
+                //     if(j==0)	{
+                //         E[eval]=pt_Spectrum_and_Precision_Parameters->E_min_table;
+                //     } else {
+                //         E[eval]=E[pt_Spectrum_and_Precision_Parameters->eval_max-1];
+                //     }
+                // } else {
+                //     E[eval]=E[0]+eval*h;
+                // }
+                E[eval]=pt_Spectrum_and_Precision_Parameters->E_min_table+j*dE+eval*h;
 
                 if(E[eval]<pt_Particle_Physics_Model->E_0) {
                     linearint(pt_Gamma_Spectrum->Energy, pt_Gamma_Spectrum->Spectrum, pt_Gamma_Spectrum->Energy.size(), E[eval], f[eval]);
@@ -1055,7 +1064,7 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
                 // rate_E = 1;
                 f[eval]*=rate_E*E[eval];
                 // f[eval]=universal_spectrum(E[eval],   z, pt_Particle_Physics_Model->E_0)*E[eval];
-                resultat_1 += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
+                resultat_photons += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
 
             }
 
@@ -1063,10 +1072,14 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
             // if(res_initial!=0 && resultat/res_initial<precision)break;
             // cout << E1 << " f1 " << f1 << " (exp(E1/T)-1) "  << (exp(E1/T)-1) << " f7 " << f7 << endl;
 
-
+            #pragma omp critical(dataupdate)
+            {
+              integrale += resultat_photons;
+            }
             // 	cout << "Egamma = " << E_gamma << " E7 = " << E7 << " resultat = " << resultat<< " j = " << j << endl;
         }
-        integrale = resultat_1;
+
+      }
     } else if(pt_Spectrum_and_Precision_Parameters->calculation_mode == "triangular") {
       {
       int end = pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1;
@@ -1097,7 +1110,7 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
                 if(E[eval]<pt_Particle_Physics_Model->E_0) {
 
                     linearint(pt_Gamma_Spectrum->Energy, pt_Gamma_Spectrum->Spectrum, pt_Gamma_Spectrum->Energy.size(), E[eval], f[eval]);
-                  
+
                 } else {
                     f[eval]=0;
                 }
@@ -1112,7 +1125,7 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
                 if(E[eval]<pt_Particle_Physics_Model->E_0) {
 
                     linearint(pt_Electron_Spectrum->Energy, pt_Electron_Spectrum->Spectrum, pt_Electron_Spectrum->Energy.size(), E[eval], g[eval]);
-                  
+
                 } else {
                     g[eval]=0;
                 }
