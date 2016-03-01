@@ -1309,7 +1309,7 @@ void Triangular_Spectrum(Structure_Particle_Physics_Model * pt_Particle_Physics_
 								pt_Cascade_Spectrum->Spectrum[i] += resultat_photons;
 								Tmp_Photon_Spectrum.Spectrum[i] += resultat_photons*(Rate_photons_E_g);
 								pt_Electron_Spectrum->Spectrum[i] += resultat_electrons;
-								Tmp_Electron_Spectrum.Spectrum[i] += resultat_photons*Rate_electrons_E_e;
+								Tmp_Electron_Spectrum.Spectrum[i] += resultat_electrons*Rate_electrons_E_e;
 							}
 					}
 				}
@@ -1434,7 +1434,7 @@ void Triangular_Spectrum(Structure_Particle_Physics_Model * pt_Particle_Physics_
     }
 }
     if(pt_Spectrum_and_Precision_Parameters->check_energy_conservation == "yes") {
-        check_energy_conservation(pt_Particle_Physics_Model,pt_Spectrum_and_Precision_Parameters,pt_Cascade_Spectrum,&Tmp_Electron_Spectrum,integrale);
+        check_energy_conservation(pt_Particle_Physics_Model,pt_Spectrum_and_Precision_Parameters,&Tmp_Photon_Spectrum,&Tmp_Electron_Spectrum,integrale);
 
         for(int i = (pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1); i>=0 ; i--) {
 
