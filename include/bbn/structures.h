@@ -87,6 +87,9 @@ class Structure_Scan_Parameters_and_Results{
 public:
 
   std::string nuclei;
+  int i_min, i_max;
+  int k_min, k_max;
+  double Y_0, Y_min, Y_max;
   double tau_min;
   double tau_max;
   double zeta_min;
@@ -102,7 +105,7 @@ public:
 class Structure_Output_Options{
 
   public:
-    
+
   std::string results_files;
   std::string spectrum_files;
   std::string interaction_rate_files;
