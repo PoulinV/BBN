@@ -21,7 +21,7 @@ static void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Casc
         const int i_max,
         double &resultat,
         double z);
-
+        
 static void  Compute_Constraints_from_destruction_only_loop(const int step,
         Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
         Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
@@ -68,7 +68,6 @@ void Compute_constraints_from_destruction_and_production(Structure_Particle_Phys
 
 
 double cross_section(double  x, int i);
-
 static void Check_nuclei(Structure_Scan_Parameters_and_Results * pt_Scan_Parameters_and_Results);
 
 #endif // __BBN_BBN_CONSTRAINTS_H__
