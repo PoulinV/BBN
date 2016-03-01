@@ -43,6 +43,7 @@ static void  compute_constraints_from_destruction_and_production_loop(const int 
 static void Compute_constraints_from_destruction_and_production_loop_2(const int step,
         Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
         Structure_Scan_Parameters_and_Results * pt_Scan_Parameters_and_Results,
+        Structure_Scan_Parameters_and_Results * pt_Destruction_4He,
         Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
         Structure_Output_Options * pt_Output_Options,
         std::vector<double> &Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei,
