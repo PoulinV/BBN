@@ -18,7 +18,9 @@ typedef std::map<std::string, std::string> map_parameters;
 typedef std::map<std::string, Spectrum> map_spectrum;
 
 
-struct Structure_Spectrum{
+class Structure_Spectrum{
+
+public:
 
   int iterations;
   double redshift;
@@ -33,7 +35,9 @@ struct Structure_Spectrum{
 
 
 
-struct Structure_Particle_Physics_Model{
+class Structure_Particle_Physics_Model{
+
+public:
 
   double  M_x;
   double  E_0;
@@ -44,7 +48,9 @@ struct Structure_Particle_Physics_Model{
 
 };
 
-struct Structure_Spectrum_and_Precision_Parameters{
+class Structure_Spectrum_and_Precision_Parameters{
+
+public:
 
   int number_iterations_photon;
   int number_iterations_electron;
@@ -76,7 +82,9 @@ struct Structure_Spectrum_and_Precision_Parameters{
 
 };
 
-struct Structure_Scan_Parameters_and_Results{
+class Structure_Scan_Parameters_and_Results{
+
+public:
 
   std::string nuclei;
   double tau_min;
@@ -91,7 +99,10 @@ struct Structure_Scan_Parameters_and_Results{
 
 };
 
-struct Structure_Output_Options{
+class Structure_Output_Options{
+
+  public:
+    
   std::string results_files;
   std::string spectrum_files;
   std::string interaction_rate_files;
