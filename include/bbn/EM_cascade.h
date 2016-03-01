@@ -15,6 +15,18 @@ double dsigma_pair_creation(double z,
 													  double E_gamma,
 													  Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
 														Structure_Output_Options * pt_Output_Options);
+void integration_distribution_over_kernel(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+																						Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+																						Structure_Output_Options * pt_Output_Options,
+																						double E_i,
+																						double z,
+																						Structure_Spectrum * pt_Cascade_Spectrum,
+																						Structure_Spectrum * pt_Electron_Spectrum,
+																						const int step,
+																						const double Rate_electrons_E_e,
+																						const double Rate_photons_E_g,
+																						double &resultat_electrons,
+																						double &resultat_photons);
 double rate_compton(double  x, double  z);
 double rate_NPC(double  x, double  z);
 double rate_gg_scattering(double  x, double  z);

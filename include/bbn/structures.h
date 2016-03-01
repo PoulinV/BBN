@@ -59,8 +59,7 @@ public:
   int eval_max;
   std::vector<int> weight;
   double divisor;
-  double Gamma_Table_Size;
-  double Energy_Table_Size;
+  int Energy_Table_Size;
   double E_min_table;
   std::string calculation_mode;
   std::string photon_spectrum_choice;
