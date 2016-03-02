@@ -543,13 +543,13 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
             cout << "The task isn't reckognised, it has to be one among : 'compute_constraints_from_destruction_and_production', 'compute_constraints_from_destruction_only' and 'compute_cascade_spectrum'." << endl;
         }
     } else if(name == "task_test") {
-        if(value == "print_interaction_rate" || value == "print_polylog" || value == "print_func_kawmor") {
+        if(value == "print_interaction_rate" || value == "print_polylog" || value == "print_func_kawmor" || value == "integrate_dsigma_compton") {
             error_value = "no";
             error_name = "no";
 
         } else {
             error_value = "yes";
-            cout << "The task_test isn't reckognised, it has to be one among : 'print_interaction_rate', 'print_polylog', 'print_func_kawmor'." << endl;
+            cout << "The task_test isn't reckognised, it has to be one among : 'print_interaction_rate', 'print_polylog', 'print_func_kawmor', 'integrate_dsigma_compton'." << endl;
         }
     } else if(name == "number_iterations_photon") {
         if(atoi(value.c_str())>20) {
