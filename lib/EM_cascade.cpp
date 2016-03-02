@@ -1310,7 +1310,7 @@ void Triangular_Spectrum(Structure_Particle_Physics_Model * pt_Particle_Physics_
 							#pragma omp critical(dataupdate)
 							{
 								pt_Cascade_Spectrum->Spectrum[i] += resultat_photons;
-								Tmp_Photon_Spectrum.Spectrum[i] += resultat_photons*(Rate_photons_E_g);
+								Tmp_Photon_Spectrum.Spectrum[i] += resultat_photons*Rate_photons_E_g;
 								pt_Electron_Spectrum->Spectrum[i] += resultat_electrons;
 								Tmp_Electron_Spectrum.Spectrum[i] += resultat_electrons*Rate_electrons_E_e;
 							}
@@ -1321,6 +1321,7 @@ void Triangular_Spectrum(Structure_Particle_Physics_Model * pt_Particle_Physics_
           #pragma omp critical(print)
           {
             cout << " ******************* at z = " << z << " E = "<< pt_Electron_Spectrum->Energy[i] << " pt_Electron_Spectrum->Spectrum[i] = " << pt_Electron_Spectrum->Spectrum[i] << " pt_Cascade_Spectrum->Spectrum[i] = " << pt_Cascade_Spectrum->Spectrum[i]  << " ******************* " << endl;
+            cout << " ******************* at z = " << z << " E = "<< pt_Electron_Spectrum->Energy[i] << " " << Dirac_Spectrum_After_One_Iteration(E_g,z,E_0,pt_Spectrum_and_Precision_Parameters) << " ******************* " << endl;
           }
         }
     }

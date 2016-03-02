@@ -34,6 +34,7 @@
 double universal_spectrum(double  E, double  z, double E_0);
 double no_electrons_injected(double x, double z, double E_0);
 double no_photons_injected(double x, double z, double E_0);
+double Dirac_Spectrum_After_One_Iteration(double  x, double  z, double E_0,Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);
 void attribute_map_spectrum(std::map<std::string,Spectrum> &map_spectrum,std::map<std::string,std::string> &map_parameters);
 void check_name_spectrum(const std::string &value, std::string &error_value);
 
