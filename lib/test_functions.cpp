@@ -263,7 +263,7 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
   }
     integrale = 0.;
     double integrale_electrons = 0;
-    double dE = (pt_Particle_Physics_Model->E_0 - pt_Spectrum_and_Precision_Parameters->E_min_table) / (double) (pt_Spectrum_and_Precision_Parameters->n_step - 1);
+    // double dE = (pt_Particle_Physics_Model->E_0 - pt_Spectrum_and_Precision_Parameters->E_min_table) / (double) (pt_Spectrum_and_Precision_Parameters->n_step - 1);
     double h;
     double dE_2, h2;
     double E1, E2, E3, E4, E5, E6, E7, f1, f2, f3, f4, f5, f6, f7, g1, g2, g3, g4, g5, g6, g7, E_gamma, E_e;
@@ -272,6 +272,8 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
     double F1, F2, F3, F4, F5, F6, F7;
     double z = pt_Gamma_Spectrum->redshift;
     double E_c = E_c_0/(1+z);
+    double dE = (E_c - pt_Spectrum_and_Precision_Parameters->E_min_table) / (double) (pt_Spectrum_and_Precision_Parameters->n_step - 1);
+
     int y = 0;
     double E_gamma_bb = 2.701*T_0*(1+z);
     double E_cmb_max = 10*E_gamma_bb;

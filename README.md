@@ -1,3 +1,13 @@
+# INSTALLATION OF THE CODE
+
+To use the code, here are the steps you have to follow.
+
+      mkdir build
+      cd build/
+      cmake .. ***WARNING FOR MAC USERS : to compile with openMP, check next instruction line***      
+      make (-jN)
+
+
 # FOR MAC USERS :
 
 To compile with openMP, use gcc instead of clang. Here is an example.
@@ -9,9 +19,15 @@ To compile with openMP, use gcc instead of clang. Here is an example.
 
 # EXPORT PATH
 
-You can add the executable to you path in order to avoid switching diretories while working. Here is the command.
+You can add the executable to you path in order to avoid switching directories while working. Here is the command.
 
     export PATH=$PATH:$(pwd)/build/src/
+
+# MAKE FROM THE MAIN REPOSITORY
+
+You can do the following command in order to launch 'make' directly from the BBN directory.
+
+    cd build ; make clean ; make -j ; cd ..
 
 # CHOOSE THE NUMBER OF CORES
 

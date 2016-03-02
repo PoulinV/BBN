@@ -27,17 +27,17 @@ static void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Casc
     int n_step = pt_Spectrum_and_Precision_Parameters->n_step;
     double h,dE;
     int y;
-    // if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "universal" || pt_Spectrum_and_Precision_Parameters->calculation_mode== "simplified"){
-    //   E_max = E_0;
-    //   if(E_0 > 1.5*E_c)E_max = 1.5*E_c;
-    // }
-    // else{
-    //   E_max = E_0;
-    // }
-    E_max = E_0;
-    if(E_0 > 1.5*E_c) {
-        E_max = 1.5*E_c;
+    if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "universal" || pt_Spectrum_and_Precision_Parameters->calculation_mode== "simplified"){
+      E_max = E_0;
+      if(E_0 > 1.5*E_c)E_max = 1.5*E_c;
     }
+    else{
+      E_max = E_0;
+    }
+    // E_max = E_0;
+    // if(E_0 > 1.5*E_c) {
+    //     E_max = 1.5*E_c;
+    // }
     resultat = 0;
     dE = (E_max - pt_Spectrum_and_Precision_Parameters->E_min_table)/ (double) n_step;
     y = 0;
@@ -57,17 +57,8 @@ static void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Casc
 
         // cout << "pt_Spectrum_and_Precision_Parameters->eval_max = " << pt_Spectrum_and_Precision_Parameters->eval_max << " h2 " << h2 << endl;
         for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++) {
-            if(eval == 0) {
-                if(i==0)	{
-                    E[eval]=pt_Spectrum_and_Precision_Parameters->E_min_table;
-                } else {
-                    E[eval]=E[pt_Spectrum_and_Precision_Parameters->eval_max-1];
-                }
-            } else {
-                E[eval]=E[0]+eval*h;
-            }
 
-
+            E[eval]=pt_Spectrum_and_Precision_Parameters->E_min_table+eval*h+i*dE;
             linearint(pt_Cascade_Spectrum->Energy, pt_Cascade_Spectrum->Spectrum, pt_Cascade_Spectrum->Energy.size(), E[eval], f[eval]);
             for(int j = i_min; j<=i_max; j++) {
                 cross_sections[eval] += cross_section(E[eval],j);
@@ -87,7 +78,7 @@ static void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Casc
         for(int i = i_min; i<=i_max; i++) {
             resultat+=cross_section(pt_Particle_Physics_Model->E_0,i)/(rate_NPC(pt_Particle_Physics_Model->E_0,z)+rate_compton(pt_Particle_Physics_Model->E_0,z)+rate_gg_scattering(pt_Particle_Physics_Model->E_0,z));
             if(i_min == 17 && i_max == 18 && i == i_min) {
-                resultat+=cross_section(pt_Particle_Physics_Model->E_0,i)/(rate_NPC(pt_Particle_Physics_Model->E_0,z)+rate_compton(pt_Particle_Physics_Model->E_0,z)+rate_gg_scattering(pt_Particle_Physics_Model->E_0,z));
+            resultat+=cross_section(pt_Particle_Physics_Model->E_0,i)/(rate_NPC(pt_Particle_Physics_Model->E_0,z)+rate_compton(pt_Particle_Physics_Model->E_0,z)+rate_gg_scattering(pt_Particle_Physics_Model->E_0,z));
             }
         }
     }
@@ -117,7 +108,7 @@ static void  Compute_Constraints_from_destruction_only_loop(const int step,
     n_step = pt_Spectrum_and_Precision_Parameters->n_step;
     tau_min = pt_Scan_Parameters_and_Results->tau_min;
     z_initial =  (5*(pow(2*H_r*tau_min,-0.5)-1));
-    z_final =  2000;
+    z_final =  Z_MIN_SCAN;
     z = z_initial*pow(z_final/z_initial,(double) step/(z_step));
 
     double resultat;
@@ -235,7 +226,7 @@ static void  compute_constraints_from_destruction_and_production_loop(const int 
     n_step = pt_Spectrum_and_Precision_Parameters->n_step;
     tau_min = pt_Scan_Parameters_and_Results->tau_min;
     z_initial =  (5*(pow(2*H_r*tau_min,-0.5)-1));
-    z_final =  2000;
+    z_final =  Z_MIN_SCAN;
     z = z_initial*pow(z_final/z_initial,(double) step/(z_step));
 
     double resultat;
@@ -384,7 +375,7 @@ void Compute_Constraints_from_destruction_only(Structure_Particle_Physics_Model 
     Cascade_Spectrum_Integrated_Over_Cross_Section_Destruction_Nuclei.resize(z_step+1);
     Cascade_Spectrum_Integrated_Over_Cross_Section_redshift_Destruction_Nuclei.resize(z_step+1);
 
-    double z_initial =  (5*(pow(2*H_r*tau_min,-0.5)-1)), z_final =  2000, z_x;
+    double z_initial =  (5*(pow(2*H_r*tau_min,-0.5)-1)), z_final =  Z_MIN_SCAN, z_x;
     double zeta_x, tau_x;
     double log10_dtau = (log10(tau_max)-log10(tau_min))/(double) tau_step;
     double log10_dZ = (log10(zeta_max)-log10(zeta_min))/(double) zeta_step;
@@ -549,7 +540,7 @@ static void Compute_constraints_from_destruction_and_production_loop_2(const int
   z_step = pt_Spectrum_and_Precision_Parameters->z_step;
   number_iterations_photon = pt_Spectrum_and_Precision_Parameters->number_iterations_photon;
   /******************************************************************************************/
-  double z_initial =  (5*(pow(2*H_r*tau_min,-0.5)-1)), z_final =  2000;
+  double z_initial =  (5*(pow(2*H_r*tau_min,-0.5)-1)), z_final =  Z_MIN_SCAN;
   double Y_0, Y_min, Y_max;
   double K_0, K_min, K_max;
   double dz,h;
@@ -777,7 +768,7 @@ void Compute_constraints_from_destruction_and_production(Structure_Particle_Phys
     double zeta_x, tau_x, z_x;
     // double M_x = pt_Particle_Physics_Model->M_x;
     double E1, dE;
-    double z_initial =  (5*(pow(2*H_r*tau_min,-0.5)-1)), z_final =  2000;
+    double z_initial =  (5*(pow(2*H_r*tau_min,-0.5)-1)), z_final =  Z_MIN_SCAN;
     double log10_dz=(log10(z_initial)-log10(z_final))/(double) z_step;
     double log10_dtau = (log10(tau_max)-log10(tau_min))/(double) tau_step;
     double log10_dZ = (log10(zeta_max)-log10(zeta_min))/(double) zeta_step;

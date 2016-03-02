@@ -84,11 +84,13 @@ double  rate_gg_scattering(double  x, double  z)
 {
 
     double  Gamma;
-    if(x < (m_e*m_e)/(T_0*(1+z))) {
-        Gamma = 1946./(50625*pi)*pow(ALPHA*r_e,2)*pow(x,3)*8*pow(pi,4)*pow(T_0*(1+z)/m_e,6)/63.;
-    } else {
-        Gamma = 0;
-    }
+    // if(x < (m_e*m_e)/(T_0*(1+z))) {
+    //     Gamma = 1946./(50625*pi)*pow(ALPHA*r_e,2)*pow(x,3)*8*pow(pi,4)*pow(T_0*(1+z)/m_e,6)/63.;
+    // } else {
+    //     Gamma = 0;
+    // }
+    Gamma = 1946./(50625*pi)*pow(ALPHA*r_e,2)*pow(x,3)*8*pow(pi,4)*pow(T_0*(1+z)/m_e,6)/63.;
+
     return Gamma;
 }
 
@@ -665,17 +667,10 @@ double dsigma_pair_creation(double z,
         for(int j=0; j<pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1; j++) {
             // cout << "pt_Spectrum_and_Precision_Parameters->eval_max = " << pt_Spectrum_and_Precision_Parameters->eval_max << " h2 " << h2 << endl;
             for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++) {
-                if(eval == 0) {
-                    if(j==0)	{
-                        E[eval]=E_cmb_min;
-                    } else {
-                        E[eval]=E[pt_Spectrum_and_Precision_Parameters->eval_max-1];
-                    }
-                } else {
-                    E[eval]=E[0]+eval*h2;
-                }
 
-                if((exp(E[eval]/T)-1)!=0.) {
+              E[eval]=E_cmb_min+eval*h2+j*dE;
+
+              if((exp(E[eval]/T)-1)!=0.) {
                     f[eval]=function_integrand_pair_creation(E_e,E_gamma,E[eval])/(exp(E[eval]/T)-1);
                 } else {
                     f[eval] = 0;
@@ -761,15 +756,8 @@ double dsigma_pair_creation_v2(double z,
     for(int j=0; j<pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1; j++) {
         // cout << "pt_Spectrum_and_Precision_Parameters->eval_max = " << pt_Spectrum_and_Precision_Parameters->eval_max << " h2 " << h2 << endl;
         for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++) {
-            if(eval == 0) {
-                if(j==0)	{
-                    x[eval]=x_cmb_min;
-                } else {
-                    x[eval]=x[pt_Spectrum_and_Precision_Parameters->eval_max-1];
-                }
-            } else {
-                x[eval]=x[0]+eval*h2;
-            }
+
+            x[eval]=x_cmb_min+eval*h2+j*dx;
 
             if((exp(x[eval]/theta)-1)!=0.) {
                 f[eval]=function_integrand_pair_creation_v2(x_gamma,gamma_e,x[eval])*x[eval]*x[eval]/(exp(x[eval]/theta)-1);
@@ -1316,14 +1304,13 @@ void Triangular_Spectrum(Structure_Particle_Physics_Model * pt_Particle_Physics_
 							}
 					}
 				}
-
-        if(pt_Output_Options->EM_cascade_verbose > 0) {
-          #pragma omp critical(print)
-          {
-            cout << " ******************* at z = " << z << " E = "<< pt_Electron_Spectrum->Energy[i] << " pt_Electron_Spectrum->Spectrum[i] = " << pt_Electron_Spectrum->Spectrum[i] << " pt_Cascade_Spectrum->Spectrum[i] = " << pt_Cascade_Spectrum->Spectrum[i]  << " ******************* " << endl;
-            cout << " ******************* at z = " << z << " E = "<< pt_Electron_Spectrum->Energy[i] << " " << Dirac_Spectrum_After_One_Iteration(E_g,z,E_0,pt_Spectrum_and_Precision_Parameters) << " ******************* " << endl;
-          }
-        }
+    }
+    if(pt_Output_Options->EM_cascade_verbose > 0) {
+      #pragma omp critical(print)
+      {
+        cout << " ******************* at z = " << z << " E = "<< pt_Electron_Spectrum->Energy[i] << " pt_Electron_Spectrum->Spectrum[i] = " << pt_Electron_Spectrum->Spectrum[i] << " pt_Cascade_Spectrum->Spectrum[i] = " << pt_Cascade_Spectrum->Spectrum[i]  << " ******************* " << endl;
+        // cout << " ******************* at z = " << z << " E = "<< pt_Electron_Spectrum->Energy[i] << " " << Dirac_Spectrum_After_One_Iteration(E_g,z,E_0,pt_Spectrum_and_Precision_Parameters) << " ******************* " << endl;
+      }
     }
 }
     if(pt_Spectrum_and_Precision_Parameters->check_energy_conservation == "yes") {

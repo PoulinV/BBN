@@ -56,14 +56,19 @@ double no_photons_injected(double x, double z, double E_0)
 double Dirac_Spectrum_After_One_Iteration(double  x, double  z, double E_0, Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters){
 
 
-	double Gamma_tot = rate_NPC(E_0,z)+rate_compton(E_0,z)+rate_gg_scattering(E_0,z)+rate_pair_creation_v2(E_0, z,pt_Spectrum_and_Precision_Parameters);
-
+	double Gamma_tot = rate_NPC(E_0,z)+rate_compton(E_0,z);
+  double E_c = E_c_0/(1+z), E_phph = m_e*m_e/(T_0*(1+z));
+  if(x < E_phph) Gamma_tot += rate_gg_scattering(E_0,z);
+  if(x > E_c) Gamma_tot += rate_pair_creation_v2(E_0, z,pt_Spectrum_and_Precision_Parameters);
 	double T = T_0*(1+z);
 	double int_BB = 8./63.*pow(pi,4)*pow(T_0*(1+z),6);
 
-	double spectre_gamma_gamma = 1112./(10125*pi)*pow((ALPHA)*r_e,2)*pow(m_e,-6)*pow(E_0,2)*pow(1-x/E_0+pow(x/E_0,2),2)*int_BB;
-	double spectre_compton = pi*r_e*r_e*m_e*pow(E_0,-2)*(x/E_0+E_0/x+pow(m_e/x-m_e/E_0,2)-2*m_e*(1/x-1/E_0))*n_e*pow(1+z,3);
+	double spectre_gamma_gamma,spectre_compton;
+  if(x < E_phph) spectre_gamma_gamma = 1112./(10125*pi)*pow((ALPHA)*r_e,2)*pow(m_e,-6)*pow(E_0,2)*pow(1-x/E_0+pow(x/E_0,2),2)*int_BB;
+  else spectre_gamma_gamma = 0;
+  spectre_compton = pi*pow(r_e,2)*m_e/pow(E_0,2)*(E_0/x+x/E_0+pow(m_e/x-m_e/E_0,2)-2*m_e*(1/x-1/E_0))*n_e*pow(1+z,3);
 	double f = (spectre_gamma_gamma+spectre_compton)/(Gamma_tot);
+  if(x==E_0)f=1/Gamma_tot;
 	if(x>E_0)f=0;
 	return f;
 

@@ -46,7 +46,7 @@ int main(int argc, char** argv){
   if(argc==2)get_parameter_from_file(file_input,task);
   if(task=="default" || argc==1) task=map_parameters["task"];
 
-  
+
   struct Structure_Particle_Physics_Model Particle_Physics_Model;
   struct Structure_Spectrum_and_Precision_Parameters Spectrum_and_Precision_Parameters;
   struct Structure_Scan_Parameters_and_Results Scan_Parameters_and_Results;
@@ -114,7 +114,6 @@ int main(int argc, char** argv){
 
   // /**************To compute constraints in the zeta-tau plane***********/
   else if(task=="compute_constraints_from_destruction_only"||task=="compute_constraints_from_destruction_and_production"){
-  cout << "********************* Hello ! Thanks for using cBBNfast, ***********************" << endl;
   cout << "***** You're computing the constraints from BBN on EM-decaying particles *******" << endl;
   cout << "***************************** in the zeta-tau plane. ***************************" << endl;
 
