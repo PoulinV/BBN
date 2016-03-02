@@ -267,15 +267,8 @@ double rate_pair_creation_v2(double E_gamma, double z, Structure_Spectrum_and_Pr
 
         // cout << "pt_Spectrum_and_Precision_Parameters->eval_max = " << pt_Spectrum_and_Precision_Parameters->eval_max << " h2 " << h2 << endl;
         for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++) {
-            if(eval == 0) {
-                if(i==0)	{
-                    E[eval]=E_cmb_min;
-                } else {
-                    E[eval]=E[pt_Spectrum_and_Precision_Parameters->eval_max-1];
-                }
-            } else {
-                E[eval]=E[0]+eval*h;
-            }
+            E[eval]=E_cmb_min+i*dE+eval*h;
+
             f[eval]=integrand_rate_pair_creation_v3(E_gamma/m_e,E[eval]/m_e,pt_Spectrum_and_Precision_Parameters)/(exp(E[eval]/T)-1);
             // f[eval]=integrand_rate_pair_creation_v2(E_gamma,E[eval])/(exp(E[eval]/T)-1);
             result += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
@@ -854,130 +847,6 @@ double integrator_simpson_rate_inverse_compton(double z,
     return result;
 }
 
-double print_interaction_rate(double z,
-                              double E_MIN,
-                              double E_MAX,
-                              Structure_Output_Options * pt_Output_Options,
-                              Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters)
-{
-
-    ostringstream os;
-    string name;
-    if(pt_Output_Options->interaction_rate_files=="automatic") {
-        os << "Output/Interaction_Rate_Folder/Interaction_Rate_at_z"<< z <<".dat";
-    } else {
-        os << pt_Output_Options->interaction_rate_files << ".dat";
-    }
-    name = os.str();
-
-    ofstream file(name);
-    if(pt_Output_Options->BBN_constraints_verbose > 0) {
-        cout << "Printing in file " << name <<"."<<  endl;
-    }
-
-
-    double E_e, E_g;
-    double E_c = E_c_0/(1+z);
-    double E_phph = m_e*m_e/(T_0*(1+z));
-    double E_gamma_bb = 2.701*T_0*(1+z);
-    double Rate_photons_E_g = 0, Rate_electrons_E_e = 0;
-    double rate_PP= 0, rate_COM= 0, rate_DP= 0, rate_DP_2= 0, rate_NP = 0;
-    double PP = 0, CS= 0, ICS_g = 0, ICS_e= 0, NPC= 0, COM= 0, DP= 0;
-    for(double i = (pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1); i>=0 ; i--) {
-        Rate_photons_E_g = 0;
-        E_g = pt_Spectrum_and_Precision_Parameters->E_min_table*pow(E_MAX/pt_Spectrum_and_Precision_Parameters->E_min_table,(double) i/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1));
-        if(pt_Spectrum_and_Precision_Parameters->inverse_compton_scattering == "yes") {
-            Rate_electrons_E_e = integrator_simpson_rate_inverse_compton(z,E_g,pt_Spectrum_and_Precision_Parameters,pt_Output_Options);
-        } else {
-            Rate_electrons_E_e = 0.;
-        }
-        if(pt_Spectrum_and_Precision_Parameters->pair_creation_in_nuclei =="yes") {
-            rate_NP= rate_NPC(E_g,z);
-        } else {
-            rate_NP = 0.;
-        }
-        if(pt_Spectrum_and_Precision_Parameters->compton_scattering =="yes") {
-            rate_COM = rate_compton(E_g,z);
-        } else {
-            rate_COM = 0.;
-        }
-        if(pt_Spectrum_and_Precision_Parameters->photon_photon_diffusion =="yes" && E_g < E_phph) {
-            rate_PP=rate_gg_scattering(E_g,z);
-        } else {
-            rate_PP = 0.;
-        }
-        if(pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation=="yes" && E_g > E_c/10.) {
-            rate_DP=rate_pair_creation_v2(E_g,z,pt_Spectrum_and_Precision_Parameters);
-        } else {
-            rate_DP = 0.;
-        }
-
-        Rate_photons_E_g += rate_NP;
-        Rate_photons_E_g += rate_COM;
-        Rate_photons_E_g+=rate_PP;
-        Rate_photons_E_g+=rate_DP;
-
-        file << E_g << " " << rate_NP << "  " << rate_COM << " " << rate_PP << " " << rate_DP << "  " << Rate_photons_E_g << " " << Rate_electrons_E_e << endl;
-        if(pt_Output_Options->BBN_constraints_verbose > 0 && i == (pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1)) {
-            cout << "E_g" << " " << "rate_NP" << "  " << "rate_COM" << " " << "rate_PP" << " " << "rate_DP" << "  " << "Rate_photons_E_g" << " " << "Rate_electrons_E_e" << endl;
-        }
-        if(pt_Output_Options->BBN_constraints_verbose > 0) {
-            cout << E_g << " " << rate_NP << "  " << rate_COM << " " << rate_PP << " " << rate_DP << "  " <<  Rate_photons_E_g << " " << Rate_electrons_E_e << endl;
-        }
-        // file << 100/E_g << " " << 2*dsigma_pair_creation(z,100,E_g,pt_Spectrum_and_Precision_Parameters)/rate_DP*E_g/m_e  << endl;
-        // cout << 100/E_g << " "  << endl;
-        // cout << "check : " << rate_PP/integrate_dsigma_phph(0,E_g,z,pt_Spectrum_and_Precision_Parameters) << "  " << rate_PP/integrator_simpson_dsigma_pair_creation(z,100,E_g,pt_Spectrum_and_Precision_Parameters,pt_Output_Options) << endl;
-    }
-    return 0;
-}
-
-double integrator_simpson_blackbody_spectrum(double z,
-        double E_ini,
-        double E_max,
-        Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters)
-{
-
-    double T=T_0*(1+z);
-    double dE = (E_max- E_ini)/ (double) (10*pt_Spectrum_and_Precision_Parameters->n_step-1);
-    // cout << "E_max "<< E_max << " E_ini " << E_ini <<" dE = " << dE << endl;
-    double E[pt_Spectrum_and_Precision_Parameters->eval_max], f[pt_Spectrum_and_Precision_Parameters->eval_max],h2;
-    double resultat = 0;
-    // cout << "here "<< dE << endl;
-    int y = 1;
-    for(int j=0; j<pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1; j++) {
-        h2 = dE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
-        // cout << "pt_Spectrum_and_Precision_Parameters->eval_max = " << pt_Spectrum_and_Precision_Parameters->eval_max << " h2 " << h2 << endl;
-        for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++) {
-            if(eval == 0) {
-                if(j==0)	{
-                    E[eval]=E_ini;
-                } else {
-                    E[eval]=E[pt_Spectrum_and_Precision_Parameters->eval_max-1];
-                }
-            } else {
-                E[eval]=E[0]+eval*h2;
-            }
-
-            if((exp(E[eval]/T)-1)!=0.) {
-                f[eval]=E[eval]*E[eval]/(exp(E[eval]/T)-1);
-            } else {
-                f[eval] = 0;
-            }
-            resultat += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
-            // cout << "eval " << eval << "E = " << E[eval] << " weight = " << pt_Spectrum_and_Precision_Parameters->weight[eval] << " f[eval] = "<< f[eval] <<" resultat = " << resultat << endl;
-        }
-
-        // if(res_initial==0 && resultat !=0)res_initial = resultat;
-        // if(res_initial!=0 && resultat/res_initial<precision)break;
-        // cout << E1 << " f1 " << f1 << " (exp(E1/T)-1) "  << (exp(E1/T)-1) << " f7 " << f7 << endl;
-
-
-        // 	cout << "Egamma = " << E_gamma << " E7 = " << E7 << " resultat = " << resultat<< " j = " << j << endl;
-    }
-    resultat*=1./(pi*pi);
-    // if(resultat != 0)cout << "(integrator_simpson_blackbody_spectrum_over_rate_inverse_compton : ) resultat = " << resultat << endl;
-    return resultat;
-}
 double function_integrand_pair_creation(double E_e, double E_gamma, double E_gamma_bar)
 {
     double E_e_prime = E_gamma+E_gamma_bar-E_e, A, B, C, D;
@@ -999,6 +868,7 @@ double function_integrand_pair_creation(double E_e, double E_gamma, double E_gam
     }
     return 2*result;			// We treat electron and positron on an equal footing, hence we simply multiply here by 2.
 }
+
 void integration_distribution_over_kernel(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
 																						Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
 																						Structure_Output_Options * pt_Output_Options,
@@ -1208,7 +1078,6 @@ void Triangular_Spectrum(Structure_Particle_Physics_Model * pt_Particle_Physics_
 
 #pragma omp parallel sections // starts a new team
 {
-	#pragma omp section
 
       {  Rate_electrons_E_e = integrator_simpson_rate_inverse_compton(z,E_g,pt_Spectrum_and_Precision_Parameters,pt_Output_Options);
 

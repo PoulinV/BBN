@@ -48,9 +48,14 @@ double integrate_dsigma_compton(double E_MIN, double E_MAX, double z, Structure_
 
     double  q1, q2, q3, q4, q5, q6, q7,F1, F2, F3, F4, F5, F6, F7, dq, h, rate = 0;
     int n_step = pt_Spectrum_and_Precision_Parameters->n_step;
-    dq = (E_MAX-pt_Spectrum_and_Precision_Parameters->E_min_table)/ (double) (10000*pt_Spectrum_and_Precision_Parameters->n_step-1);
-    h = dq/6.;
-    q1=pt_Spectrum_and_Precision_Parameters->E_min_table;
+    int y=0;
+
+    dE = (E_MAX-pt_Spectrum_and_Precision_Parameters->E_min_table)/ (double) (pt_Spectrum_and_Precision_Parameters->n_step-1);
+    while(dE>pt_Spectrum_and_Precision_Parameters->E_min_table) {
+        dE/=10.;
+        y++;
+    }
+    h = dE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
     rate = 0.;
 
     for(int i=0; i<10000*pt_Spectrum_and_Precision_Parameters->n_step-1; i++) {
@@ -428,4 +433,116 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
       }
     }
 
+}
+
+
+double print_interaction_rate(double z,
+                              double E_MIN,
+                              double E_MAX,
+                              Structure_Output_Options * pt_Output_Options,
+                              Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters)
+{
+
+    ostringstream os;
+    string name;
+    if(pt_Output_Options->interaction_rate_files=="automatic") {
+        os << "output/Interaction_Rate_Folder/Interaction_Rate_at_z"<< z <<".dat";
+    } else {
+        os << pt_Output_Options->interaction_rate_files << ".dat";
+    }
+    name = os.str();
+
+    ofstream file(name);
+    if(file){
+      if(pt_Output_Options->BBN_constraints_verbose > 0) {
+          cout << "Printing in file " << name <<"."<<  endl;
+      }
+    }
+    else{
+      cout << "I cannot open file " << name << ", please check that the folder exist." << endl;
+      exit(0);
+    }
+
+
+
+    double E_e, E_g;
+    double E_c = E_c_0/(1+z);
+    double E_phph = m_e*m_e/(T_0*(1+z));
+    double E_gamma_bb = 2.701*T_0*(1+z);
+    double Rate_photons_E_g = 0, Rate_electrons_E_e = 0;
+    double rate_PP= 0, rate_COM= 0, rate_DP= 0, rate_DP_2= 0, rate_NP = 0;
+    double PP = 0, CS= 0, ICS_g = 0, ICS_e= 0, NPC= 0, COM= 0, DP= 0;
+    for(double i = (pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1); i>=0 ; i--) {
+        Rate_photons_E_g = 0;
+        E_g = pt_Spectrum_and_Precision_Parameters->E_min_table*pow(E_MAX/pt_Spectrum_and_Precision_Parameters->E_min_table,(double) i/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1));
+        #pragma omp parallel sections // starts a new team
+        {
+        	#pragma omp section
+
+              {  Rate_electrons_E_e = integrator_simpson_rate_inverse_compton(z,E_g,pt_Spectrum_and_Precision_Parameters,pt_Output_Options);
+
+        				if(pt_Output_Options->Test_functions_verbose > 0) {
+        					#pragma omp critical(print)
+        					{
+        						cout << "(Rate electrons : ) at E = " << E_e << " tot = " << Rate_electrons_E_e << endl;
+        					}
+        				}
+
+        			}
+
+
+
+        		#pragma omp section
+        				{
+        			    if(pt_Spectrum_and_Precision_Parameters->pair_creation_in_nuclei == "yes") {
+        			        rate_NP= rate_NPC(E_g,z);
+        			    } else {
+        			        rate_NP = 0;
+        			    }
+        			    if(pt_Spectrum_and_Precision_Parameters->compton_scattering == "yes") {
+        			        rate_COM = rate_compton(E_g,z);
+        			    } else {
+        			        rate_COM = 0;
+        			    }
+
+        			    if(pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation=="yes" && E_g >= E_c) {
+        			        rate_DP=rate_pair_creation_v2(E_g,z,pt_Spectrum_and_Precision_Parameters);
+        			    } else {
+        			        rate_DP = 0.;
+        			    }
+        			    if(pt_Spectrum_and_Precision_Parameters->photon_photon_diffusion == "yes" && E_g < E_phph ) {
+        			        rate_PP=rate_gg_scattering(E_g,z);
+        			    }
+        			    // else rate_PP=rate_gg_scattering(E_phph,z);
+        			    else {
+        			        rate_PP = 0.;
+        			    }
+        			    Rate_photons_E_g += rate_PP;
+        			    Rate_photons_E_g += rate_NP;
+        			    Rate_photons_E_g += rate_COM;
+        			    Rate_photons_E_g += rate_DP;
+
+        					if(pt_Output_Options->Test_functions_verbose > 0) {
+        						#pragma omp critical(print)
+        						{
+        							cout << "(Rate photons : ) at E = " << E_g << " rate_NP = " << rate_NP << " rate_COM = " << rate_COM << " rate_PP = " << rate_PP << " rate_DP = " << rate_DP << " tot = " << Rate_photons_E_g << endl;
+        						}
+        					}
+
+        			}
+
+        }
+
+
+
+
+
+
+
+        file << E_g << " " << rate_NP << "  " << rate_COM << " " << rate_PP << " " << rate_DP << "  " << Rate_photons_E_g << " " << Rate_electrons_E_e << endl;
+        // file << 100/E_g << " " << 2*dsigma_pair_creation(z,100,E_g,pt_Spectrum_and_Precision_Parameters)/rate_DP*E_g/m_e  << endl;
+        // cout << 100/E_g << " "  << endl;
+        // cout << "check : " << rate_PP/integrate_dsigma_phph(0,E_g,z,pt_Spectrum_and_Precision_Parameters) << "  " << rate_PP/integrator_simpson_dsigma_pair_creation(z,100,E_g,pt_Spectrum_and_Precision_Parameters,pt_Output_Options) << endl;
+    }
+    return 0;
 }

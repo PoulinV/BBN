@@ -23,4 +23,9 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
                               Structure_Spectrum * pt_Gamma_Spectrum,
                               Structure_Spectrum * pt_Electron_Spectrum,
                               double &integrale);
+double print_interaction_rate(double z,
+															double E_MIN,
+															double E_MAX,
+															Structure_Output_Options * pt_Output_Options,
+													  	Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);
 #endif // __BBN_TEST_FUNCTIONS_H__
