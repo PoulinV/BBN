@@ -382,6 +382,7 @@ void fill_structure_output_options(ifstream &file, map_parameters &map_parameter
     pt_Structure_Output_Options->task_test = map_parameters["task_test"];
     pt_Structure_Output_Options->EM_cascade_verbose = atoi(map_parameters["EM_cascade_verbose"].c_str());
     pt_Structure_Output_Options->BBN_constraints_verbose = atoi(map_parameters["BBN_constraints_verbose"].c_str());
+    pt_Structure_Output_Options->Test_functions_verbose = atoi(map_parameters["Test_functions_verbose"].c_str());
     pt_Structure_Output_Options->Input_verbose = atoi(map_parameters["Input_verbose"].c_str());
     pt_Structure_Output_Options->Output_verbose = atoi(map_parameters["Output_verbose"].c_str());
     file.clear();
@@ -808,7 +809,7 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
                 error_value = "yes";
             }
         }
-    } else if(name == "EM_cascade_verbose" || name == "BBN_constraints_verbose" || name == "Input_verbose" || name == "Output_verbose") {
+    } else if(name == "EM_cascade_verbose" || name == "BBN_constraints_verbose" || name == "Test_functions_verbose" || name == "Input_verbose" || name == "Output_verbose") {
         if(atoi(value.c_str())<0) {
             error_value = "yes";
             cout << "The number '" << name <<"' has to be bigger or equal to 0. Please change accordingly." << endl;
@@ -993,173 +994,6 @@ double factorial(int n)
         }
     }
     return factorial;
-}
-
-void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
-                               Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
-                               Structure_Spectrum * pt_Gamma_Spectrum,
-                               Structure_Spectrum * pt_Electron_Spectrum,
-                               double &integrale)
-{
-    cout << " **** Currently checking energy conservation *** " << endl;
-    integrale = 0.;
-    double integrale_electrons = 0;
-    double dE = (pt_Particle_Physics_Model->E_0 - pt_Spectrum_and_Precision_Parameters->E_min_table) / (double) (pt_Spectrum_and_Precision_Parameters->n_step - 1);
-    double h;
-    double dE_2, h2;
-    double E1, E2, E3, E4, E5, E6, E7, f1, f2, f3, f4, f5, f6, f7, g1, g2, g3, g4, g5, g6, g7, E_gamma, E_e;
-    double rate_E1,rate_E2,rate_E3,rate_E4,rate_E5,rate_E6,rate_E7;
-    double resultat_1 = 0, resultat_2 = 0, resultat_3 = 0, resultat_4 = 0, resultat_5 = 0;
-    double F1, F2, F3, F4, F5, F6, F7;
-    double z = pt_Gamma_Spectrum->redshift;
-    double E_c = E_c_0/(1+z);
-    int y = 0;
-    double E_gamma_bb = 2.701*T_0*(1+z);
-    double E_cmb_max = 10*E_gamma_bb;
-    double E_cmb_min = E_gamma_bb/100.;
-    vector<double> Gamma_Spectrum_Integrated_Over_Kernel;
-    vector<double> Gamma_Spectrum_Integrated_Over_Kernel_energy;
-    vector<double> Electron_Spectrum_Integrated_Over_Kernel;
-    vector<double> Electron_Spectrum_Integrated_Over_Kernel_energy;
-    double int_bb = 2*pow(T_0*(1+z),3)*1.20205/(pi*pi);
-    double dE_3 = (pt_Particle_Physics_Model->E_0 - pt_Spectrum_and_Precision_Parameters->E_min_table) / (double) (pt_Spectrum_and_Precision_Parameters->z_step - 1);
-    while(dE > pt_Spectrum_and_Precision_Parameters->E_min_table) {
-        dE/=10.;
-        y++;
-    }
-    h = dE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
-
-    if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice=="universal") {
-      {
-      int end = pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1;
-      int end2 = pt_Spectrum_and_Precision_Parameters->eval_max;
-      #pragma omp parallel for ordered schedule(dynamic)
-
-        for(int j=0; j<end; j++) {
-          #pragma omp critical(print)
-          {
-            cout << " step j : " << j << " still " << pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1-j << " to go."<< endl;
-          }
-          double E[end2],f[end2], rate_E;
-          double resultat_photons = 0;
-            // cout << "end2 = " << end2 << " h2 " << h2 << endl;
-            for(int eval=0; eval < end2; eval++) {
-                // if(eval == 0) {
-                //     if(j==0)	{
-                //         E[eval]=pt_Spectrum_and_Precision_Parameters->E_min_table;
-                //     } else {
-                //         E[eval]=E[pt_Spectrum_and_Precision_Parameters->eval_max-1];
-                //     }
-                // } else {
-                //     E[eval]=E[0]+eval*h;
-                // }
-                E[eval]=pt_Spectrum_and_Precision_Parameters->E_min_table+j*dE+eval*h;
-
-                if(E[eval]<pt_Particle_Physics_Model->E_0) {
-                    linearint(pt_Gamma_Spectrum->Energy, pt_Gamma_Spectrum->Spectrum, pt_Gamma_Spectrum->Energy.size(), E[eval], f[eval]);
-                } else {
-                    f[eval]=0;
-                }
-                rate_E = rate_NPC(E[eval],z)+rate_compton(E[eval],z)+rate_gg_scattering(E[eval],z);
-                // rate_E = 1;
-                f[eval]*=rate_E*E[eval];
-                // f[eval]=universal_spectrum(E[eval],   z, pt_Particle_Physics_Model->E_0)*E[eval];
-                resultat_photons += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
-
-            }
-
-            // if(res_initial==0 && resultat !=0)res_initial = resultat;
-            // if(res_initial!=0 && resultat/res_initial<precision)break;
-            // cout << E1 << " f1 " << f1 << " (exp(E1/T)-1) "  << (exp(E1/T)-1) << " f7 " << f7 << endl;
-
-            #pragma omp critical(dataupdate)
-            {
-              integrale += resultat_photons;
-            }
-            // 	cout << "Egamma = " << E_gamma << " E7 = " << E7 << " resultat = " << resultat<< " j = " << j << endl;
-        }
-
-      }
-    } else if(pt_Spectrum_and_Precision_Parameters->calculation_mode == "triangular") {
-      {
-      int end = pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1;
-      int end2 = pt_Spectrum_and_Precision_Parameters->eval_max;
-      #pragma omp parallel for ordered schedule(dynamic)
-
-        for(int j=0; j<end; j++) {
-
-          double E[end2],f[end2],g[end2],rate_E;
-          double resultat_photons = 0, resultat_electrons = 0 ;
-          #pragma omp critical(print)
-          {
-            cout << " step j : " << j << " still " << pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1-j << " to go."<< endl;
-          }
-            // cout << "pt_Spectrum_and_Precision_Parameters->eval_max = " << pt_Spectrum_and_Precision_Parameters->eval_max << " h2 " << h2 << endl;
-            for(int eval=0; eval < end2; eval++) {
-                // if(eval == 0) {
-                //     if(j==0)	{
-                //         E[eval]=1;
-                //     } else {
-                //         E[eval]=E[pt_Spectrum_and_Precision_Parameters->eval_max-1];
-                //     }
-                // } else {
-                //     E[eval]=E[0]+eval*h;
-                // }
-                E[eval]=pt_Spectrum_and_Precision_Parameters->E_min_table+j*dE+eval*h;
-
-                if(E[eval]<pt_Particle_Physics_Model->E_0) {
-
-                    linearint(pt_Gamma_Spectrum->Energy, pt_Gamma_Spectrum->Spectrum, pt_Gamma_Spectrum->Energy.size(), E[eval], f[eval]);
-
-                } else {
-                    f[eval]=0;
-                }
-                // rate_E = rate_NPC(E[eval],z)+rate_compton(E[eval],z)+rate_gg_scattering(E[eval],z);
-                // if(pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation=="yes" && E[eval] >= E_c) {
-                //     rate_E+=rate_pair_creation_v2(E[eval],z,pt_Spectrum_and_Precision_Parameters);
-                // }
-                rate_E = 1;
-                f[eval]*=rate_E*E[eval];
-                resultat_photons += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
-
-                if(E[eval]<pt_Particle_Physics_Model->E_0) {
-
-                    linearint(pt_Electron_Spectrum->Energy, pt_Electron_Spectrum->Spectrum, pt_Electron_Spectrum->Energy.size(), E[eval], g[eval]);
-
-                } else {
-                    g[eval]=0;
-                }
-                g[eval]*=E[eval];
-                // g[eval]*=E[eval]*(integrator_simpson_rate_inverse_compton_v2(z,E_cmb_min,E_cmb_max,E[eval],pt_Spectrum_and_Precision_Parameters));
-                resultat_electrons += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*g[eval];
-                // #pragma omp critical(print)
-                // {
-                //   cout << "eval " << eval << "E = " << E[eval] << " weight = " << pt_Spectrum_and_Precision_Parameters->weight[eval] << " f[eval] = "<< f[eval] <<" resultat = " << resultat_photons << endl;
-                // }
-            }
-
-            // if(res_initial==0 && resultat !=0)res_initial = resultat;
-            // if(res_initial!=0 && resultat/res_initial<precision)break;
-            // cout << E1 << " f1 " << f1 << " (exp(E1/T)-1) "  << (exp(E1/T)-1) << " f7 " << f7 << endl;
-            #pragma omp critical(dataupdate)
-            {
-              integrale += resultat_photons;
-              integrale_electrons += resultat_electrons;
-            }
-            // 	cout << "Egamma = " << E_gamma << " E7 = " << E7 << " resultat = " << resultat<< " j = " << j << endl;
-        }
-      }
-
-
-
-    }
-
-
-    cout << "The total energy contained in " <<   pt_Gamma_Spectrum->spectrum_name  << "spectrum is " << integrale << " MeV";
-    cout << " and in " << pt_Electron_Spectrum->spectrum_name << "spectrum is " << integrale_electrons << " MeV ";
-    cout << "for a total of "<< integrale+integrale_electrons <<" MeV, you had injected " << pt_Particle_Physics_Model->E_0 << " MeV." << endl;
-
-
 }
 
 

@@ -1186,8 +1186,11 @@ void Triangular_Spectrum(Structure_Particle_Physics_Model * pt_Particle_Physics_
     double E_switch = pt_Spectrum_and_Precision_Parameters->E_min_table;
     double PP= 0, CS= 0, ICS_g = 0, ICS_e= 0, NPC= 0, COM= 0, DP= 0;
 
-    if(pt_Output_Options->EM_cascade_verbose > 0) {
-        cout << "E_c = " << E_c << "E_max = " << E_max << " E_phph = " << E_phph << " E_switch = " << E_switch << endl;
+    if(pt_Output_Options->EM_cascade_verbose > 1) {
+      #pragma omp critical(print)
+      {
+        cout << "E_c = " << E_c << "E_max = " << E_max << " E_phph = " << E_phph << endl;
+      }
     }
 
     for(int i = (pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1); i>=0 ; i--) {
@@ -1313,135 +1316,24 @@ void Triangular_Spectrum(Structure_Particle_Physics_Model * pt_Particle_Physics_
 							}
 					}
 				}
-						//     E_j = pt_Spectrum_and_Precision_Parameters->E_min_table*pow(E_max/pt_Spectrum_and_Precision_Parameters->E_min_table,(double) j/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1));
-						//     E_j_plus_1 = pt_Spectrum_and_Precision_Parameters->E_min_table*pow(E_max/pt_Spectrum_and_Precision_Parameters->E_min_table,((double) j+1)/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1));
-						//     E_j_minus_1 = pt_Spectrum_and_Precision_Parameters->E_min_table*pow(E_max/pt_Spectrum_and_Precision_Parameters->E_min_table,((double) j-1)/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1));
-						//
-						//     // if(i<(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1)/2.){
-						//     // 	E_max = E_switch;
-						//     // 	E_j = pt_Spectrum_and_Precision_Parameters->E_min_table*pow(E_max/pt_Spectrum_and_Precision_Parameters->E_min_table,(double) j/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1));
-						//     // 	E_j_plus_1 = pt_Spectrum_and_Precision_Parameters->E_min_table*pow(E_max/pt_Spectrum_and_Precision_Parameters->E_min_table,((double) j+1)/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1));
-						//     // 	E_j_minus_1 = pt_Spectrum_and_Precision_Parameters->E_min_table*pow(E_max/pt_Spectrum_and_Precision_Parameters->E_min_table,((double) j-1)/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1));
-						//     // }
-						//     // else{
-						//     // 	E_j = E_switch*pow(E_max/E_switch,(double) j/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1));
-						//     // 	E_j_plus_1 = E_switch*pow(E_max/E_switch,((double) j+1)/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1));
-						//     // 	E_j_minus_1 = E_switch*pow(E_max/E_switch,((double) j-1)/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1));
-						//     // }
-						//     dE_j = (E_j_plus_1 - E_j_minus_1)/2.;
-						//
-						//     // if(pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum(E_j,z,pt_Particle_Physics_Model->E_0)!=0){
-						//     // 	Rate_photons_E_j = rate_NPC(E_j,z)+rate_compton(E_j,z)+rate_gg_scattering(E_j,z);
-						//     // 	if(pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation=="yes" && E_j>E_c/2.){
-						//     // 		Rate_photons_E_j+=rate_pair_creation(E_j,z,pt_Spectrum_and_Precision_Parameters);
-						//     // 	}
-						//     // 	pt_Cascade_Spectrum->Spectrum[i] +=pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum(E_j,z,pt_Particle_Physics_Model->E_0)/Rate_photons_E_j;
-						//     // 	cout << "(source :) pt_Cascade_Spectrum->Spectrum[i] = " << pt_Cascade_Spectrum->Spectrum[i] << " E = " << E_g << " E_x = " << E_x << endl;
-						//     // }
-						//     // if(pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum(E_j,z,pt_Particle_Physics_Model->E_0)!=0){
-						//     // 	Rate_electrons_E_j =	Rate_Inverse_Compton(E_j,z,pt_Spectrum_and_Precision_Parameters);
-						//     // 	pt_Electron_Spectrum->Spectrum[i]+=pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum(E_j,z,pt_Particle_Physics_Model->E_0)/Rate_electrons_E_j;
-						//     // }
-						//
-						//     if(Rate_electrons_E_e!=0) {
-						//         if(pt_Spectrum_and_Precision_Parameters->compton_scattering == "yes") {
-						//             COM = dE_j * pt_Cascade_Spectrum->Spectrum[j] * dsigma_compton(E_j,z,(E_j+m_e-E_e),pt_Output_Options);
-						//         } else {
-						//             COM = 0;
-						//         }
-						//         if(pt_Spectrum_and_Precision_Parameters->pair_creation_in_nuclei == "yes") {
-						//             NPC = dE_j * pt_Cascade_Spectrum->Spectrum[j] * dsigma_NPC(E_j+m_e,z,E_e,pt_Output_Options);
-						//         } else {
-						//             NPC = 0;
-						//         }
-						//         if(pt_Spectrum_and_Precision_Parameters->inverse_compton_scattering == "yes") {
-						//             gamma_e = E_j/m_e;
-						//             gamma_prime = E_e/m_e;
-						//             // ICS_e =  dE_j * pt_Electron_Spectrum->Spectrum[j]  * 2*pi*r_e*r_e*m_e*m_e*integrator_simpson_scattered_electron_inverse_compton(z,E_e,E_j,pt_Spectrum_and_Precision_Parameters)/(E_j*E_j);
-						//             ICS_e =  dE_j * pt_Electron_Spectrum->Spectrum[j]  * Analytical_form_scattered_electron_from_inverse_compton(z, gamma_e,  gamma_prime,  pt_Spectrum_and_Precision_Parameters, pt_Output_Options);
-						//         } else {
-						//             ICS_e = 0;
-						//         }
-						//         if(pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation=="yes" && E_j>=E_c) {
-						//             DP = dE_j * pt_Cascade_Spectrum->Spectrum[j] * dsigma_pair_creation_v2(z,E_e,E_j,pt_Spectrum_and_Precision_Parameters,pt_Output_Options);
-						//             if(DP<0) {
-						//                 DP = 0.;
-						//             }
-						//         } else {
-						//             DP = 0.;
-						//         }
-						//         pt_Electron_Spectrum->Spectrum[i] += COM/(Rate_electrons_E_e);
-						//         pt_Electron_Spectrum->Spectrum[i] += NPC/(Rate_electrons_E_e);
-						//         pt_Electron_Spectrum->Spectrum[i] += ICS_e/(Rate_electrons_E_e);
-						//         pt_Electron_Spectrum->Spectrum[i] += DP/(Rate_electrons_E_e);
-						//         Tmp_Electron_Spectrum.Spectrum[i] = pt_Electron_Spectrum->Spectrum[i]*Rate_electrons_E_e;
-						//     } else {
-						//         pt_Electron_Spectrum->Spectrum[i] += 0;
-						//     }
-						//
-						//     if(pt_Output_Options->EM_cascade_verbose > 1) {
-						//         cout <<"(Scattering electrons : ) at E = " << E_e << " E_j = " <<  E_j <<  " COM = " << COM << " NPC = " << NPC << " ICS_e = " << ICS_e << " DP = " << DP << endl;
-						//     }
-						//     if(Rate_photons_E_g!=0) {
-						//         if(	pt_Spectrum_and_Precision_Parameters->photon_photon_diffusion == "yes" &&  E_j < E_phph)	{
-						//             PP = dE_j * pt_Cascade_Spectrum->Spectrum[j] * (dsigma_phph(E_j,z,E_g,pt_Output_Options));
-						//         }
-						//         // else  PP = dE_j * pt_Cascade_Spectrum->Spectrum[j] * (dsigma_phph(E_phph,z,E_g,pt_Output_Options));
-						//         else {
-						//             PP = 0;
-						//         }
-						//         if(pt_Spectrum_and_Precision_Parameters->compton_scattering == "yes") {
-						//             CS = dE_j * pt_Cascade_Spectrum->Spectrum[j] * (dsigma_compton(E_j,z,E_g,pt_Output_Options));
-						//         } else {
-						//             CS = 0;
-						//         }
-						//
-						//
-						//
-						//
-						//         if(pt_Spectrum_and_Precision_Parameters->inverse_compton_scattering == "yes") {
-						//             E_e_ICS = E_j;
-						//             gamma_e = E_e_ICS/m_e;
-						//             if(E_e_ICS <= E_max) {
-						//                 linearint(pt_Electron_Spectrum->Energy, pt_Electron_Spectrum->Spectrum, pt_Electron_Spectrum->Energy.size(), E_e_ICS, f_e);
-						//             } else {
-						//                 f_e = 0;
-						//             }
-						//
-						//             ICS_g = dE_j*f_e*gamma_inverse_compton_analytical_v2(gamma_e,E_g,z,pt_Output_Options)*m_e/(E_g);
-						//             // ICS_g = dE_j*f_e*gamma_inverse_compton_analytical(gamma_e,E_g,z,3,pt_Spectrum_and_Precision_Parameters,pt_Output_Options);
-						//
-						//
-						//         } else {
-						//             ICS_g = 0;
-						//         }
-						//         pt_Cascade_Spectrum->Spectrum[i] += CS/(Rate_photons_E_g);
-						//         pt_Cascade_Spectrum->Spectrum[i] += PP/(Rate_photons_E_g);
-						//         pt_Cascade_Spectrum->Spectrum[i] += ICS_g/(Rate_photons_E_g);
-						//         Tmp_Photon_Spectrum.Spectrum[i] = pt_Cascade_Spectrum->Spectrum[i]*(Rate_photons_E_g);
-						//         if(pt_Output_Options->EM_cascade_verbose > 1) {
-						//             cout <<"(Scattering photons : ) at E = " << E_g << " E_j = " <<  E_j <<  " PP = " << PP << " CS = " << CS << " ICS_g = " << ICS_g << "f_e " << f_e << endl;
-						//         }
-						//     } else {
-						//         pt_Cascade_Spectrum->Spectrum[i] += 0;
-						//     }
-						//
-						// }
 
         if(pt_Output_Options->EM_cascade_verbose > 0) {
-            cout << " ************************************** E = "<< pt_Electron_Spectrum->Energy[i] << " pt_Electron_Spectrum->Spectrum[i] = " << pt_Electron_Spectrum->Spectrum[i] << " pt_Cascade_Spectrum->Spectrum[i] = " << pt_Cascade_Spectrum->Spectrum[i]  <<endl;
+          #pragma omp critical(print)
+          {
+            cout << " ******************* at z = " << z << " E = "<< pt_Electron_Spectrum->Energy[i] << " pt_Electron_Spectrum->Spectrum[i] = " << pt_Electron_Spectrum->Spectrum[i] << " pt_Cascade_Spectrum->Spectrum[i] = " << pt_Cascade_Spectrum->Spectrum[i]  << " ******************* " << endl;
+          }
         }
     }
 }
     if(pt_Spectrum_and_Precision_Parameters->check_energy_conservation == "yes") {
-        check_energy_conservation(pt_Particle_Physics_Model,pt_Spectrum_and_Precision_Parameters,&Tmp_Photon_Spectrum,&Tmp_Electron_Spectrum,integrale);
+        check_energy_conservation(pt_Particle_Physics_Model,pt_Spectrum_and_Precision_Parameters,pt_Output_Options,&Tmp_Photon_Spectrum,&Tmp_Electron_Spectrum,integrale);
 
         for(int i = (pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1); i>=0 ; i--) {
 
             pt_Cascade_Spectrum->Spectrum[i]=pt_Cascade_Spectrum->Spectrum[i]*E_0/integrale;
             Tmp_Photon_Spectrum.Spectrum[i]=Tmp_Photon_Spectrum.Spectrum[i]*E_0/integrale;
         }
-        // check_energy_conservation(pt_Particle_Physics_Model,pt_Spectrum_and_Precision_Parameters,pt_Cascade_Spectrum,&Tmp_Electron_Spectrum,integrale);
+        // check_energy_conservation(pt_Particle_Physics_Model,pt_Spectrum_and_Precision_Parameters,pt_Output_Options,pt_Cascade_Spectrum,&Tmp_Electron_Spectrum,integrale);
     }
 
     else {
@@ -1535,7 +1427,7 @@ void  Cascade_Spectrum_Calculation(double z,
         }
         pt_Cascade_Spectrum->spectrum_name="universal_photon_";
         if(pt_Spectrum_and_Precision_Parameters->check_energy_conservation == "yes") {
-            check_energy_conservation(pt_Particle_Physics_Model,pt_Spectrum_and_Precision_Parameters,pt_Cascade_Spectrum,&Electron_Spectrum,integrale);
+            check_energy_conservation(pt_Particle_Physics_Model,pt_Spectrum_and_Precision_Parameters,pt_Output_Options,pt_Cascade_Spectrum,&Electron_Spectrum,integrale);
         } else {
             if(pt_Output_Options->EM_cascade_verbose > 1) {
                 cout << "*** No energy check energy conservation check requested ***" << endl;
@@ -1555,7 +1447,7 @@ void  Cascade_Spectrum_Calculation(double z,
                 Electron_Spectrum.Spectrum[i]=0;
             }
             if(pt_Spectrum_and_Precision_Parameters->check_energy_conservation == "yes") {
-                check_energy_conservation(pt_Particle_Physics_Model,pt_Spectrum_and_Precision_Parameters,pt_Cascade_Spectrum,&Electron_Spectrum,integrale);
+                check_energy_conservation(pt_Particle_Physics_Model,pt_Spectrum_and_Precision_Parameters,pt_Output_Options,pt_Cascade_Spectrum,&Electron_Spectrum,integrale);
             } else {
                 if(pt_Output_Options->EM_cascade_verbose > 1) {
                     cout << "*** No energy check energy conservation check requested ***" << endl;

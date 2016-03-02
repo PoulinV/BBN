@@ -113,6 +113,7 @@ class Structure_Output_Options{
   std::string task_test;
   int EM_cascade_verbose;
   int BBN_constraints_verbose;
+  int Test_functions_verbose;
   int Input_verbose;
   int Output_verbose;
 };

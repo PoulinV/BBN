@@ -16,5 +16,11 @@ double integrator_simpson_dsigma_pair_creation(double z,
 																							 Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
 																						 	 Structure_Output_Options * pt_Output_Options);
 double Function_Integrand_Spectre_Compton_times_bb_spectrum(double E_e, double E_gamma,  double E_gamma_bar);
-double  print_func_kawmor(double  z, double  E_0, Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);
+double print_func_kawmor(double  z, double  E_0, Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters);
+void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
+                              Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+															Structure_Output_Options * pt_Output_Options,
+                              Structure_Spectrum * pt_Gamma_Spectrum,
+                              Structure_Spectrum * pt_Electron_Spectrum,
+                              double &integrale);
 #endif // __BBN_TEST_FUNCTIONS_H__
