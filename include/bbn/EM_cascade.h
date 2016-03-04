@@ -15,6 +15,11 @@ double dsigma_pair_creation(double z,
                             double E_gamma,
                             Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
                             Structure_Output_Options * pt_Output_Options);
+double dsigma_pair_creation_v2(double z,
+                               double E_e,
+                               double E_gamma,
+                               Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+                               Structure_Output_Options * pt_Output_Options);
 void integration_distribution_over_kernel(Structure_Particle_Physics_Model * pt_Particle_Physics_Model,
         Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
         Structure_Output_Options * pt_Output_Options,
@@ -27,6 +32,28 @@ void integration_distribution_over_kernel(Structure_Particle_Physics_Model * pt_
         const double Rate_photons_E_g,
         double &resultat_electrons,
         double &resultat_photons);
+double compute_photons_rate(double E,
+                           double z,
+                           Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+                           Structure_Output_Options * pt_Output_Options);
+double compute_photons_kernel(double E_g,
+                             double E_g_prime,
+                             double z,
+                             double Electron_Spectrum,
+                             double Gamma_Spectrum,
+                             Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+                             Structure_Output_Options * pt_Output_Options);
+double compute_electrons_kernel(double E_e,
+                               double E_e_prime,
+                               double z,
+                               double Electron_Spectrum,
+                               double Gamma_Spectrum,
+                               Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+                               Structure_Output_Options * pt_Output_Options);
+double compute_electrons_rate(double E,
+                             double z,
+                             Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+                             Structure_Output_Options * pt_Output_Options);
 double rate_compton(double  x, double  z);
 double rate_NPC(double  x, double  z);
 double rate_gg_scattering(double  x, double  z);

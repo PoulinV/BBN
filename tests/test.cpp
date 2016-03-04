@@ -89,10 +89,10 @@ if(task == "print_func_kawmor"){
 
     print_func_kawmor( redshift_d, atof(map_parameters["m_x"].c_str())/2., &Spectrum_and_Precision_Parameters);
 }
-if(task == "integrate_dsigma_compton"){
+if(task == "integrate_dsigma_compton" || task =="integrate_dsigma_phph" || task == "integrate_dsigma_pair_creation"){
 
   string redshift = "redshift";
-  double redshift_d;
+  double redshift_d, E_g;
   string temperature = "temperature";
   if(argc==2)get_parameter_from_file(file_input,redshift);
   if(redshift=="default" && argc!=1){
@@ -101,8 +101,19 @@ if(task == "integrate_dsigma_compton"){
       else redshift_d=atof(map_parameters["redshift"].c_str());
     }
     else redshift_d=atof(map_parameters["redshift"].c_str());
+    for(int i = (Spectrum_and_Precision_Parameters.Energy_Table_Size-1); i>=0 ; i--){
 
-    integrate_dsigma_compton(atof(map_parameters["E_min_table"].c_str())/1000000,atof(map_parameters["m_x"].c_str())/10000.,redshift_d,&Spectrum_and_Precision_Parameters,&Output_Options);
+    E_g = Spectrum_and_Precision_Parameters.E_min_table*pow((Particle_Physics_Model.E_0)/Spectrum_and_Precision_Parameters.E_min_table,(double) i/(Spectrum_and_Precision_Parameters.Energy_Table_Size-1));
+
+    if(task == "integrate_dsigma_compton"){
+        integrate_dsigma_compton(E_g/(m_e+2*E_g),E_g,redshift_d,&Spectrum_and_Precision_Parameters,&Output_Options);
+      }
+    if(task == "integrate_dsigma_pair_creation"){
+      integrate_dsigma_pair_creation(m_e,E_g,redshift_d,&Spectrum_and_Precision_Parameters,&Output_Options);
+    }
+    if(task == "integrate_dsigma_phph")integrate_dsigma_phph(0.0001,10,redshift_d,&Spectrum_and_Precision_Parameters,&Output_Options);
+
+    }
 
 }
 

@@ -13,7 +13,7 @@
 
 #include "bbn/common.h"
 
-typedef double (*Spectrum)(double E, double  z, double E_0);
+typedef double (*Spectrum)(double E, double  z, double E_0, struct Structure_Output_Options * pt_Output_Options);
 typedef std::map<std::string, std::string> map_parameters;
 typedef std::map<std::string, Spectrum> map_spectrum;
 
