@@ -67,8 +67,10 @@ public:
     std::string calculation_mode;
     std::string photon_spectrum_choice;
     std::string photon_spectrum_file_name;
+    std::string photon_spectrum_function_name;
     std::string electron_spectrum_choice;
     std::string electron_spectrum_file_name;
+    std::string electron_spectrum_function_name;
     std::string spectrum_mode;
     std::string inverse_compton_scattering;
     std::string double_photon_pair_creation;

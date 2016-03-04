@@ -244,7 +244,6 @@ void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parame
 {
 
     map_spectrum map_spectrum;
-    attribute_map_spectrum(map_spectrum,map_parameters);
     int i=0;
     string name = "", value = "";
     string error_name="",error_value="";
@@ -277,9 +276,11 @@ void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parame
     pt_Spectrum_and_Precision_Parameters->Energy_Table_Size = atof(map_parameters["Energy_Table_Size"].c_str());
     pt_Spectrum_and_Precision_Parameters->E_min_table = atof(map_parameters["E_min_table"].c_str());
     pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice = map_parameters["photon_spectrum_choice"];
-    pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice = map_parameters["electron_spectrum_choice"];
     pt_Spectrum_and_Precision_Parameters->photon_spectrum_file_name = map_parameters["photon_spectrum_file_name"];
+    pt_Spectrum_and_Precision_Parameters->photon_spectrum_function_name = map_parameters["photon_spectrum_function_name"];
+    pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice = map_parameters["electron_spectrum_choice"];
     pt_Spectrum_and_Precision_Parameters->electron_spectrum_file_name = map_parameters["electron_spectrum_file_name"];
+    pt_Spectrum_and_Precision_Parameters->electron_spectrum_function_name = map_parameters["electron_spectrum_function_name"];
     pt_Spectrum_and_Precision_Parameters->spectrum_mode = map_parameters["spectrum_mode"];
     pt_Spectrum_and_Precision_Parameters->inverse_compton_scattering = map_parameters["inverse_compton_scattering"];
     pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation = map_parameters["double_photon_pair_creation"];
@@ -290,31 +291,16 @@ void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parame
     pt_Spectrum_and_Precision_Parameters->integration_method = map_parameters["integration_method"];
 
 
-    if(map_parameters["calculation_mode"] == "triangular" && map_parameters["photon_spectrum_choice"] == "Dirac") {
+    if(map_parameters["photon_spectrum_choice"] == "Dirac" || map_parameters["photon_spectrum_choice"]=="none") {
         pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum = no_photons_injected;
-    } else if(map_parameters["calculation_mode"] == "iterative" && map_parameters["photon_spectrum_choice"] == "Dirac") {
-        pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum = no_photons_injected;
-        // pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum = photon_dirac_spectrum_after_one_iteration;
-    } else {
-        if(map_parameters["photon_spectrum_choice"]=="none") {
-            pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum = no_photons_injected;
-        } else {
-            pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum = map_spectrum[map_parameters["Gamma_Spectrum"]];
-        }
+    }  else if(map_parameters["photon_spectrum_choice"] == "from_function"){
+            pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum = map_spectrum[map_parameters["photon_spectrum_function_name"]];
     }
-    if(map_parameters["calculation_mode"] == "triangular" && map_parameters["electron_spectrum_choice"] == "Dirac") {
+    if(map_parameters["electron_spectrum_choice"] == "Dirac" || map_parameters["electron_spectrum_choice"]=="none") {
         pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum = no_electrons_injected;
-    } else if(map_parameters["calculation_mode"] == "iterative" && map_parameters["electron_spectrum_choice"] == "Dirac") {
-        pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum = no_electrons_injected;
-        // pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum = electron_dirac_spectrum_after_one_iteration;
-    } else {
-        if(map_parameters["electron_spectrum_choice"]=="none") {
-            pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum = no_electrons_injected;
-        } else {
-            pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum = map_spectrum[map_parameters["Electron_Spectrum"]];
-        }
+    }  else if(map_parameters["electron_spectrum_choice"] == "from_function") {
+            pt_Spectrum_and_Precision_Parameters->Injected_Electron_Spectrum = map_spectrum[map_parameters["electron_spectrum_function_name"]];
     }
-
     if(map_parameters["integration_method"] == "simpson_1/3") {
         pt_Spectrum_and_Precision_Parameters->eval_max = 3;
         pt_Spectrum_and_Precision_Parameters->divisor = 6;

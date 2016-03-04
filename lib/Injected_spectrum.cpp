@@ -111,7 +111,7 @@ void Electron_dirac_spectrum_after_one_iteration(Structure_Particle_Physics_Mode
 /***************************************** Those are the only functions you will have to modify ! *****************************************/
 /******************************************************************************************************************************************/
 
-void attribute_map_spectrum(map_spectrum &map_spectrum,map_parameters &map_parameters)
+void attribute_map_spectrum(map_spectrum &map_spectrum)
 {
     map_spectrum["no_photons_injected"]=no_photons_injected;
     map_spectrum["no_electrons_injected"]=no_electrons_injected;
