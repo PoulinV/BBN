@@ -1,3 +1,8 @@
+/**
+ * @brief The main file of the program
+ * @file main.cpp
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -21,10 +26,18 @@ using namespace std;
 #include "bbn/test_functions.h"
 
 
+/**
+ * @brief the main function
+ *
+ * @param argc argument count
+ * @param argv arguments
+ *
+ * @return 0 on success otherwise 1
+ */
 int main(int argc, char** argv){
   if(argc!=2){
     cout <<"Error : you have not given an input file! \nPlease, restart cBBNFast with one '.ini' file. If you want to use default parameters, just give 'default_param.ini'." << endl;
-    return 0;
+    return 1;
   }
 
   mkdir("output",01777);
@@ -46,7 +59,7 @@ int main(int argc, char** argv){
   if(argc==2)get_parameter_from_file(file_input,task);
   if(task=="default" || argc==1) task=map_parameters["task"];
 
-  
+
   struct Structure_Particle_Physics_Model Particle_Physics_Model;
   struct Structure_Spectrum_and_Precision_Parameters Spectrum_and_Precision_Parameters;
   struct Structure_Scan_Parameters_and_Results Scan_Parameters_and_Results;
