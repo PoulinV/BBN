@@ -28,15 +28,6 @@ On MacOSx, the current version of clang not support OpenMP. If you wish to use B
 
     cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/g++ -DCMAKE_C_COMPILER=/usr/local/bin/gcc ..
 
-### Documentation
-
-To build the documentation, run the following command :
-
-    cd build
-    make doc
-
-The documentation will be generated in "build/doc".
-
 ## Run
 
 ### Add executable in your path
@@ -50,3 +41,19 @@ You can add the executable to your path in order to avoid switching directories 
 To choose the number of cores with which cBBNfast is running you can use the following command before launching the executable.
 
     OMP_NUM_THREADS=4 ./cbbn param.ini
+
+## Documentation
+
+To build the documentation, run the following commands :
+
+    cd build
+    make doc
+
+The documentation will be generated in "build/doc".
+
+## Tests
+
+To execute the test suite, run the following commands :
+
+    cd build
+    make test
