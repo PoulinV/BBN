@@ -2,6 +2,8 @@ project(bbn)
 
 cmake_minimum_required(VERSION 2.8)
 
+set(BBN_VERSION "0.1.0-devel") # cannot use project before required cmake 3.0
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
 include(CheckCPP11Flags)
@@ -24,3 +26,4 @@ add_subdirectory(include)
 add_subdirectory(lib)
 add_subdirectory(src)
 add_subdirectory(tests)
+add_subdirectory(doc)
