@@ -244,6 +244,7 @@ void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parame
 {
 
     map_spectrum map_spectrum;
+    attribute_map_spectrum(map_spectrum);
     int i=0;
     string name = "", value = "";
     string error_name="",error_value="";
@@ -294,6 +295,7 @@ void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parame
     if(map_parameters["photon_spectrum_choice"] == "Dirac" || map_parameters["photon_spectrum_choice"]=="none") {
         pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum = no_photons_injected;
     }  else if(map_parameters["photon_spectrum_choice"] == "from_function"){
+      cout << map_parameters["photon_spectrum_function_name"] << endl;
             pt_Spectrum_and_Precision_Parameters->Injected_Gamma_Spectrum = map_spectrum[map_parameters["photon_spectrum_function_name"]];
     }
     if(map_parameters["electron_spectrum_choice"] == "Dirac" || map_parameters["electron_spectrum_choice"]=="none") {
@@ -577,17 +579,19 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
             error_value = "yes";
         }
     } else if(name == "photon_spectrum_choice") {
-        check_name_spectrum(value, error_value);
+        if(value == "Dirac" || value == "none" || value == "universal" || value == "from_file" || value == "from_function") {
+          error_value = "no";
+        }
         if(error_value=="yes") {
-            cout << "The name of the injected photon spectrum is not reckognised. Please check that it is one among : 'Dirac', 'none', universal' or user specified 'name_of_your_function'."<<endl;
-            cout << "The function should have been correctly added in 'injected_spectrum.cpp' and 'injected_spectrum.h' before."<<endl;
+            cout << "The parameter " << name << "isn't reckognised Please check that it is one among : 'Dirac', 'none', 'universal', 'from_file' or 'from_function'."<<endl;
         }
     } else if(name == "electron_spectrum_choice") {
-        check_name_spectrum(value, error_value);
-        if(error_value=="yes") {
-            cout << "The name of the injected electron spectrum is not reckognised. Please check that it is one among : 'Dirac', 'none', universal' or user specified 'name_of_your_function'."<<endl;
-            cout << "The function should have been correctly added in 'injected_spectrum.cpp' and 'injected_spectrum.h' before."<<endl;
-        }
+      if(value == "Dirac" || value == "none" || value == "from_file" || value == "from_function") {
+        error_value = "no";
+      }
+      if(error_value=="yes") {
+          cout << "The parameter " << name << "isn't reckognised Please check that it is one among : 'Dirac', 'none', 'from_file' or 'from_function'."<<endl;
+      }
     } else if(name == "check_energy_conservation") {
         if(value == "yes" || value == "no") {
             error_value="no";
@@ -783,7 +787,20 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
                 error_value = "yes";
             }
         }
-    } else if(name == "spectrum_files") {
+    }else if(name == "photon_spectrum_function_name") {
+        check_name_spectrum(value,error_value);
+        if(error_value=="yes"){
+          cout << "The name of the injected photon spectrum is not reckognised. Please check."<< endl;
+          cout << "The function should have been correctly added in 'injected_spectrum.cpp' and 'injected_spectrum.h' before. " << endl;
+        }
+    } else if(name == "electron_spectrum_function_name") {
+      check_name_spectrum(value,error_value);
+      if(error_value=="yes"){
+        cout << "The name of the injected electron spectrum is not reckognised. Please check."<< endl;
+        cout << "The function should have been correctly added in 'injected_spectrum.cpp' and 'injected_spectrum.h' before. " << endl;
+      }
+    }
+     else if(name == "spectrum_files") {
         if(value=="automatic") {
             error_value="no";
         } else {
