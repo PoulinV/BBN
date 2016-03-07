@@ -898,7 +898,7 @@ double compute_electrons_kernel(double E_e,
       ICS_e = 0;
   }
 
-  if(pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation=="yes" && E_e >= E_c && Gamma_Spectrum != 0) {
+  if(pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation=="yes" && E_e >= E_c/2. && Gamma_Spectrum != 0) {
       DP = Gamma_Spectrum * dsigma_pair_creation_v2(z,E_e_prime,E_e,pt_Spectrum_and_Precision_Parameters,pt_Output_Options);
       if(DP<0) {
           DP = 0.;
@@ -981,7 +981,7 @@ double E_phph = m_e*m_e/(T_0*(1+z));
                    else {
                        rate_PP = 0.;
                    }
-                   if(pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation=="yes" && E >= E_c) {
+                   if(pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation=="yes" && E >= E_c/2.) {
                        rate_DP=rate_pair_creation_v2(E,z,pt_Spectrum_and_Precision_Parameters);
                    } else {
                        rate_DP = 0.;
@@ -1034,7 +1034,7 @@ void integration_distribution_over_kernel(Structure_Particle_Physics_Model * pt_
         double &resultat_photons)
 {
 
-    double E_j, E_j_plus_1, E_j_minus_1, dE_j, E_e_ICS;
+    double E_j, E_j_plus_1, E_j_minus_1, dE_j, dlogE_j;
     double Rate_photons_E_j, Rate_electrons_E_j;
     double E_c = E_c_0/(1+z), E_x = E_x_0/(1+z);
     double E_phph = m_e*m_e/(T_0*(1+z));
@@ -1044,8 +1044,13 @@ void integration_distribution_over_kernel(Structure_Particle_Physics_Model * pt_
     double E_s, x_j, gamma_prime;
 
     E_j = pt_Spectrum_and_Precision_Parameters->E_min_table*pow(E_max/pt_Spectrum_and_Precision_Parameters->E_min_table,(double) step/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1));
-    E_j_plus_1 = pt_Spectrum_and_Precision_Parameters->E_min_table*pow(E_max/pt_Spectrum_and_Precision_Parameters->E_min_table,((double) step+1)/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1));
-    E_j_minus_1 = pt_Spectrum_and_Precision_Parameters->E_min_table*pow(E_max/pt_Spectrum_and_Precision_Parameters->E_min_table,((double) step-1)/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1));
+    // E_j_plus_1 = pt_Spectrum_and_Precision_Parameters->E_min_table*pow(E_max/pt_Spectrum_and_Precision_Parameters->E_min_table,((double) step+1)/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1));
+    // E_j_minus_1 = pt_Spectrum_and_Precision_Parameters->E_min_table*pow(E_max/pt_Spectrum_and_Precision_Parameters->E_min_table,((double) step-1)/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1));
+    dlogE_j = 2*(log(E_max/pt_Spectrum_and_Precision_Parameters->E_min_table))/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1);
+    // dlogE_j = 2*(log(E_max)-log(E_i))/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1-initial_step);
+    // E_j = exp(log(E_i)+(step-initial_step)*dlogE_j/2.);
+    cout << "dlogE_j " << dlogE_j << " E_j " << E_j << endl;
+    if(step == (pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1))dlogE_j/=2;
 
     // if(i<(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1)/2.){
     // 	E_max = E_switch;
@@ -1058,10 +1063,10 @@ void integration_distribution_over_kernel(Structure_Particle_Physics_Model * pt_
     // 	E_j_plus_1 = E_switch*pow(E_max/E_switch,((double) j+1)/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1));
     // 	E_j_minus_1 = E_switch*pow(E_max/E_switch,((double) j-1)/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1));
     // }
-    dE_j = (E_j_plus_1 - E_j_minus_1)/2.;
-
+    // if(step==(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1))dE_j = E_j - E_j_minus_1;
+    // else dE_j = (E_j_plus_1 - E_j_minus_1)/2.;
     if(Rate_electrons_E_e!=0) {
-      resultat_electrons += dE_j/Rate_electrons_E_e*compute_electrons_kernel(E_j,
+      resultat_electrons += dlogE_j/Rate_electrons_E_e*E_j*compute_electrons_kernel(E_j,
                                                                             E_i,
                                                                             z,
                                                                             pt_Electron_Spectrum->Spectrum[step],
@@ -1078,7 +1083,7 @@ void integration_distribution_over_kernel(Structure_Particle_Physics_Model * pt_
     }
 
     if(Rate_photons_E_g!=0) {
-        resultat_photons += dE_j/Rate_photons_E_g*compute_photons_kernel(E_j,
+        resultat_photons += dlogE_j/Rate_photons_E_g*E_j*compute_photons_kernel(E_j,
                                                                         E_i,
                                                                         z,
                                                                         pt_Electron_Spectrum->Spectrum[step],
@@ -1163,14 +1168,15 @@ void Triangular_Spectrum(Structure_Particle_Physics_Model * pt_Particle_Physics_
         // 	E_e_minus_1 = E_switch*pow(E_max/E_switch,((double) i-1)/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1));
         // }
         E_g = E_e;
-        dE = (E_e_plus_1 - E_e_minus_1)/2.;
-        error = pow(2*dE,3)/12.;
+        // if(i==(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1))dE = E_e - E_e_minus_1;
+        // else dE = (E_e_plus_1 - E_e_minus_1)/2.;
+        dE = E_e - E_e_minus_1;
+        // error = pow(2*dE,3)/12.;
         pt_Electron_Spectrum->Energy[i] = E_e;
         pt_Cascade_Spectrum->Energy[i] = E_g;
         Tmp_Electron_Spectrum.Energy[i] = E_e;
         Tmp_Photon_Spectrum.Energy[i] = E_g;
 
-        cout << "dE " << dE << endl;
 
         #pragma omp parallel sections // starts a new team
         {
@@ -1221,9 +1227,9 @@ void Triangular_Spectrum(Structure_Particle_Physics_Model * pt_Particle_Physics_
 
                     #pragma omp critical(dataupdate)
                     {
-                        pt_Cascade_Spectrum->Spectrum[i] += resultat_photons+error/Rate_photons_E_g;
+                        pt_Cascade_Spectrum->Spectrum[i] += resultat_photons;
                         Tmp_Photon_Spectrum.Spectrum[i] += resultat_photons*Rate_photons_E_g;
-                        pt_Electron_Spectrum->Spectrum[i] += resultat_electrons+error/Rate_electrons_E_e;
+                        pt_Electron_Spectrum->Spectrum[i] += resultat_electrons;
                         Tmp_Electron_Spectrum.Spectrum[i] += resultat_electrons*Rate_electrons_E_e;
                     }
                 }
