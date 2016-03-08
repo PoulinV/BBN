@@ -25,7 +25,7 @@ static void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Casc
     double f[pt_Spectrum_and_Precision_Parameters->eval_max];
     double cross_sections[pt_Spectrum_and_Precision_Parameters->eval_max];
     int n_step = pt_Spectrum_and_Precision_Parameters->n_step;
-    double h,dE;
+    double h,dE,dlogE;
     int y;
     if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice == "universal" || pt_Spectrum_and_Precision_Parameters->calculation_mode== "simplified") {
         E_max = E_0;
@@ -41,13 +41,15 @@ static void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Casc
     // }
     resultat = 0;
     dE = (E_max - pt_Spectrum_and_Precision_Parameters->E_min_table)/ (double) n_step;
+
     y = 0;
     // while(dE>pt_Spectrum_and_Precision_Parameters->E_min_table){
     //   dE/=10.;
     //   y++;
     // }
-    h = dE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
-
+    // h = dE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
+    dlogE = (log(E_max)- log(pt_Spectrum_and_Precision_Parameters->E_min_table))/(n_step-1);
+    h = dlogE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
     // cout << " dE = " << dE  << " y " << y << endl;
     // ds = (E*E_gamma_bb/(m_e*m_e) - 1)/ (double) (pt_Spectrum_and_Precision_Parameters->n_step-1);
 
@@ -58,8 +60,9 @@ static void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Casc
 
         // cout << "pt_Spectrum_and_Precision_Parameters->eval_max = " << pt_Spectrum_and_Precision_Parameters->eval_max << " h2 " << h2 << endl;
         for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++) {
+            E[eval]=exp(log(pt_Spectrum_and_Precision_Parameters->E_min_table)+eval*h+i*dlogE);
 
-            E[eval]=pt_Spectrum_and_Precision_Parameters->E_min_table+eval*h+i*dE;
+            // E[eval]=pt_Spectrum_and_Precision_Parameters->E_min_table+eval*h+i*dE;
             linearint(pt_Cascade_Spectrum->Energy, pt_Cascade_Spectrum->Spectrum, pt_Cascade_Spectrum->Energy.size(), E[eval], f[eval]);
             for(int j = i_min; j<=i_max; j++) {
                 cross_sections[eval] += cross_section(E[eval],j);
@@ -68,7 +71,8 @@ static void Spectrum_and_cross_sections_convolution(Structure_Spectrum * pt_Casc
                     cross_sections[eval] += cross_section(E[eval],j);
                 }
             }
-            resultat += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval]*cross_sections[eval];
+            resultat += dlogE*E[eval]/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval]*cross_sections[eval];
+            // resultat += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval]*cross_sections[eval];
             // cout << "eval " << eval << "E = " << E[eval] << " weight = " << pt_Spectrum_and_Precision_Parameters->weight[eval] << " f[eval] = "<< f[eval] <<" resultat = " << resultat << endl;
         }
     }

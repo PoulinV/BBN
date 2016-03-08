@@ -107,8 +107,8 @@ void print_results_scan(Structure_Output_Options * pt_Output_Options,
     ofstream file(name);
     if(file) {
         cout << "Printing in file " << name <<"."<< endl;
-        file<< "#Scan parameters : tau in [" <<pt_Scan_Parameters_and_Results->tau_min<<","<<pt_Scan_Parameters_and_Results->tau_max<<"] and zeta in ["<<pt_Scan_Parameters_and_Results->zeta_min<<","<<pt_Scan_Parameters_and_Results->zeta_max<<"]"<<endl;
-        file <<"#You have injected photon :" <<pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice <<"and electron :" << pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice << " and used the " <<pt_Spectrum_and_Precision_Parameters->calculation_mode<<" method."<<endl;
+        file<< "#Scan parameters: tau in [" <<pt_Scan_Parameters_and_Results->tau_min<<","<<pt_Scan_Parameters_and_Results->tau_max<<"] and zeta in ["<<pt_Scan_Parameters_and_Results->zeta_min<<","<<pt_Scan_Parameters_and_Results->zeta_max<<"]"<<endl;
+        file <<"#You have injected photon: " <<pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice <<" and electron: " << pt_Spectrum_and_Precision_Parameters->electron_spectrum_choice << " and used the " <<pt_Spectrum_and_Precision_Parameters->calculation_mode<<" method."<<endl;
         if(pt_Spectrum_and_Precision_Parameters->calculation_mode=="iterative") {
             file<<"#You have asked for "<<pt_Spectrum_and_Precision_Parameters->number_iterations_photon<<" iterations for the photons and " <<pt_Spectrum_and_Precision_Parameters->number_iterations_electron << "iterations for the electrons."<<endl;
         }
@@ -511,6 +511,8 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
 {
 
     char * pEnd;
+    ostringstream os;
+
     // cout << "value =_"<< value << "_ name =_" << name<<"_"<<endl;
     error_name = "no";
     if(name == "calculation_mode") {
@@ -731,6 +733,8 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
         if(value=="automatic") {
             error_value="no";
         } else {
+          os << value << ".dat" << endl;
+          value=os.str();
             ofstream file(value);
             if(file) {
                 error_value="no";
@@ -743,6 +747,8 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
         if(value=="automatic") {
             error_value="no";
         } else {
+          // os << value << ".dat" << endl;
+          // value=os.str();
             ofstream file(value);
             if(file) {
                 error_value="no";
@@ -755,6 +761,8 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
         if(value=="automatic") {
             error_value="no";
         } else {
+          os << value << ".dat" << endl;
+          value=os.str();
             ofstream file(value);
             if(file) {
                 error_value="no";

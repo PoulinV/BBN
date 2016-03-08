@@ -472,7 +472,7 @@ double print_interaction_rate(double z,
     ofstream file(name);
     if(file) {
         if(pt_Output_Options->BBN_constraints_verbose > 0) {
-            cout << "Printing in file " << name <<"."<<  endl;
+            cout << "Printing in file " << name <<  endl;
         }
     } else {
         cout << "I cannot open file " << name << ", please check that the folder exist." << endl;
