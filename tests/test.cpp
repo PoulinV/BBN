@@ -89,7 +89,7 @@ if(task == "print_func_kawmor"){
 
     print_func_kawmor( redshift_d, atof(map_parameters["m_x"].c_str())/2., &Spectrum_and_Precision_Parameters);
 }
-if(task == "integrate_dsigma_compton" || task =="integrate_dsigma_phph" || task == "integrate_dsigma_pair_creation"){
+if(task == "integrate_dsigma_compton" || task =="integrate_dsigma_phph" || task == "integrate_dsigma_pair_creation" || task == "integrate_dsigma_NPC"){
 
   string redshift = "redshift";
   double redshift_d, E_g;
@@ -111,7 +111,8 @@ if(task == "integrate_dsigma_compton" || task =="integrate_dsigma_phph" || task 
     if(task == "integrate_dsigma_pair_creation"){
       integrate_dsigma_pair_creation(m_e,E_g,redshift_d,&Spectrum_and_Precision_Parameters,&Output_Options);
     }
-    if(task == "integrate_dsigma_phph")integrate_dsigma_phph(0.0001,10,redshift_d,&Spectrum_and_Precision_Parameters,&Output_Options);
+    if(task == "integrate_dsigma_phph")integrate_dsigma_phph(E_g*pow(10,-3),E_g,redshift_d,&Spectrum_and_Precision_Parameters,&Output_Options);
+    if(task == "integrate_dsigma_NPC")integrate_dsigma_phph(E_g*pow(10,-3),E_g,redshift_d,&Spectrum_and_Precision_Parameters,&Output_Options);
 
     }
 

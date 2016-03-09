@@ -533,7 +533,7 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
             cout << "The task isn't reckognised, it has to be one among : 'compute_constraints_from_destruction_and_production', 'compute_constraints_from_destruction_only' and 'compute_cascade_spectrum'." << endl;
         }
     } else if(name == "task_test") {
-        if(value == "print_interaction_rate" || value == "print_polylog" || value == "print_func_kawmor" || value == "integrate_dsigma_compton" || value == "integrate_dsigma_phph" || value == "integrate_dsigma_pair_creation") {
+        if(value == "print_interaction_rate" || value == "print_polylog" || value == "print_func_kawmor" || value == "integrate_dsigma_compton" || value == "integrate_dsigma_phph" || value == "integrate_dsigma_pair_creation" || value == "integrate_dsigma_NPC") {
             error_value = "no";
             error_name = "no";
 

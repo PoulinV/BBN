@@ -4,7 +4,8 @@
 #include "bbn/BBN_constraints.h"
 #include "bbn/tools.h"
 #include "bbn/test_functions.h"
-
+#include "bbn/photons.h"
+#include "bbn/electrons.h"
 
 using namespace std;
 
@@ -62,17 +63,18 @@ double integrate_dsigma_compton(double E_MIN,
                                 Structure_Output_Options * pt_Output_Options)
 {
 
-    double h, dE, f[pt_Spectrum_and_Precision_Parameters->eval_max],E[pt_Spectrum_and_Precision_Parameters->eval_max], result;
+    double h, dlogE, f[pt_Spectrum_and_Precision_Parameters->eval_max],E[pt_Spectrum_and_Precision_Parameters->eval_max], result;
     double  result_eval = 0.;
+    //  E_MIN = E_MAX*pow(10,-3);
     int n_step = pt_Spectrum_and_Precision_Parameters->n_step;
-    int y=0;
+    int y=3;
 
-    dE = (E_MAX-E_MIN)/ (double) (pt_Spectrum_and_Precision_Parameters->n_step);
-    while(dE>E_MIN) {
-        dE/=10.;
-        y++;
-    }
-    h = dE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
+    dlogE = (log(E_MAX)-log(E_MIN))/ (double) (pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step);
+    // while(dE>E_MIN) {
+    //     dE/=10.;
+    //     y++;
+    // }
+    h = dlogE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
     result = 0.;
     {
         int end = pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step;
@@ -81,11 +83,10 @@ double integrate_dsigma_compton(double E_MIN,
           result_eval = 0;
             for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++) {
 
-                E[eval]=E_MIN+i*dE+eval*h;
+                E[eval]=exp(log(E_MIN)+i*dlogE+eval*h);
 
                 f[eval]=dsigma_compton(E_MAX,z,E[eval],pt_Output_Options);
-                // f[eval]=integrand_rate_pair_creation_v2(E_gamma,E[eval])/(exp(E[eval]/T)-1);
-                result_eval += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
+                result_eval += dlogE*E[eval]/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
                 // cout << "eval " << eval << "E = " << E[eval] << " weight = " << pt_Spectrum_and_Precision_Parameters->weight[eval] << " f[eval] = "<< f[eval] <<" resultat = " << result_eval << endl;
             }
             #pragma omp atomic
@@ -96,49 +97,89 @@ double integrate_dsigma_compton(double E_MIN,
 
     return result;
 }
+double integrate_dsigma_NPC(double E_MIN,
+                                double E_MAX,
+                                double z,
+                                Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+                                Structure_Output_Options * pt_Output_Options)
+{
+
+    double h, dlogE, f[pt_Spectrum_and_Precision_Parameters->eval_max],E[pt_Spectrum_and_Precision_Parameters->eval_max], result;
+    double  result_eval = 0.;
+    //  E_MIN = E_MAX*pow(10,-3);
+    int n_step = pt_Spectrum_and_Precision_Parameters->n_step;
+    int y=2;
+
+    dlogE = (log(E_MAX)-log(E_MIN))/ (double) (pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step);
+    // while(dE>E_MIN) {
+    //     dE/=10.;
+    //     y++;
+    // }
+    h = dlogE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
+    result = 0.;
+    {
+        int end = pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step;
+        #pragma omp parallel for ordered schedule(static) private(result_eval,f,E) shared(result)
+        for(int i=0; i<end; i++) {
+          result_eval = 0;
+            for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++) {
+
+                E[eval]=exp(log(E_MIN)+i*dlogE+eval*h);
+
+                f[eval]=dsigma_NPC(E_MAX,z,E[eval],pt_Output_Options);
+                result_eval += dlogE*E[eval]/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
+                // cout << "eval " << eval << "E = " << E[eval] << " weight = " << pt_Spectrum_and_Precision_Parameters->weight[eval] << " f[eval] = "<< f[eval] <<" resultat = " << result_eval << endl;
+            }
+            #pragma omp atomic
+            result +=result_eval;
+        }
+    }
+    cout << "(integrate_dsigma_NPC: ) E_max = " << E_MAX << " result " << result << " ratio = " << rate_NPC(E_MAX,z)/result << endl;
+
+    return result;
+}
 double integrate_dsigma_pair_creation(double E_MIN,
                                       double E_MAX,
                                       double z,
                                       Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
                                       Structure_Output_Options * pt_Output_Options)
 {
-  bool flag = false;
-  double h, dE, f[pt_Spectrum_and_Precision_Parameters->eval_max],E[pt_Spectrum_and_Precision_Parameters->eval_max], result, result_eval;
+  // bool flag = false;
+  double h, dE, dlogE, f[pt_Spectrum_and_Precision_Parameters->eval_max],E[pt_Spectrum_and_Precision_Parameters->eval_max], result, result_eval;
   int n_step = pt_Spectrum_and_Precision_Parameters->n_step;
   int y=0, count = 0;
   double result_old = 0.0, precision = 1e-6;
-  dE = (E_MAX-E_MIN)/ (double) (pt_Spectrum_and_Precision_Parameters->n_step-1);
-  while(dE>E_MIN) {
-      dE/=10.;
-      y++;
-  }
-  h = dE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
+  // dE = (E_MAX-E_MIN)/ (double) (pt_Spectrum_and_Precision_Parameters->n_step-1);
+  dlogE = (log(E_MAX)-log(E_MIN))/ (double) (pt_Spectrum_and_Precision_Parameters->n_step-1);
+  // while(dE>E_MIN) {
+  //     dE/=10.;
+  //     y++;
+  // }
+  // h = dE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
+  h = dlogE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
   result = 0.;
   {
       int end = pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1;
-      #pragma omp parallel for ordered schedule(dynamic) private(result_eval) shared(result, count)
+      #pragma omp parallel for ordered schedule(dynamic) private(result_eval) shared(result)
       for(int i=0; i<end; i++){
 
 
         double result_eval = 0.;
         double f[pt_Spectrum_and_Precision_Parameters->eval_max],E[pt_Spectrum_and_Precision_Parameters->eval_max];
-        if(flag)continue;
+        // if(flag)continue;
           result_eval = 0.;
           for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++) {
 
-              E[eval]=E_MIN+i*dE+eval*h;
+              E[eval]=exp(log(E_MIN)+i*dlogE+eval*h);
 
               f[eval]=dsigma_pair_creation_v2(z,E[eval],E_MAX,pt_Spectrum_and_Precision_Parameters,pt_Output_Options);
               // f[eval]=integrand_rate_pair_creation_v2(E_gamma,E[eval])/(exp(E[eval]/T)-1);
-              result_eval += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
+              result_eval += dlogE*E[eval]/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
               // cout << "eval " << eval << "E = " << E[eval] << " weight = " << pt_Spectrum_and_Precision_Parameters->weight[eval] << " f[eval] = "<< f[eval] <<" resultat = " << resultat << endl;
           }
           #pragma omp critical(dataupdate)
           result +=result_eval;
-          if(flag == false && i != 0 && (result_eval)/result<precision){
-            #pragma omp critical(dataupdate)
-            flag = true;
-          }
+
 
 
       }
@@ -305,13 +346,14 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
     vector<double> Electron_Spectrum_Integrated_Over_Kernel;
     vector<double> Electron_Spectrum_Integrated_Over_Kernel_energy;
     double int_bb = 2*pow(T_0*(1+z),3)*1.20205/(pi*pi);
-    double dE_3 = (pt_Particle_Physics_Model->E_0 - pt_Spectrum_and_Precision_Parameters->E_min_table) / (double) (pt_Spectrum_and_Precision_Parameters->z_step - 1);
-    while(dE > pt_Spectrum_and_Precision_Parameters->E_min_table) {
-        dE/=10.;
-        y++;
-    }
-    h = dE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
-
+    double dlogE;
+    // while(dE > pt_Spectrum_and_Precision_Parameters->E_min_table) {
+    //     dE/=10.;
+    //     y++;
+    // }
+    // h = dE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
+    dlogE = (log(pt_Particle_Physics_Model->E_0)-log(pt_Spectrum_and_Precision_Parameters->E_min_table))/(pt_Spectrum_and_Precision_Parameters->n_step-1);
+    h = dlogE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
     if(pt_Spectrum_and_Precision_Parameters->photon_spectrum_choice=="universal") {
         {
             int end = pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1;
@@ -338,7 +380,8 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
                     // } else {
                     //     E[eval]=E[0]+eval*h;
                     // }
-                    E[eval]=pt_Spectrum_and_Precision_Parameters->E_min_table+j*dE+eval*h;
+                    // E[eval]=pt_Spectrum_and_Precision_Parameters->E_min_table+j*dE+eval*h;
+                    E[eval]=exp(log(pt_Spectrum_and_Precision_Parameters->E_min_table)+j*dlogE+eval*h);
 
                     if(E[eval]<pt_Particle_Physics_Model->E_0) {
                         linearint(pt_Gamma_Spectrum->Energy, pt_Gamma_Spectrum->Spectrum, pt_Gamma_Spectrum->Energy.size(), E[eval], f[eval]);
@@ -349,7 +392,8 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
                     // rate_E = 1;
                     f[eval]*=rate_E*E[eval];
                     // f[eval]=universal_spectrum(E[eval],   z, pt_Particle_Physics_Model->E_0)*E[eval];
-                    resultat_photons += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
+                    resultat_photons += dlogE*E[eval]/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
+                    // resultat_photons += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
 
                 }
 
@@ -392,7 +436,8 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
                     // } else {
                     //     E[eval]=E[0]+eval*h;
                     // }
-                    E[eval]=pt_Spectrum_and_Precision_Parameters->E_min_table+j*dE+eval*h;
+                    // E[eval]=pt_Spectrum_and_Precision_Parameters->E_min_table+j*dE+eval*h;
+                    E[eval]=exp(log(pt_Spectrum_and_Precision_Parameters->E_min_table)+j*dlogE+eval*h);
 
                     if(E[eval]<pt_Particle_Physics_Model->E_0) {
 
@@ -405,9 +450,10 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
                     // if(pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation=="yes" && E[eval] >= E_c) {
                     //     rate_E+=rate_pair_creation_v2(E[eval],z,pt_Spectrum_and_Precision_Parameters);
                     // }
-                    rate_E = 1;
-                    f[eval]*=rate_E*E[eval];
-                    resultat_photons += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
+                    // rate_E = 1;
+                    f[eval]*=E[eval];
+                    resultat_photons += dlogE*E[eval]/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
+                    // resultat_photons += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
 
                     if(E[eval]<pt_Particle_Physics_Model->E_0) {
 
@@ -418,7 +464,7 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
                     }
                     g[eval]*=E[eval];
                     // g[eval]*=E[eval]*(integrator_simpson_rate_inverse_compton_v2(z,E_cmb_min,E_cmb_max,E[eval],pt_Spectrum_and_Precision_Parameters));
-                    resultat_electrons += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*g[eval];
+                    resultat_electrons += dlogE*E[eval]/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*g[eval];
                     // #pragma omp critical(print)
                     // {
                     //   cout << "eval " << eval << "E = " << E[eval] << " weight = " << pt_Spectrum_and_Precision_Parameters->weight[eval] << " f[eval] = "<< f[eval] <<" resultat = " << resultat_photons << endl;

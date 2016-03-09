@@ -4,6 +4,8 @@
 #include "bbn/BBN_constraints.h"
 #include "bbn/tools.h"
 #include "bbn/test_functions.h"
+#include "bbn/photons.h"
+#include "bbn/electrons.h"
 
 using namespace std;
 
