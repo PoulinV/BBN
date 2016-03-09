@@ -10,18 +10,21 @@
 using namespace std;
 
 /**
-* Processus udergone by photon population
+* @brief The photons module :
+* Contains all processes udergone by the photon population.
+* @file photons.cpp
 */
 
 double  dsigma_compton(double  x, double  z, double x_prime, Structure_Output_Options * pt_Output_Options)
 {
-
+  ///Text book result taken from Kawasaki and Moroi 1995 ApJ 452:506-514.
     double  dsigma = pi*pow(r_e,2)*m_e/pow(x,2)*(x/x_prime+x_prime/x+pow(m_e/x_prime-m_e/x,2)-2*m_e*(1/x_prime-1/x))*n_e*pow(1+z,3);
     return dsigma;
 
 }
 double  dsigma_phph(double  x, double  z,  double x_prime, Structure_Output_Options * pt_Output_Options)
 {
+  /// Taken from Svensson and Zdziarski 1990, ApJ, 349:415-428.
 
     double  dsigma = pow(T_0*(1+z),6)*8*pow(pi,4)*1112*pow(ALPHA*r_e,2)*pow(m_e,-6)*pow(x,2)*pow(1-x_prime/x+pow(x_prime/x,2),2)/(63*10125*pi);
     return dsigma;
@@ -30,6 +33,7 @@ double  dsigma_phph(double  x, double  z,  double x_prime, Structure_Output_Opti
 
 double dsigma_NPC(double E_gamma, double z, double E_e, Structure_Output_Options * pt_Output_Options)
 {
+  ///Taken from Kawasaki and Moroi 1995 ApJ 452:506-514. It has been derived in Berestetskii, Lifschitz and Pitaevskii 1971, Relativistic Quantum Theory (Oxford: Pergamon Press).
 
     double p = sqrt(E_e*E_e-m_e*m_e);
     double E_pos = E_gamma-E_e-m_e;
@@ -47,11 +51,55 @@ double dsigma_NPC(double E_gamma, double z, double E_e, Structure_Output_Options
                      *(-4./3-2*E_pos*E_e*(p_pos*p_pos+p*p)/(p*p*p_pos*p_pos)+m_e*m_e*(l*E_pos/pow(p,3)+l_pos*E_e/pow(p_pos,3)-l*l_pos/(p_pos*p))
                        +L*(-8*E_pos*E_e/(3*p_pos*p)+E_gamma*E_gamma/pow(p_pos*p,3)*(pow(E_pos*E_e,2)+pow(p_pos*p,2)-m_e*m_e*E_pos*E_e)-m_e*m_e*E_gamma/(2*p_pos*p)*(l_pos*(E_pos*E_e-pow(p_pos,2))/pow(p_pos,3)+l*(E_pos*E_e-p*p)/pow(p,3))));
 // n_H+(Z^2 = 4)*n_He = (1-Y)n_b+Y*n_He = n_b
-    return result;
+    return 2*result;
 }
 
-double function_integrand_pair_creation_v2(double x_gamma, double gamma_e, double x_bb)
+double  rate_compton(double  x, double  z)
 {
+  ///Text book result taken from Kawasaki and Moroi 1995 ApJ 452:506-514.
+    double X = 2*x/m_e;
+    double sigma_cs = 2*pi*pow(r_e,2)/X*((1-4./X-8./pow(X,2))*log(1+X)+0.5+8./X-1./(2*pow(1+X,2)));
+    double Gamma = sigma_cs*n_e*pow(1+z,3);
+    return Gamma;
+
+}
+double  rate_NPC(double  x, double  z)
+{
+  ///Taken from Kawasaki and Moroi 1995 ApJ 452:506-514. It has been derived in Maximon 1968, J. Res. NBS, 72(B), 79.
+    double	k = x/m_e;
+    double  rho = (2*k-4)/(k+2+2*pow(2*k,0.5));
+    double  sigma_PCN;
+    if(k >= 4) {
+        sigma_PCN = ALPHA*pow(r_e,2)
+                    *(28./9*log(2*k)-218./27
+                      +pow(2/k,2)*(2./3*pow(log(2*k),3)-pow(log(2*k),2)+(6-pi*pi/3)*log(2*k)+2*1.20205+pi*pi/6-7./2.)
+                      -pow(2/k,4)*(3./16.*log(2*k)+1./8.)
+                      -pow(2/k,6)*(29./2304*log(2*k)-77./13824.));
+    } else {
+        sigma_PCN = ALPHA*pow(r_e,2)*2*pi/3.*pow((k-2)/k,3)*(1+0.5*rho+23./40.*pow(rho,2)+11./60.*pow(rho,3)+29./960.*pow(rho,4));
+    }
+    double Gamma = sigma_PCN*pow(1+z,3)*eta*n_y_0;			// n_H+(Z^2 = 4)*n_He = (1-Y)n_b+Y*n_b = n_b
+    if(Gamma<0) {
+        Gamma = 0;
+    }
+    return Gamma;
+}
+
+double  rate_gg_scattering(double  x, double  z)
+{
+    /// Taken from Svensson and Zdziarski 1990, ApJ, 349:415-428.
+    double  Gamma;
+    Gamma = 1946./(50625*pi)*pow(ALPHA*r_e,2)*pow(x,3)*8*pow(pi,4)*pow(T_0*(1+z)/m_e,6)/63.;
+
+    return Gamma;
+}
+
+
+
+double integrand_dsigma_pair_creation_v2(double x_gamma, double gamma_e, double x_bb)
+{
+  /// It is taken from Zdziarski 1988 ApJ 335:786-802. To be used with dsigma_pair_creation_v2.
+
     double gamma_prime = x_gamma - gamma_e;
     double r = 1./2*(gamma_e/gamma_prime+gamma_prime/gamma_e);
     double E_s = x_gamma*x_gamma/(4*gamma_e*gamma_prime);
@@ -72,6 +120,7 @@ double dsigma_pair_creation_v2(double z,
                                Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
                                Structure_Output_Options * pt_Output_Options)
 {
+  /// It is taken from Zdziarski 1988 ApJ 335:786-802. To be used with integrand_dsigma_pair_creation_v2.
 
     double gamma_e, gamma_prime, x_gamma;
     double E_gamma_bb,x_cmb_min, x_cmb_max, E_s;
@@ -117,7 +166,7 @@ double dsigma_pair_creation_v2(double z,
             // x[eval]=exp(log(x_cmb_min)+eval*h2+j*dlogx);
 
             if((exp(x[eval]/theta)-1)!=0.) {
-                f[eval]=function_integrand_pair_creation_v2(x_gamma,gamma_e,x[eval])*x[eval]*x[eval]/(exp(x[eval]/theta)-1);
+                f[eval]=integrand_dsigma_pair_creation_v2(x_gamma,gamma_e,x[eval])*x[eval]*x[eval]/(exp(x[eval]/theta)-1);
             } else {
                 f[eval] = 0;
             }
@@ -141,11 +190,13 @@ double dsigma_pair_creation_v2(double z,
     if(pt_Output_Options->EM_cascade_verbose > 2) {
         cout << "(dsigma_pair_creation_v2 : )" <<" z " << z << " E_e "<< E_e << "E_gamma "<< E_gamma << " result "<<  result << endl;
     }
-    return 2*result; //We treat positron and electron on an equal footing, hence the factor 2.
+    return 2*result/m_e; //We treat positron and electron on an equal footing, hence the factor 2.
 }
 
-double function_integrand_pair_creation(double E_e, double E_gamma, double E_gamma_bar)
+double integrand_dsigma_pair_creation(double E_e, double E_gamma, double E_gamma_bar)
 {
+  /// Taken from Kawasaki and Moroi 1995 ApJ 452:506-514. To be used with dsigma_pair_creation.
+
     double E_e_prime = E_gamma+E_gamma_bar-E_e, A, B, C, D;
 
     A = 4*pow(E_e+E_e_prime,2)/(E_e*E_e_prime)*log(4*E_gamma_bar*E_e*E_e_prime/(m_e*m_e*(E_e+E_e_prime)));
@@ -173,7 +224,7 @@ double dsigma_pair_creation(double z,
                             Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
                             Structure_Output_Options * pt_Output_Options)
 {
-
+    /// Diffential pair creation cross section as given in Kawasaki and Moroi 1995 ApJ 452:506-514. To be used with integrand_dsigma_pair_creation.
     double gamma_e, gamma_prime, x_j;
     double E_gamma_bb,E_cmb_min, E_cmb_max, E_s;
     double E[pt_Spectrum_and_Precision_Parameters->eval_max], f[pt_Spectrum_and_Precision_Parameters->eval_max],h2;
@@ -216,7 +267,7 @@ double dsigma_pair_creation(double z,
                 E[eval]=E_cmb_min+eval*h2+j*dE;
 
                 if((exp(E[eval]/T)-1)!=0.) {
-                    f[eval]=function_integrand_pair_creation(E_e,E_gamma,E[eval])/(exp(E[eval]/T)-1);
+                    f[eval]=integrand_dsigma_pair_creation(E_e,E_gamma,E[eval])/(exp(E[eval]/T)-1);
                 } else {
                     f[eval] = 0;
                 }
@@ -252,6 +303,8 @@ double dsigma_pair_creation(double z,
 
 double integrand_rate_pair_creation(double s)
 {
+  /// Taken from Kawasaki and Moroi 1995 ApJ 452:506-514. To be used with rate_pair_creation.
+
     double beta = pow(1-(4*m_e*m_e/s),0.5);
     double result;
     if(beta>=0) {
@@ -264,7 +317,8 @@ double integrand_rate_pair_creation(double s)
     return result;
 }
 double rate_pair_creation(double E_gamma, double z, Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters)
-{ /// Pair reation rate as given in Kawasaki and Moroi 1995 ApJ 452:506-514. To be used with integrand_rate_pair_creation.
+{
+  /// Pair creation rate as given in Kawasaki and Moroi 1995 ApJ 452:506-514. To be used with integrand_rate_pair_creation.
     double E_gamma_bb = 2.701*T_0*(1+z);
     // if(E_gamma > 10000)E_gamma = 10000.;
     // cout << "E_gamma_bb = " << E_gamma_bb << endl;
@@ -354,35 +408,7 @@ double rate_pair_creation(double E_gamma, double z, Structure_Spectrum_and_Preci
     // return 1/(8*E*E)*int_bb/pow(E_gamma_bb,2)*resultat;
 }
 
-double integrand_rate_pair_creation_v2(double E_gamma, double E_gamma_bar)
-{   /// Old result by Gould and Schreder 1967 PRL Vol 155,5.
-    /// Found to be wrong in Brown, Mikaelian and Gould 1973 Ap. Lettze, 14, 203. Re-updated in Zdziarski 1988 ApJ 335:786-802.
-    double s_0;
-    double beta_0, beta_0_squared;
-    double w_0;
-    double L_0, L_prime_0;
-    double result;
-    int N = 100;
-    s_0 = E_gamma*E_gamma_bar/(m_e*m_e);
-    beta_0_squared = 1-1/s_0;
-    if(beta_0_squared>=0) {
-        beta_0 = pow(beta_0_squared,0.5);
-        w_0 = (1+beta_0)/(1-beta_0);
-        L_prime_0 = pi*pi/12;
-        for(int i = 1; i <= N ; i++) {
-            L_prime_0 -= pow(-1,i-1)*pow(i,-2)*pow(w_0,-i);
-        }
-        L_0 = 0.5*pow(log(w_0),2)+L_prime_0;
-        result = (1+beta_0_squared)/(1-beta_0_squared)*log(w_0)-beta_0_squared*log(w_0)-pow(log(w_0),2)-4*beta_0/(1-beta_0_squared)
-                 +2*beta_0+4*log(w_0)*log(w_0+1)-L_0;
-    } else {
-        result = 0;
-    }
-
-    return result;
-
-}
-double integrand_rate_pair_creation_v3(double x_gamma, double x_gamma_bar, Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters)
+double integrand_rate_pair_creation_v2(double x_gamma, double x_gamma_bar, Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters)
 {
    /// Parameterization introduced in Zdziarski 1988 ApJ 335:786-802.
 
@@ -404,8 +430,7 @@ double integrand_rate_pair_creation_v3(double x_gamma, double x_gamma_bar, Struc
 }
 double rate_pair_creation_v2(double E_gamma, double z, Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters)
 {
-    /// To be used with integrand_rate_pair_creation_v2 or integrand_rate_pair_creation_v3.
-    /// It is taken from Zdziarski 1988 ApJ 335:786-802.
+    /// It is taken from Zdziarski 1988 ApJ 335:786-802. To be used with integrand_rate_pair_creation_v2.
     double h, dE, dlogE, E[pt_Spectrum_and_Precision_Parameters->eval_max],f[pt_Spectrum_and_Precision_Parameters->eval_max], T=T_0*(1+z), result;
     double E_gamma_bb = 2.701*T_0*(1+z);
     double E_cmb_min = m_e*m_e/E_gamma;
@@ -431,13 +456,10 @@ double rate_pair_creation_v2(double E_gamma, double z, Structure_Spectrum_and_Pr
 
         // cout << "pt_Spectrum_and_Precision_Parameters->eval_max = " << pt_Spectrum_and_Precision_Parameters->eval_max << " h2 " << h2 << endl;
         for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++) {
-            // E[eval]=E_cmb_min+i*dE+eval*h;
             E[eval]=exp(log(E_cmb_min)+i*dlogE+eval*h);
 
-            f[eval]=integrand_rate_pair_creation_v3(E_gamma/m_e,E[eval]/m_e,pt_Spectrum_and_Precision_Parameters)/(exp(E[eval]/T)-1);
-            // f[eval]=integrand_rate_pair_creation_v2(E_gamma,E[eval])/(exp(E[eval]/T)-1);
+            f[eval]=integrand_rate_pair_creation_v2(E_gamma/m_e,E[eval]/m_e,pt_Spectrum_and_Precision_Parameters)/(exp(E[eval]/T)-1);
             result += dlogE*E[eval]/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
-            // result += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
             // cout << "eval " << eval << "E = " << E[eval] << " weight = " << pt_Spectrum_and_Precision_Parameters->weight[eval] << " f[eval] = "<< f[eval] <<" resultat = " << resultat << endl;
         }
     }
@@ -448,45 +470,4 @@ double rate_pair_creation_v2(double E_gamma, double z, Structure_Spectrum_and_Pr
     // return pow(r_e,2)*pow(m_e,4)/(pi*E_gamma*E_gamma)*result;
     return 3*sigma_T*A*m_e/(8*E_gamma*E_gamma)*result;
     // return 3*sigma_T/(E_gamma)*result;
-}
-
-
-double  rate_compton(double  x, double  z)
-{
-
-    double X = 2*x/m_e;
-    double sigma_cs = 2*pi*pow(r_e,2)/X*((1-4./X-8./pow(X,2))*log(1+X)+0.5+8./X-1./(2*pow(1+X,2)));
-    double Gamma = sigma_cs*n_e*pow(1+z,3);
-    return Gamma;
-
-}
-double  rate_NPC(double  x, double  z)
-{
-
-    double	k = x/m_e;
-    double  rho = (2*k-4)/(k+2+2*pow(2*k,0.5));
-    double  sigma_PCN;
-    if(k >= 4) {
-        sigma_PCN = ALPHA*pow(r_e,2)
-                    *(28./9*log(2*k)-218./27
-                      +pow(2/k,2)*(2./3*pow(log(2*k),3)-pow(log(2*k),2)+(6-pi*pi/3)*log(2*k)+2*1.20205+pi*pi/6-7./2.)
-                      -pow(2/k,4)*(3./16.*log(2*k)+1./8.)
-                      -pow(2/k,6)*(29./2304*log(2*k)-77./13824.));
-    } else {
-        sigma_PCN = ALPHA*pow(r_e,2)*2*pi/3.*pow((k-2)/k,3)*(1+0.5*rho+23./40.*pow(rho,2)+11./60.*pow(rho,3)+29./960.*pow(rho,4));
-    }
-    double Gamma = sigma_PCN*pow(1+z,3)*eta*n_y_0;			// n_H+(Z^2 = 4)*n_He = (1-Y)n_b+Y*n_b = n_b
-    if(Gamma<0) {
-        Gamma = 0;
-    }
-    return Gamma;
-}
-
-double  rate_gg_scattering(double  x, double  z)
-{
-
-    double  Gamma;
-    Gamma = 1946./(50625*pi)*pow(ALPHA*r_e,2)*pow(x,3)*8*pow(pi,4)*pow(T_0*(1+z)/m_e,6)/63.;
-
-    return Gamma;
 }

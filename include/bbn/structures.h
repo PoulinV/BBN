@@ -78,6 +78,7 @@ public:
     std::string compton_scattering;
     std::string photon_photon_diffusion;
     std::string check_energy_conservation;
+    std::string ensure_energy_conservation;
     std::string integration_method;
 
     Spectrum Injected_Gamma_Spectrum;

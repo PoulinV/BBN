@@ -10,7 +10,9 @@
 using namespace std;
 
 /**
-* Processus undergone by electron population
+* @brief  the electron module :
+* Contains all processes undergone by the electron population.
+* @file electrons.cpp
 */
 
 double dsigma_inverse_compton_electron_spectrum(double z,
@@ -19,6 +21,8 @@ double dsigma_inverse_compton_electron_spectrum(double z,
         Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
         Structure_Output_Options * pt_Output_Options)
 {
+  /// Parameterization introduced in Zdziarski 1988 ApJ 335:786-802.
+  /// Can be used to compute the gamma spectrum by setting gamma_prime -> gamma_e - (E_photon/m_e). It has been checked to work.
     double T = T_0*(1+z);
     double A = 8*pi*pow(m_e/(2*pi),3);
     double a, b;
@@ -42,7 +46,7 @@ double dsigma_inverse_compton_electron_spectrum(double z,
     a = r*LI2;
     // a = r*polylog_2(exp(-k),pt_Spectrum_and_Precision_Parameters);
     b = 2*k*(log(1-exp(-k))+k*Eps_0+Eps_1);
-    result = 3*sigma_T*A*theta*theta/(4*gamma_e*gamma_e)*(a-b);
+    result = 3*sigma_T*A*theta*theta/(4*gamma_e*gamma_e)*(a-b)/m_e;
     // if(result < 0) {
     //     result = 0;
     // }
@@ -63,6 +67,7 @@ double dsigma_inverse_compton_electron_spectrum_v2(double z,
         Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
         Structure_Output_Options * pt_Output_Options){
 
+  /// Taken from Zdziarski 1988 ApJ 335:786-802. Compute numerically the integral, only for checking i) the integration algorithm ii) the analytical formula.
   double T = T_0*(1+z);
   double A = 8*pi*pow(m_e/(2*pi),3);
   double r = 0.5*(gamma_e/gamma_prime + gamma_prime/gamma_e);
@@ -98,6 +103,8 @@ return 3*A*sigma_T*result/(4);
 
 double gamma_inverse_compton_analytical_v2(double gamma_e, double E_gamma, double z,Structure_Output_Options * pt_Output_Options)
 {
+  /// Parameterization introduced in Petruk 2009 arXiv:0807.1969v2 [astro-ph].
+
     double T = T_0*(1+z);
     double eta_c = T*E_gamma/(m_e*m_e);
     double eta_0 = E_gamma*E_gamma/(4*gamma_e*m_e*(gamma_e*m_e-E_gamma));
@@ -119,6 +126,7 @@ double gamma_inverse_compton_analytical(double gamma_e,
                                         Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
                                         Structure_Output_Options * pt_Output_Options)
 {
+    ///Parameterization introduced in Zdziarski and Pjanka 201, arXiv:1307.6732v2 [astro-ph.HE].
     double A = 8*pi*pow(m_e/(2*pi),3);
     double T = T_0*(1+z);
     E_gamma /= m_e;
@@ -161,7 +169,7 @@ double gamma_inverse_compton_analytical(double gamma_e,
     // return sigma_T*T*T*E_gamma/(8*gamma_e*gamma_e);
     // cout << " x = " << x << endl;
     // cout << "f1 = " << f_1 << " f_0 = " << f_0 << " f_ln = " << f_ln << " f_minus_1 = " << f_minus_1 << endl;
-    result = 3*sigma_T*A/(4*gamma_e*gamma_e)*((1-2*E_gamma*E_n+2*log(E_n/theta))*E_n*theta*f_0+(1+2*E_gamma*E_n)*theta*theta*f_1-2*E_n*E_n*f_minus_1-2*E_n*E_n*f_minus_1-2*E_n*theta*f_ln);
+    result = 3*sigma_T*A/(4*gamma_e*gamma_e)*((1-2*E_gamma*E_n+2*log(E_n/theta))*E_n*theta*f_0+(1+2*E_gamma*E_n)*theta*theta*f_1-2*E_n*E_n*f_minus_1-2*E_n*E_n*f_minus_1-2*E_n*theta*f_ln)/m_e;
     if(result < 0) {
         result = 0;
     }
@@ -180,6 +188,8 @@ double gamma_inverse_compton_analytical(double gamma_e,
 
 double Analytical_form_inverse_compton(double E_e, double E_gamma_bar, Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters)
 {
+  /// Taken from Zdziarski 1988 ApJ 335:786-802. To be used with integrator_simpson_rate_inverse_compton.
+
     double gamma_e = E_e/m_e;
     E_gamma_bar =  E_gamma_bar/m_e;
     double s = 4*gamma_e*E_gamma_bar;
@@ -192,12 +202,12 @@ double Analytical_form_inverse_compton(double E_e, double E_gamma_bar, Structure
     }
     return 3*result/(2*s*s);
 }
-
 double integrator_simpson_rate_inverse_compton(double z,
         double E_e,
         Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
         Structure_Output_Options * pt_Output_Options)
 {
+  /// Taken from Zdziarski 1988 ApJ 335:786-802. To be used with Analytical_form_inverse_compton.
 
     double T=T_0*(1+z);
     double A = 8*pi*pow(m_e/(2*pi),3);
@@ -264,6 +274,7 @@ double integrator_simpson_rate_inverse_compton_v2(double z,
         Structure_Output_Options * pt_Output_Options)
 {
 
+  /// Taken from Zdziarski 1988 ApJ 335:786-802. Integrate the differential electron spectra to get the full scattering rate. Only for checking i) the integration algorithm ii) the analytical formula.
     double T=T_0*(1+z);
     double A = 8*pi*pow(m_e/(2*pi),3);
     double E_gamma_bb = 2.701*T;

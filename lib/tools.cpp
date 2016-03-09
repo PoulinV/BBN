@@ -289,6 +289,7 @@ void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parame
     pt_Spectrum_and_Precision_Parameters->compton_scattering = map_parameters["compton_scattering"];
     pt_Spectrum_and_Precision_Parameters->photon_photon_diffusion = map_parameters["photon_photon_diffusion"];
     pt_Spectrum_and_Precision_Parameters->check_energy_conservation = map_parameters["check_energy_conservation"];
+    pt_Spectrum_and_Precision_Parameters->ensure_energy_conservation = map_parameters["ensure_energy_conservation"];
     pt_Spectrum_and_Precision_Parameters->integration_method = map_parameters["integration_method"];
 
 
@@ -594,11 +595,11 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
       if(error_value=="yes") {
           cout << "The parameter " << name << "isn't reckognised Please check that it is one among : 'Dirac', 'none', 'from_file' or 'from_function'."<<endl;
       }
-    } else if(name == "check_energy_conservation") {
+    } else if(name == "check_energy_conservation" || name == "ensure_energy_conservation") {
         if(value == "yes" || value == "no") {
             error_value="no";
         } else {
-            cout << "check_energy_conservation : I couldn't understand your choice, please choose 'yes' if you want to take it into account and 'no' otherwise." <<endl;
+            cout << value << ": I couldn't understand your choice, please choose 'yes' if you want to take it into account and 'no' otherwise." <<endl;
         }
     } else if(name == "spectrum_mode") {
         if(value == "writing" || value == "nothing" || value == "reading") {
