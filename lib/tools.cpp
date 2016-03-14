@@ -290,6 +290,7 @@ void fill_structure_spectrum_and_precision_parameters(ifstream &file, map_parame
     pt_Spectrum_and_Precision_Parameters->photon_photon_diffusion = map_parameters["photon_photon_diffusion"];
     pt_Spectrum_and_Precision_Parameters->check_energy_conservation = map_parameters["check_energy_conservation"];
     pt_Spectrum_and_Precision_Parameters->ensure_energy_conservation = map_parameters["ensure_energy_conservation"];
+    pt_Spectrum_and_Precision_Parameters->switch_step_on = map_parameters["switch_step_on"];
     pt_Spectrum_and_Precision_Parameters->integration_method = map_parameters["integration_method"];
 
 
@@ -534,7 +535,7 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
             cout << "The task isn't reckognised, it has to be one among : 'compute_constraints_from_destruction_and_production', 'compute_constraints_from_destruction_only' and 'compute_cascade_spectrum'." << endl;
         }
     } else if(name == "task_test") {
-        if(value == "print_interaction_rate" || value == "print_polylog" || value == "print_func_kawmor" || value == "integrate_dsigma_compton" || value == "integrate_dsigma_phph" || value == "integrate_dsigma_pair_creation" || value == "integrate_dsigma_NPC") {
+        if(value == "print_interaction_rate" || value == "print_polylog" || value == "print_func_kawmor" || value == "integrate_dsigma_compton" || value == "integrate_dsigma_phph" || value == "integrate_dsigma_pair_creation" || value == "integrate_dsigma_NPC" || value == "integrate_dsigma_inverse_compton_electron_spectrum") {
             error_value = "no";
             error_name = "no";
 
@@ -567,9 +568,9 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
             error_name =  "no";
         }
     } else if(name == "n_step") {
-        if(atoi(value.c_str())>2000) {
+        if(atoi(value.c_str())>20000) {
             error_value = "yes";
-            cout << "The number n_step is too big. Please choose a number <= 2000." << endl;
+            cout << "The number n_step is too big. Please choose a number <= 20000." << endl;
         } else {
             error_value = "no";
             error_name =  "no";
@@ -595,7 +596,7 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
       if(error_value=="yes") {
           cout << "The parameter " << name << "isn't reckognised Please check that it is one among : 'Dirac', 'none', 'from_file' or 'from_function'."<<endl;
       }
-    } else if(name == "check_energy_conservation" || name == "ensure_energy_conservation") {
+    } else if(name == "check_energy_conservation" || name == "ensure_energy_conservation" || name == "switch_step_on") {
         if(value == "yes" || value == "no") {
             error_value="no";
         } else {

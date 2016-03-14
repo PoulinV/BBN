@@ -4,7 +4,8 @@
 #include "bbn/BBN_constraints.h"
 #include "bbn/tools.h"
 #include "bbn/test_functions.h"
-
+#include "bbn/electrons.h"
+#include "bbn/photons.h"
 using namespace std;
 
 
@@ -87,9 +88,9 @@ if(task == "print_func_kawmor"){
     }
     else redshift_d=atof(map_parameters["redshift"].c_str());
 
-    print_func_kawmor( redshift_d, atof(map_parameters["m_x"].c_str())/2., &Spectrum_and_Precision_Parameters);
+    print_func_kawmor( redshift_d, atof(map_parameters["m_x"].c_str())/2., &Spectrum_and_Precision_Parameters, &Output_Options);
 }
-if(task == "integrate_dsigma_compton" || task =="integrate_dsigma_phph" || task == "integrate_dsigma_pair_creation" || task == "integrate_dsigma_NPC"){
+if(task == "integrate_dsigma_compton" || task =="integrate_dsigma_phph" || task == "integrate_dsigma_pair_creation" || task == "integrate_dsigma_NPC" || task == "integrate_dsigma_inverse_compton_electron_spectrum"){
 
   string redshift = "redshift";
   double redshift_d, E_g;
@@ -103,21 +104,49 @@ if(task == "integrate_dsigma_compton" || task =="integrate_dsigma_phph" || task 
     else redshift_d=atof(map_parameters["redshift"].c_str());
     for(int i = (Spectrum_and_Precision_Parameters.Energy_Table_Size-1); i>=0 ; i--){
 
-    E_g = Spectrum_and_Precision_Parameters.E_min_table*pow((Particle_Physics_Model.E_0)/Spectrum_and_Precision_Parameters.E_min_table,(double) i/(Spectrum_and_Precision_Parameters.Energy_Table_Size-1));
+    E_g = Spectrum_and_Precision_Parameters.E_min_table*pow((Particle_Physics_Model.E_0/2)/Spectrum_and_Precision_Parameters.E_min_table,(double) i/(Spectrum_and_Precision_Parameters.Energy_Table_Size-1));
 
     if(task == "integrate_dsigma_compton"){
-        integrate_dsigma_compton(E_g/(m_e+2*E_g),E_g,redshift_d,&Spectrum_and_Precision_Parameters,&Output_Options);
+        integrate_dsigma_compton(E_g*m_e/(m_e+2*E_g),E_g,redshift_d,&Spectrum_and_Precision_Parameters,&Output_Options);
       }
     if(task == "integrate_dsigma_pair_creation"){
       integrate_dsigma_pair_creation(m_e,E_g,redshift_d,&Spectrum_and_Precision_Parameters,&Output_Options);
     }
     if(task == "integrate_dsigma_phph")integrate_dsigma_phph(E_g*pow(10,-3),E_g,redshift_d,&Spectrum_and_Precision_Parameters,&Output_Options);
-    if(task == "integrate_dsigma_NPC")integrate_dsigma_phph(E_g*pow(10,-3),E_g,redshift_d,&Spectrum_and_Precision_Parameters,&Output_Options);
-
+    if(task == "integrate_dsigma_NPC")integrate_dsigma_NPC(1,E_g,redshift_d,&Spectrum_and_Precision_Parameters,&Output_Options);
+    if(task == "integrate_dsigma_inverse_compton_electron_spectrum")integrate_dsigma_inverse_compton_electron_spectrum(m_e,E_g,redshift_d,&Spectrum_and_Precision_Parameters,&Output_Options);
+    // double v1 = dsigma_inverse_compton_electron_spectrum(redshift_d,
+    //         Particle_Physics_Model.E_0/m_e,
+    //         Particle_Physics_Model.E_0/m_e-E_g/m_e,
+    //         &Spectrum_and_Precision_Parameters,
+    //         &Output_Options);
+    // double v2 = gamma_inverse_compton_analytical(Particle_Physics_Model.E_0/m_e, E_g/m_e, redshift_d,3,&Spectrum_and_Precision_Parameters,
+    //         &Output_Options);
+    // cout << v1  << " "<< v2 << "ratio = " << v1/v2 <<endl;
     }
 
 }
-
+// if(task == "print_injected_spectrum"){
+//   struct Structure_Spectrum Injected_Spectrum;
+//   string redshift = "redshift";
+//   double E_g;
+//   string temperature = "temperature";
+//   if(argc==2)get_parameter_from_file(file_input,redshift);
+//   if(redshift=="default" && argc!=1){
+//       get_parameter_from_file(file_input,temperature);
+//       if(temperature!="default")Injected_Spectrum.redshift=atof(temperature.c_str())/T_0-1;
+//       else Injected_Spectrum.redshift=atof(map_parameters["redshift"].c_str());
+//     }
+//     else Injected_Spectrum.redshift=atof(map_parameters["redshift"].c_str());
+//     for(int i = (Spectrum_and_Precision_Parameters.Energy_Table_Size-1); i>=0 ; i--){
+//
+//     E_g = Spectrum_and_Precision_Parameters.E_min_table*pow((Particle_Physics_Model.E_0)/Spectrum_and_Precision_Parameters.E_min_table,(double) i/(Spectrum_and_Precision_Parameters.Energy_Table_Size-1));
+//     // pt_Spectrum_and_Precision_Parameters->Injec
+//
+//     }
+//
+//
+// }
 file_input.close();
 file_default.close();
 t2 = time(NULL);

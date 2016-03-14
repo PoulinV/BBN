@@ -133,7 +133,7 @@ double dsigma_pair_creation_v2(double z,
     int y=0;
 
     E_gamma_bb = 2.701*T_0*(1+z);
-    x_cmb_max = 10*E_gamma_bb/m_e;
+    x_cmb_max = 1000*E_gamma_bb/m_e;
     x_gamma = E_gamma/m_e;
     gamma_e = E_e/m_e;
     gamma_prime = x_gamma - gamma_e;
@@ -142,46 +142,47 @@ double dsigma_pair_creation_v2(double z,
     while(x_cmb_min>x_cmb_max) {
         x_cmb_max*=10.;
     }
-    dx = (x_cmb_max- x_cmb_min)/ (double) (pt_Spectrum_and_Precision_Parameters->n_step-1);
+    // dx = (x_cmb_max- x_cmb_min)/ (double) (pt_Spectrum_and_Precision_Parameters->n_step-1);
     // cout << "x_cmb_max "<< x_cmb_max << " x_cmb_min " << x_cmb_min <<" dx = " << dx << endl;
 
     // if(E_s > 1 ){
 
-    while(dx>x_cmb_min) {
-        dx/=10.;
-        y++;
-    }
-    h2 = dx/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
+    // while(dx>x_cmb_min) {
+    //     dx/=10.;
+    //     y++;
+    // }
+    // h2 = dx/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
 
-    // dlogx = (log(x_cmb_max)-log(x_cmb_min))/(pt_Spectrum_and_Precision_Parameters->n_step-1);
-    // h2 = dlogx/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
+    dlogx = (log(x_cmb_max)-log(x_cmb_min))/(pt_Spectrum_and_Precision_Parameters->n_step-1);
+    h2 = dlogx/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
 
 
-    precision = 1e-4;
+    // precision = 1e-4;
     for(int j=0; j<pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1; j++) {
         // cout << "pt_Spectrum_and_Precision_Parameters->eval_max = " << pt_Spectrum_and_Precision_Parameters->eval_max << " h2 " << h2 << endl;
         for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++) {
 
-            x[eval]=x_cmb_min+eval*h2+j*dx;
-            // x[eval]=exp(log(x_cmb_min)+eval*h2+j*dlogx);
+            // x[eval]=x_cmb_min+eval*h2+j*dx;
+            x[eval]=exp(log(x_cmb_min)+eval*h2+j*dlogx);
 
             if((exp(x[eval]/theta)-1)!=0.) {
                 f[eval]=integrand_dsigma_pair_creation_v2(x_gamma,gamma_e,x[eval])*x[eval]*x[eval]/(exp(x[eval]/theta)-1);
             } else {
                 f[eval] = 0;
             }
-            result += dx/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
-            // result += dlogx*x[eval]/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
-            // cout << "eval " << eval << "E = " << E[eval] << " weight = " << pt_Spectrum_and_Precision_Parameters->weight[eval] << " f[eval] = "<< f[eval] <<" result = " << result << endl;
+            // result += dx/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
+            if(isnan(f[eval])==1)f[eval]=0;
+            result += dlogx*x[eval]/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
+            // cout << "eval " << eval << "E = " << x[eval] << " weight = " << pt_Spectrum_and_Precision_Parameters->weight[eval] << " f[eval] = "<< f[eval] <<" result = " << result << endl;
         }
 
 
-        if(res_initial==0 && result !=0) {
-            res_initial = result;
-        }
-        if(res_initial!=0 && result/res_initial<precision) {
-            break;
-        }
+        // if(res_initial==0 && result !=0) {
+        //     res_initial = result;
+        // }
+        // if(res_initial!=0 && result/res_initial<precision) {
+        //     break;
+        // }
 
     }
     // }
@@ -190,7 +191,7 @@ double dsigma_pair_creation_v2(double z,
     if(pt_Output_Options->EM_cascade_verbose > 2) {
         cout << "(dsigma_pair_creation_v2 : )" <<" z " << z << " E_e "<< E_e << "E_gamma "<< E_gamma << " result "<<  result << endl;
     }
-    return 2*result/m_e; //We treat positron and electron on an equal footing, hence the factor 2.
+    return 2*result/(m_e*m_e); //We treat positron and electron on an equal footing, hence the factor 2.
 }
 
 double integrand_dsigma_pair_creation(double E_e, double E_gamma, double E_gamma_bar)
@@ -466,8 +467,11 @@ double rate_pair_creation_v2(double E_gamma, double z, Structure_Spectrum_and_Pr
     if(result < 0 ) {
         result = 0;
     }
-    // cout << "(rate_pair_creation_v2 : ) resultat = " << pow(r_e,2)*pow(m_e,4)/(pi*E_gamma*E_gamma)*result<< " energy = " << E_gamma << endl;
-    // return pow(r_e,2)*pow(m_e,4)/(pi*E_gamma*E_gamma)*result;
-    return 3*sigma_T*A*m_e/(8*E_gamma*E_gamma)*result;
+
+    result *=3*sigma_T*A*m_e/(8*E_gamma*E_gamma) ;
+    result /= m_e; // Conversion factor
+    // cout << "(rate_pair_creation_v2 : ) resultat = " << result<< " energy = " << E_gamma << endl;
+
+    return result;
     // return 3*sigma_T/(E_gamma)*result;
 }

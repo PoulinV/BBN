@@ -80,7 +80,8 @@ public:
     std::string check_energy_conservation;
     std::string ensure_energy_conservation;
     std::string integration_method;
-
+    std::string switch_step_on;
+    
     Spectrum Injected_Gamma_Spectrum;
     Spectrum Injected_Electron_Spectrum;
 
