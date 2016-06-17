@@ -11,7 +11,7 @@ using namespace std;
 
 /**
 * @brief The photons module :
-* Contains all processes udergone by the photon population.
+* Contains all processes undergone by the photon population.
 * @file photons.cpp
 */
 

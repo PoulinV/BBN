@@ -126,6 +126,33 @@ if(task == "integrate_dsigma_compton" || task =="integrate_dsigma_phph" || task 
     }
 
 }
+if(task == "check_energy_conservation_injected_spectrum"){
+  Structure_Spectrum Electron_Spectrum;
+  Structure_Spectrum Photon_Spectrum;
+  Electron_Spectrum.species = "electron";
+  Photon_Spectrum.species = "photon";
+  string redshift = "redshift";
+  double redshift_d;
+  string temperature = "temperature";
+  if(argc==2)get_parameter_from_file(file_input,redshift);
+  if(redshift=="default" && argc!=1){
+      get_parameter_from_file(file_input,temperature);
+      if(temperature!="default")redshift_d=atof(temperature.c_str())/T_0-1;
+      else redshift_d=atof(map_parameters["redshift"].c_str());
+    }
+    else redshift_d=atof(map_parameters["redshift"].c_str());
+
+  double integrale;
+  Cascade_Spectrum_Reading_From_File(redshift_d,&Particle_Physics_Model,&Electron_Spectrum,&Spectrum_and_Precision_Parameters);
+  Cascade_Spectrum_Reading_From_File(redshift_d,&Particle_Physics_Model,&Photon_Spectrum,&Spectrum_and_Precision_Parameters);
+  check_energy_conservation(&Particle_Physics_Model,&Spectrum_and_Precision_Parameters,&Output_Options,&Photon_Spectrum,&Electron_Spectrum,integrale);
+  if(Spectrum_and_Precision_Parameters.ensure_energy_conservation == "yes") {
+      for(int i = 0 ; i < Photon_Spectrum.Spectrum.size() ; i++) {
+          Photon_Spectrum.Spectrum[i]=Photon_Spectrum.Spectrum[i]*Particle_Physics_Model.E_0/integrale;
+      }
+      print_spectrum(&Output_Options,&Spectrum_and_Precision_Parameters, &Photon_Spectrum, &Particle_Physics_Model);
+  }
+}
 // if(task == "print_injected_spectrum"){
 //   struct Structure_Spectrum Injected_Spectrum;
 //   string redshift = "redshift";

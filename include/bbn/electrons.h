@@ -20,6 +20,11 @@ double dsigma_inverse_compton_electron_spectrum_v3(double z,
         double E_e_prime,
         Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
         Structure_Output_Options * pt_Output_Options);
+double dsigma_inverse_compton_electron_spectrum_v4(double z,
+        double E_e,
+        double E_e_prime,
+        Structure_Spectrum_and_Precision_Parameters * pt_Spectrum_and_Precision_Parameters,
+        Structure_Output_Options * pt_Output_Options);
 double gamma_inverse_compton_analytical(double gamma_e,
                                         double E_gamma,
                                         double z,

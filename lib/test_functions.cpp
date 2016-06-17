@@ -208,19 +208,20 @@ double integrate_dsigma_inverse_compton_electron_spectrum(double E_MIN,
     // cout << "here "<< dE << endl;
 
     for(int j=0; j<10*pt_Spectrum_and_Precision_Parameters->n_step-1; j++) {
-
+      // cout << j << endl;
         for(int eval=0; eval < pt_Spectrum_and_Precision_Parameters->eval_max; eval++) {
             gamma[eval]=exp(log(gamma_ini)+eval*h2+j*dlogGamma);
             if(j == 10*pt_Spectrum_and_Precision_Parameters->n_step-2 && eval == pt_Spectrum_and_Precision_Parameters->eval_max-1 ) f[eval]=0;
-            else f[eval]=dsigma_inverse_compton_electron_spectrum(z, gamma_max,  gamma[eval],  pt_Spectrum_and_Precision_Parameters, pt_Output_Options);
+            // else f[eval]=dsigma_inverse_compton_electron_spectrum_v3(z, gamma_max,  gamma[eval],  pt_Spectrum_and_Precision_Parameters, pt_Output_Options);
             // else f[eval]=gamma_inverse_compton_analytical_v2(gamma_max,gamma_max*m_e-gamma[eval]*m_e,z,pt_Output_Options)/(gamma_max*m_e-gamma[eval]*m_e);
+            else f[eval]=gamma_inverse_compton_analytical(gamma_max,gamma_max*m_e-gamma[eval]*m_e,z,3,pt_Spectrum_and_Precision_Parameters,pt_Output_Options);
 
             result += dlogGamma*gamma[eval]/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
 
         }
 
     }
-    // result*=m_e;
+    result*=m_e;
     cout << "(integrate_dsigma_inverse_compton_electron_spectrum: ) E_max = " << E_MAX << " result " << result << " ratio = " << rate_electron_inverse_compton(z,E_MAX,pt_Spectrum_and_Precision_Parameters,pt_Output_Options)/(result) << endl;
 
     return result;
@@ -344,10 +345,10 @@ double  print_func_kawmor(double  z, double  E_0, Structure_Spectrum_and_Precisi
     double  T = T_0*(1+z);
     for(int i = 0; i<pt_Spectrum_and_Precision_Parameters->Energy_Table_Size; i++) {
         x = pt_Spectrum_and_Precision_Parameters->E_min_table*pow(E_0/pt_Spectrum_and_Precision_Parameters->E_min_table,(double) i/(pt_Spectrum_and_Precision_Parameters->Energy_Table_Size-1));
-        if(x < E_x) {
-            f = E_0*N_low[h]*pow(T*pow(10.,-3),-3)*pow(x*pow(10.,-3),a_low[h])*pow(10.,-3);
-        } else if(x > E_x && x < E_c) {
-            f = E_0*N_pp[h]*pow(T*pow(10.,-3),-6)*pow(x*pow(10.,-3),a_pp[h])*pow(10.,-3);
+        if(x <= E_x) {
+            f = E_0*N_low[h]*pow(T*pow(10.,-3),-3)*pow(x*pow(10.,-3),a_low[h])*pow(10.,-4);
+        } else if(x > E_x && x <= E_c) {
+            f = E_0*N_pp[h]*pow(T*pow(10.,-3),-6)*pow(x*pow(10.,-3),a_pp[h])*pow(10.,-4);
         } else {
             f = 0;
         }
@@ -355,6 +356,60 @@ double  print_func_kawmor(double  z, double  E_0, Structure_Spectrum_and_Precisi
         file << x << "  " << f*1e-6 << endl;
         if(pt_Output_Options->Test_functions_verbose>1)cout << x << "  " << f*1e-6 << endl;
     }
+    if(pt_Spectrum_and_Precision_Parameters->check_energy_conservation == "yes"){
+      int end = pt_Spectrum_and_Precision_Parameters->n_step-1;
+      int end2 = pt_Spectrum_and_Precision_Parameters->eval_max;
+      double integrale;
+      double dlogE,k;
+      dlogE = (log(E_0)-log(pt_Spectrum_and_Precision_Parameters->E_min_table))/(pt_Spectrum_and_Precision_Parameters->n_step-1);
+      k = dlogE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
+      #pragma omp parallel for ordered schedule(dynamic)
+
+      for(int j=0; j<end; j++) {
+          // if(pt_Output_Options->Test_functions_verbose > 1) {
+          //     #pragma omp critical(print)
+          //     {
+          //         cout << " step j : " << j << " still " << pow(10,y)*pt_Spectrum_and_Precision_Parameters->n_step-1-j << " to go."<< endl;
+          //     }
+          // }
+          double E[end2],f[end2], rate_E;
+          double resultat_photons = 0;
+          // cout << "end2 = " << end2 << " h2 " << h2 << endl;
+          for(int eval=0; eval < end2; eval++) {
+              E[eval]=exp(log(pt_Spectrum_and_Precision_Parameters->E_min_table)+j*dlogE+eval*k);
+              if(E[eval] < E_x) {
+                  f[eval] = E_0*N_low[h]*pow(T*pow(10.,-3),-3)*pow(E[eval]*pow(10.,-3),a_low[h])*pow(10.,-4);
+              } else if(E[eval] > E_x && E[eval] < E_c) {
+                  f[eval] = E_0*N_pp[h]*pow(T*pow(10.,-3),-6)*pow(E[eval]*pow(10.,-3),a_pp[h])*pow(10.,-4);
+              } else {
+                  f[eval] = 0;
+              }
+
+              rate_E = rate_NPC(E[eval],z)+rate_compton(E[eval],z)+rate_gg_scattering(E[eval],z);
+              // rate_E = 1;
+              f[eval]*=rate_E*E[eval];
+              // f[eval]=universal_spectrum(E[eval],   z, pt_Particle_Physics_Model->E_0)*E[eval];
+              resultat_photons += dlogE*E[eval]/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
+              // resultat_photons += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
+
+          }
+
+          // if(res_initial==0 && resultat !=0)res_initial = resultat;
+          // if(res_initial!=0 && resultat/res_initial<precision)break;
+          // cout << E1 << " f1 " << f1 << " (exp(E1/T)-1) "  << (exp(E1/T)-1) << " f7 " << f7 << endl;
+
+          #pragma omp critical(dataupdate)
+          {
+              integrale += resultat_photons;
+          }
+          // 	cout << "Egamma = " << E_gamma << " E7 = " << E7 << " resultat = " << resultat<< " j = " << j << endl;
+      }
+                  cout << "At z = "<< z  << ", the total energy contained in Kawasaki and Moroi spectrum is " << integrale << " MeV, ";
+                  cout << "you had injected " << E_0 << "MeV.";
+    }
+
+
+
     file.close();
     return 0;
 }
@@ -385,7 +440,7 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
     double E_c = E_c_0/(1+z);
     double dE = (pt_Particle_Physics_Model->E_0 - pt_Spectrum_and_Precision_Parameters->E_min_table) / (double) (pt_Spectrum_and_Precision_Parameters->n_step - 1);
 
-    int y = 2;
+    int y = 0;
     double E_gamma_bb = 2.701*T_0*(1+z);
     double E_cmb_max = 10*E_gamma_bb;
     double E_cmb_min = E_gamma_bb/100.;
@@ -420,16 +475,6 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
                 double resultat_photons = 0;
                 // cout << "end2 = " << end2 << " h2 " << h2 << endl;
                 for(int eval=0; eval < end2; eval++) {
-                    // if(eval == 0) {
-                    //     if(j==0)	{
-                    //         E[eval]=pt_Spectrum_and_Precision_Parameters->E_min_table;
-                    //     } else {
-                    //         E[eval]=E[pt_Spectrum_and_Precision_Parameters->eval_max-1];
-                    //     }
-                    // } else {
-                    //     E[eval]=E[0]+eval*h;
-                    // }
-                    // E[eval]=pt_Spectrum_and_Precision_Parameters->E_min_table+j*dE+eval*h;
                     E[eval]=exp(log(pt_Spectrum_and_Precision_Parameters->E_min_table)+j*dlogE+eval*h);
 
                     if(E[eval]<pt_Particle_Physics_Model->E_0) {
@@ -495,12 +540,12 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
                     } else {
                         f[eval]=0;
                     }
-                    // rate_E = rate_NPC(E[eval],z)+rate_compton(E[eval],z)+rate_gg_scattering(E[eval],z);
-                    // if(pt_Spectrum_and_Precision_Parameters->double_photon_pair_creation=="yes" && E[eval] >= E_c) {
-                    //     rate_E+=rate_pair_creation_v2(E[eval],z,pt_Spectrum_and_Precision_Parameters);
-                    // }
+
+
+                    rate_E = compute_photons_rate(E[eval],z,pt_Spectrum_and_Precision_Parameters,pt_Output_Options);
                     // rate_E = 1;
-                    f[eval]*=E[eval];
+
+                    f[eval]*=E[eval]*rate_E;
                     resultat_photons += dlogE*E[eval]/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
                     // resultat_photons += dE/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*f[eval];
 
@@ -511,7 +556,9 @@ void check_energy_conservation(Structure_Particle_Physics_Model * pt_Particle_Ph
                     } else {
                         g[eval]=0;
                     }
-                    g[eval]*=E[eval];
+                    rate_E = compute_electrons_rate(E[eval],z,pt_Spectrum_and_Precision_Parameters,pt_Output_Options);
+                    // rate_E = 1 ;
+                    g[eval]*=E[eval]*rate_E;
                     // g[eval]*=E[eval]*(rate_electron_inverse_compton_v2(z,E_cmb_min,E_cmb_max,E[eval],pt_Spectrum_and_Precision_Parameters));
                     resultat_electrons += dlogE*E[eval]/pt_Spectrum_and_Precision_Parameters->divisor*pt_Spectrum_and_Precision_Parameters->weight[eval]*g[eval];
                     // #pragma omp critical(print)

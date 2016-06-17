@@ -66,13 +66,13 @@ void print_spectrum(Structure_Output_Options * pt_Output_Options,
     cout << "Printing in file " << name <<"."<<  endl;
 
     if(pt_Spectrum->species=="photon") {
-        while(i<pt_Spectrum_and_Precision_Parameters->Energy_Table_Size) {
+        while(i<pt_Spectrum->Spectrum.size()) {
             file << pt_Spectrum->Energy[i] << "   " << pt_Spectrum->Spectrum[i] << endl;
             i++;
         }
     }
     if(pt_Spectrum->species=="electron") {
-        while(i<pt_Spectrum_and_Precision_Parameters->Energy_Table_Size) {
+        while(i<pt_Spectrum->Spectrum.size()) {
             file << pt_Spectrum->Energy[i] << "   " << pt_Spectrum->Spectrum[i] << endl;
             i++;
         }
@@ -535,13 +535,12 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
             cout << "The task isn't reckognised, it has to be one among : 'compute_constraints_from_destruction_and_production', 'compute_constraints_from_destruction_only' and 'compute_cascade_spectrum'." << endl;
         }
     } else if(name == "task_test") {
-        if(value == "print_interaction_rate" || value == "print_polylog" || value == "print_func_kawmor" || value == "integrate_dsigma_compton" || value == "integrate_dsigma_phph" || value == "integrate_dsigma_pair_creation" || value == "integrate_dsigma_NPC" || value == "integrate_dsigma_inverse_compton_electron_spectrum") {
+        if(value == "print_interaction_rate" || value == "print_polylog" || value == "print_func_kawmor" || value == "integrate_dsigma_compton" || value == "integrate_dsigma_phph" || value == "integrate_dsigma_pair_creation" || value == "integrate_dsigma_NPC" || value == "integrate_dsigma_inverse_compton_electron_spectrum" || value == "check_energy_conservation_injected_spectrum") {
             error_value = "no";
             error_name = "no";
-
         } else {
             error_value = "yes";
-            cout << "The task_test isn't reckognised, it has to be one among : 'print_interaction_rate', 'print_polylog', 'print_func_kawmor', 'integrate_dsigma_compton', 'integrate_dsigma_phph', 'integrate_dsigma_pair_creation'." << endl;
+            cout << "The task_test isn't reckognised, it has to be one among : 'print_interaction_rate', 'print_polylog', 'print_func_kawmor', 'integrate_dsigma_compton', 'integrate_dsigma_phph', 'integrate_dsigma_pair_creation', 'check_energy_conservation_injected_spectrum'." << endl;
         }
     } else if(name == "number_iterations_photon") {
         if(atoi(value.c_str())>20) {
