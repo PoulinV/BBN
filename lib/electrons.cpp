@@ -27,35 +27,39 @@ double dsigma_inverse_compton_electron_spectrum(double z,
     double A = 8*pi*pow(m_e/(2*pi),3);
     double a, b;
     double r = 0.5*(gamma_e/gamma_prime + gamma_prime/gamma_e);
-    int N = 1000;
+    int N = 10000;
     double theta = T/m_e;
     double k = (gamma_e/gamma_prime-1)/(4*gamma_e*theta);
     double Eps_0 = 0, Eps_1 = 0;
     double result, LI2 = 0;
 
-    for(int i = 1; i <= N ; i++) {
-        // Eps_0 += exponential_integral(i*k,pt_Spectrum_and_Precision_Parameters);
-        // Eps_1 += exponential_integral(i*k,pt_Spectrum_and_Precision_Parameters)/i;
-        Eps_0 += expint(1,i*k);
-        Eps_1 += expint(1,i*k)/i;
+    if(gamma_e <= gamma_prime) result = 0;
+    else {
+      for(int i = 1; i <= N ; i++) {
+          // Eps_0 += exponential_integral(i*k,pt_Spectrum_and_Precision_Parameters);
+          // Eps_1 += exponential_integral(i*k,pt_Spectrum_and_Precision_Parameters)/i;
+          Eps_0 += expint(1,i*k);
+          Eps_1 += expint(1,i*k)/i;
+      }
+      // for(int i = 1 ; i <= 10*N; i++){
+      // 	LI2 += pow(exp(-k),i)/(i*i);
+      // }
+      //
+      // a = r*LI2;
+      a = r*polylog_2(exp(-k),pt_Spectrum_and_Precision_Parameters);
+      b = 2*k*(log(1-exp(-k))+k*Eps_0+Eps_1);
+      result = 3*sigma_T*A*theta*theta/(4*gamma_e*gamma_e)*(a-b);
+      if(result < 0) {
+          result = 0;
+      }
+      if(pt_Output_Options->EM_cascade_verbose > 2) {
+          cout << "(dsigma_inverse_compton_electron_spectrum : )" <<" z " << z << " gamma_e "<< gamma_e << "gamma_prime "<< gamma_prime << " result "<< result << endl;
+      }
+      // cout << " gamma_e " << gamma_e << " gamma_prime " << gamma_prime << " exp(-k) "<< exp(-k) << " Eps_0 " << Eps_0 << " Eps_1 " << Eps_1  << " result " << result << " a/r = " << a/r <<" LI2 = " << LI2<< " a " << a << " b = " << b << " 3*sigma_T*A*theta*theta/(4*gamma_e*gamma_e)" << 3*sigma_T*A*theta*theta/(4*gamma_e*gamma_e) << endl;
+      // cout << " gamma_e " << gamma_e << " gamma_prime " << gamma_prime << " exp(-k) "<< exp(-k) << " Eps_0 " << Eps_0 << " Eps_1 " << Eps_1  << " result " << result << " a/r = " << a/r <<" LI2 = " << LI2<< " a " << a << " b = " << b <<endl;
+      // result/=(m_e*m_e); //Conversion factor from m_e unit to MeV.
     }
-    for(int i = 1 ; i <= 10*N; i++){
-    	LI2 += pow(exp(-k),i)/(i*i);
-    }
-    //
-    // a = r*LI2;
-    a = r*polylog_2(exp(-k),pt_Spectrum_and_Precision_Parameters);
-    b = 2*k*(log(1-exp(-k))+k*Eps_0+Eps_1);
-    result = 3*sigma_T*A*theta*theta/(4*gamma_e*gamma_e)*(a-b);
-    // if(result < 0) {
-    //     result = 0;
-    // }
-    if(pt_Output_Options->EM_cascade_verbose > 2) {
-        cout << "(dsigma_inverse_compton_electron_spectrum : )" <<" z " << z << " gamma_e "<< gamma_e << "gamma_prime "<< gamma_prime << " result "<< result << endl;
-    }
-    if(gamma_e == gamma_prime || k < 1) result = 0;
-    // cout << " exp(-k) "<< exp(-k) << " Eps_0 " << Eps_0 << " Eps_1 " << Eps_1  << " result " << result << " a/r = " << a/r <<" LI2 = " << LI2<< " b = " << b <<endl;
-    result/=(m_e*m_e); //Conversion factor from m_e unit to MeV.
+
     return result;
 }
 
@@ -320,10 +324,10 @@ double rate_electron_inverse_compton(double z,
     //     dE/=10.;
     //     y++;
     // }
-    // cout << "(rate_electron_inverse_compton :) E_max "<< E_max << " E_ini " << E_ini <<" dE = " << dE << " y = " << y << endl;
     // h2 = dE/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
     dlogx = (log(x_max)-log(x_ini))/(pt_Spectrum_and_Precision_Parameters->n_step-1);
     h2 = dlogx/(pt_Spectrum_and_Precision_Parameters->eval_max-1);
+    // cout << "(rate_electron_inverse_compton :) log(x_max) "<< log(x_max) << " log(x_ini) " << log(x_ini) <<" dlogx = " << dlogx << " y = " << y << endl;
 
     // x[eval]=exp(log(x_cmb_min)+eval*h2+j*dlogx);
 
@@ -351,7 +355,7 @@ double rate_electron_inverse_compton(double z,
     }
 
     result*=sigma_T*A;
-    result/=(m_e);      //Conversion factor from unit m_e to unit MeV.
+    // result/=(m_e);      //Conversion factor from unit m_e to unit MeV.
     if(pt_Output_Options->EM_cascade_verbose > 2) {
         cout << "(rate_electron_inverse_compton : )" <<" z " << z << " E_e "<< E_e << " result "<<  result/(pi*pi) << endl;
     }

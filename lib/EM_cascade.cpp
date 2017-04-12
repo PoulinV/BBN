@@ -46,7 +46,6 @@ void Cascade_Spectrum_Reading_From_File(double z,
         if(pt_Spectrum_and_Precision_Parameters->electron_spectrum_file_name=="automatic") {
             os << "output/Cascade_Spectrum_Folder/Spectrum_"<<pt_Spectrum->spectrum_name<<"_m" << pt_Particle_Physics_Model->M_x<<"_z"<< z <<"_" << "triangular.dat";
         } else {
-            cout << "here"<<endl;
             os << pt_Spectrum_and_Precision_Parameters->electron_spectrum_file_name;
         }
         // cout  << pt_Spectrum_and_Precision_Parameters->electron_spectrum_file_name;
@@ -234,11 +233,8 @@ double compute_electrons_rate(double E,
 
 
  double Rate_electrons = rate_electron_inverse_compton(z,E,pt_Spectrum_and_Precision_Parameters,pt_Output_Options);
- // double Rate_electrons = integrate_dsigma_inverse_compton_electron_spectrum(m_e,
-                                      //  E,
-                                      // z,
-                                      //  pt_Spectrum_and_Precision_Parameters,
-                                      // pt_Output_Options);
+ // double Rate_electrons = integrate_dsigma_inverse_compton_electron_spectrum(m_e,E,z,pt_Spectrum_and_Precision_Parameters,pt_Output_Options);
+
 
  if(pt_Output_Options->EM_cascade_verbose > 1) {
      #pragma omp critical(print)

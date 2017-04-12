@@ -10,7 +10,7 @@ y1,y2 = np.loadtxt("spectre_kawasaki_moroi_z425643_m200000.dat",unpack=True)
 # #
 
 plt.figure()
-plt.axis([1,1e4,1e-4,50])
+#plt.axis([1,1e4,1e-4,50])
 plt.tick_params(axis='x',labelsize=16)
 plt.tick_params(axis='y',labelsize=16)
 # plt.axis([2,2000,-0.1,0.1])

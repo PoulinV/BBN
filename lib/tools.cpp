@@ -633,7 +633,7 @@ void check_value_and_name_error(string &name,string &error_name, string &value,s
             error_value = "yes";
             cout << "The code is not reliable for E < 1 MeV. Please change your minimal energy." << endl;
         }
-    } else if(name == "m_x") {
+    } else if(name == "m_x" || name == "M_x"){
         strtod(value.c_str(),&pEnd);
         if(*pEnd != '\0' || pEnd == value.c_str()) {
             error_value = "yes";
